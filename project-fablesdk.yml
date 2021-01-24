@@ -1,0 +1,307 @@
+
+targets:
+
+  # -- CORE --
+
+  FableSDKFoundation:
+    platform: iOS
+    info: 
+      path: FableSDK/Core/Foundation/Info.plist
+    templates:
+      - Module
+    sources: 
+      - path: FableSDK/Core/Foundation
+    dependencies:
+      - {embed: false, target: AppFoundation}
+      - {embed: false, target: ReactiveFoundation}
+      - {embed: false, target: NetworkFoundation}
+      - {embed: false, target: Interface}
+
+  FableSDKUIFoundation:
+    platform: iOS
+    info: 
+      path: FableSDK/Core/UIFoundation/Info.plist
+    templates:
+      - Module
+    sources: 
+      - path: FableSDK/Core/UIFoundation
+    dependencies:
+      - {embed: false, target: AppFoundation}
+      - {embed: false, target: ReactiveFoundation}
+      - {embed: false, target: AppUIFoundation}
+      - {embed: false, target: FableSDKFoundation}
+
+  # -- INTERFACE --
+
+  FableSDKInterface:
+    platform: iOS
+    info: 
+      path: FableSDK/Core/Foundation/Info.plist
+    templates:
+      - Module
+    sources: 
+      - path: FableSDK/Core/Interface
+    dependencies:
+      - {embed: false, target: AppFoundation}
+
+  FableSDKResolver:
+    platform: iOS
+    info: 
+      path: FableSDK/Core/Foundation/Info.plist
+    templates:
+
+      - Module
+    sources: 
+      - path: FableSDK/Core/Resolver
+    dependencies:
+      - {embed: false, target: AppFoundation}
+      - {embed: false, target: ReactiveFoundation}
+      - {embed: false, target: NetworkFoundation}
+      - {embed: false, target: Interface}
+      - {embed: false, target: FableSDKFoundation}
+      - {embed: false, target: FableSDKModelObjects}
+      - {embed: false, target: FableSDKErrorObjects}
+      - {embed: false, target: FableSDKResourceTargets}
+      - {embed: false, target: FableSDKModelManagers}
+
+  # -- VIEW --
+
+  FableSDKViews:
+    platform: iOS
+    info: 
+      path: FableSDK/Core/Foundation/Info.plist
+    templates:
+      - Module
+    sources: 
+      - path: FableSDK/View/Class
+    dependencies:
+      - {embed: false, target: SwiftPackage}
+      - {embed: false, target: AppFoundation}
+      - {embed: false, target: ReactiveFoundation}
+      - {embed: false, target: NetworkFoundation}
+      - {embed: false, target: FableSDKFoundation}
+      - {embed: false, target: FableSDKUIFoundation}
+      - {embed: false, target: FableSDKModelObjects}
+      - {embed: false, target: FableSDKViewInterfaces}
+      - {embed: false, target: FableSDKEnums}
+
+  FableSDKViewControllers:
+    platform: iOS
+    info: 
+      path: FableSDK/Core/Foundation/Info.plist
+    templates:
+      - Module
+    sources: 
+      - path: FableSDK/View/Controller
+    dependencies:
+      - {embed: false, target: SwiftPackage}
+      - {embed: false, target: AppFoundation}
+      - {embed: false, target: ReactiveFoundation}
+      - {embed: false, target: NetworkFoundation}
+      - {embed: false, target: Interface}
+      - {embed: false, target: FableSDKInterface}
+      - {embed: false, target: FableSDKResolver}
+      - {embed: false, target: FableSDKFoundation}
+      - {embed: false, target: FableSDKUIFoundation}
+      - {embed: false, target: FableSDKViews}
+      - {embed: false, target: FableSDKViewPresenters}
+      - {embed: false, target: FableSDKWireObjects}
+      - {embed: false, target: FableSDKModelObjects}
+      - {embed: false, target: FableSDKModelPresenters}
+      - {embed: false, target: FableSDKViewInterfaces}
+      - {embed: false, target: FableSDKEnums}
+      - {embed: false, target: FableSDKErrorObjects}
+
+  FableSDKViewPresenters:
+    platform: iOS
+    info: 
+      path: FableSDK/Core/Foundation/Info.plist
+    templates:
+      - Module
+    sources: 
+      - path: FableSDK/View/Presenter
+    dependencies:
+      - {embed: false, target: AppFoundation}
+      - {embed: false, target: ReactiveFoundation}
+      - {embed: false, target: NetworkFoundation}
+      - {embed: false, target: Interface}
+      - {embed: false, target: FableSDKFoundation}
+      - {embed: false, target: FableSDKUIFoundation}
+      - {embed: false, target: FableSDKInterface}
+      - {embed: false, target: FableSDKResolver}
+      - {embed: false, target: FableSDKModelObjects}
+      - {embed: false, target: FableSDKModelManagers}
+      - {embed: false, target: FableSDKModelPresenters}
+      - {embed: false, target: FableSDKViewInterfaces}
+      - {embed: false, target: FableSDKViews}
+      - {embed: false, target: FableSDKEnums}
+
+  FableSDKViewInterfaces:
+    platform: iOS
+    info: 
+      path: FableSDK/Core/Foundation/Info.plist
+    templates:
+      - Module
+    sources: 
+      - path: FableSDK/View/Interface
+    dependencies:
+      - {embed: false, target: AppFoundation}
+      - {embed: false, target: ReactiveFoundation}
+      - {embed: false, target: NetworkFoundation}
+      - {embed: false, target: FableSDKFoundation}
+      - {embed: false, target: FableSDKUIFoundation}
+      - {embed: false, target: FableSDKModelObjects}
+      - {embed: false, target: FableSDKEnums}
+
+  # -- MODEL --
+
+  FableSDKModelObjects:
+    platform: iOS
+    info: 
+      path: FableSDK/Core/Foundation/Info.plist
+    templates:
+      - Module
+    sources: 
+      - path: FableSDK/Model/Object
+    dependencies:
+      - {embed: false, target: AppFoundation}
+      - {embed: false, target: ReactiveFoundation}
+      - {embed: false, target: FableSDKFoundation}
+      - {embed: false, target: FableSDKUIFoundation}
+      - {embed: false, target: FableSDKEnums}
+    # preBuildScripts:
+    #   - path: bin/sourcery_build.sh
+    #     name: Build Sourcery Files
+      
+  FableSDKEnums:
+    platform: iOS
+    info: 
+      path: FableSDK/Core/Foundation/Info.plist
+    templates:
+      - Module
+    sources: 
+      - path: FableSDK/Model/Enum
+    dependencies:
+      - {embed: false, target: AppFoundation}
+      - {embed: false, target: ReactiveFoundation}
+      - {embed: false, target: FableSDKFoundation}
+      - {embed: false, target: FableSDKInterface}
+
+  FableSDKErrorObjects:
+    platform: iOS
+    info: 
+      path: FableSDK/Core/Foundation/Info.plist
+    templates:
+      - Module
+    sources: 
+      - path: FableSDK/Model/Error
+    dependencies:
+      - {embed: false, target: AppFoundation}
+      - {embed: false, target: ReactiveFoundation}
+      - {embed: false, target: NetworkFoundation}
+      - {embed: false, target: FableSDKFoundation}
+      - {embed: false, target: FableSDKWireObjects}
+
+  FableSDKModelManagers:
+    platform: iOS
+    info: 
+      path: FableSDK/Core/Foundation/Info.plist
+    templates:
+      - Module
+    sources: 
+      - path: FableSDK/Model/Manager
+    dependencies:
+      - {embed: false, target: AppFoundation}
+      - {embed: false, target: ReactiveFoundation}
+      - {embed: false, target: NetworkFoundation}
+      - {embed: false, target: Interface}
+      - {embed: false, target: FableSDKFoundation}
+      - {embed: false, target: FableSDKUIFoundation}
+      - {embed: false, target: FableSDKResourceManagers}
+      - {embed: false, target: FableSDKResourceTargets}
+      - {embed: false, target: FableSDKEnums}
+      - {embed: false, target: FableSDKErrorObjects}
+      - {embed: false, target: FableSDKModelObjects}
+      - {embed: false, target: FableSDKInterface}
+      - {embed: false, target: FableSDKWireObjects}
+
+  FableSDKModelPresenters:
+    platform: iOS
+    info: 
+      path: FableSDK/Core/Foundation/Info.plist
+    templates:
+      - Module
+    sources: 
+      - path: FableSDK/Model/Presenter
+    dependencies:
+      - {embed: false, target: AppFoundation}
+      - {embed: false, target: ReactiveFoundation}
+      - {embed: false, target: NetworkFoundation}
+      - {embed: false, target: Interface}
+      - {embed: false, target: FableSDKFoundation}
+      - {embed: false, target: FableSDKInterface}
+      - {embed: false, target: FableSDKResolver}
+      - {embed: false, target: FableSDKUIFoundation}
+      - {embed: false, target: FableSDKModelManagers}
+      - {embed: false, target: FableSDKResourceManagers}
+      - {embed: false, target: FableSDKResourceTargets}
+      - {embed: false, target: FableSDKEnums}
+      - {embed: false, target: FableSDKModelObjects}
+      - {embed: false, target: FableSDKErrorObjects}
+      - {embed: false, target: FableSDKWireObjects}
+
+  # -- Manager --
+
+  FableSDKResourceManagers:
+    platform: iOS
+    info:
+      path: FableSDK/Core/Foundation/Info.plist
+    templates:
+      - Module
+    sources:
+      - path: FableSDK/Wire/Resource/Manager
+    dependencies:
+      - {embed: false, target: AppFoundation}
+      - {embed: false, target: ReactiveFoundation}
+      - {embed: false, target: NetworkFoundation}
+      - {embed: false, target: Interface}
+      - {embed: false, target: FableSDKFoundation}
+      - {embed: false, target: FableSDKEnums}
+      - {embed: false, target: FableSDKWireObjects}
+
+  # -- NETWORK --
+
+  FableSDKResourceTargets:
+    platform: iOS
+    info: 
+      path: FableSDK/Core/Foundation/Info.plist
+    templates:
+      - Module
+    sources: 
+      - path: FableSDK/Wire/Resource/Target
+    dependencies:
+      - {embed: false, target: AppFoundation}
+      - {embed: false, target: ReactiveFoundation}
+      - {embed: false, target: NetworkFoundation}
+      - {embed: false, target: Interface}
+      - {embed: false, target: FableSDKFoundation}
+      - {embed: false, target: FableSDKEnums}
+      - {embed: false, target: FableSDKWireObjects}
+
+  FableSDKWireObjects:
+    platform: iOS
+    info: 
+      path: FableSDK/Core/Foundation/Info.plist
+    templates:
+      - Module
+    sources: 
+      - path: FableSDK/Wire/Object
+    dependencies:
+      - {embed: false, target: AppFoundation}
+      - {embed: false, target: NetworkFoundation}
+      - {embed: false, target: FableSDKEnums}
+      - {embed: false, target: FableSDKModelObjects}
+      - {embed: false, target: FableSDKInterface}
+    # preBuildScripts:
+    #   - path: bin/sourcery_build.sh
+    #     name: Build Sourcery Files

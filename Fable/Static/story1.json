@@ -1,0 +1,8 @@
+{
+  "story_id": "story1",
+  "chapter_ids": ["chapter1", "chapter2"],
+  "actor_ids": ["actor1", "actor2"],
+  "title": "STORY TITLE",
+  "description": "amazing story!",
+  "user_id": "user1"
+}

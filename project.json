@@ -1,0 +1,374 @@
+{
+  "include" : [
+    {
+      "path" : "project-config.yml"
+    },
+    {
+      "path" : "project-module.yml"
+    },
+    {
+      "path" : "project-fablesdk.yml"
+    },
+    {
+      "path" : "project-package.yml"
+    }
+  ],
+  "name" : "Fable",
+  "options" : {
+    "createIntermediateGroups" : true,
+    "groupSortPosition" : "top",
+    "indenthWidth" : 2,
+    "usesTabs" : false
+  },
+  "targets" : {
+    "Fable" : {
+      "dependencies" : [
+        {
+          "embed" : true,
+          "target" : "SwiftPackage"
+        },
+        {
+          "embed" : false,
+          "target" : "AppFoundation"
+        },
+        {
+          "embed" : false,
+          "target" : "ReactiveFoundation"
+        },
+        {
+          "embed" : false,
+          "target" : "NetworkFoundation"
+        },
+        {
+          "embed" : false,
+          "target" : "Interface"
+        },
+        {
+          "embed" : false,
+          "target" : "AppUIFoundation"
+        },
+        {
+          "embed" : false,
+          "target" : "FableSDKInterface"
+        },
+        {
+          "embed" : false,
+          "target" : "FableSDKFoundation"
+        },
+        {
+          "embed" : false,
+          "target" : "FableSDKUIFoundation"
+        },
+        {
+          "embed" : false,
+          "target" : "FableSDKResolver"
+        },
+        {
+          "embed" : false,
+          "target" : "FableSDKViews"
+        },
+        {
+          "embed" : false,
+          "target" : "FableSDKViewControllers"
+        },
+        {
+          "embed" : false,
+          "target" : "FableSDKViewPresenters"
+        },
+        {
+          "embed" : false,
+          "target" : "FableSDKViewInterfaces"
+        },
+        {
+          "embed" : false,
+          "target" : "FableSDKEnums"
+        },
+        {
+          "embed" : false,
+          "target" : "FableSDKModelObjects"
+        },
+        {
+          "embed" : false,
+          "target" : "FableSDKErrorObjects"
+        },
+        {
+          "embed" : false,
+          "target" : "FableSDKModelManagers"
+        },
+        {
+          "embed" : false,
+          "target" : "FableSDKModelPresenters"
+        },
+        {
+          "embed" : false,
+          "target" : "FableSDKResourceManagers"
+        },
+        {
+          "embed" : false,
+          "target" : "FableSDKResourceTargets"
+        },
+        {
+          "embed" : false,
+          "target" : "FableSDKWireObjects"
+        }
+      ],
+      "platform" : "iOS",
+      "postBuildScripts" : [
+        {
+          "inputFiles" : [
+            "${DWARF_DSYM_FOLDER_PATH}\/${DWARF_DSYM_FILE_NAME}\/Contents\/Resources\/DWARF\/${TARGET_NAME}",
+            "$(SRCROOT)\/$(BUILT_PRODUCTS_DIR)\/$(INFOPLIST_PATH)"
+          ],
+          "name" : "Crashlytics Run Script",
+          "runOnlyWhenInstalling" : "YES",
+          "script" : "\"${PODS_ROOT}\/FirebaseCrashlytics\/run\" -gsp Secrets\/${FABLE_IOS_ENV}\/GoogleService-Info.plist\n"
+        }
+      ],
+      "scheme" : {
+        "commandLineArguments" : {
+          "-FIRAnalyticsDebugEnabled" : "YES"
+        },
+        "environmentVariables" : {
+          "ALLOWABLE_LOG_LEVELS" : "info,error",
+          "ENV" : "dev",
+          "OS_ACTIVITY_MODE" : "disable"
+        },
+        "testTargets" : [
+          {
+            "name" : "FableTests",
+            "parallelizable" : true,
+            "randomExecutionOrder" : true
+          }
+        ]
+      },
+      "settings" : {
+        "base" : {
+          "CODE_SIGN_ENTITLEMENTS" : "Fable\/Fable.entitlements",
+          "EXECUTABLE_NAME" : "Fable",
+          "INFOPLIST_FILE" : "Fable\/Info.plist",
+          "PRODUCT_BUNDLE_IDENTIFIER" : "com.fable.stories",
+          "PRODUCT_NAME" : "Fable",
+          "TARGETED_DEVICE_FAMILY" : 1
+        },
+        "configs" : {
+          "Debug" : {
+            "DEBUG_INFORMATION_FORMAT" : "dwarf",
+            "OTHER_LDFLAGS" : [
+              "$(inherited)",
+              "-fprofile-instr-generate"
+            ],
+            "OTHER_SWIFT_FLAGS" : [
+              "$(inherited)",
+              "-Onone",
+              "-Xfrontend -warn-long-function-bodies=300",
+              "-Xfrontend -warn-long-expression-type-checking=300"
+            ],
+            "SWIFT_OPTIMIZATION_LEVEL" : "-Onone"
+          },
+          "Release" : {
+            "DEBUG_INFORMATION_FORMAT" : "dwarf-with-dsym",
+            "SWIFT_OPTIMIZATION_LEVEL" : "-Owholemodule"
+          }
+        }
+      },
+      "sources" : [
+        {
+          "path" : "Fable"
+        },
+        {
+          "buildPhase" : {
+            "copyFiles" : {
+              "destination" : "resources"
+            }
+          },
+          "createIntermediateGroups" : false,
+          "group" : "Fable",
+          "path" : "Secrets\/${FABLE_IOS_ENV}\/GoogleService-Info.plist"
+        }
+      ],
+      "templates" : [
+        "Application"
+      ],
+      "type" : "application"
+    },
+    "FableTests" : {
+      "dependencies" : [
+        {
+          "target" : "Fable"
+        }
+      ],
+      "platform" : "iOS",
+      "preBuildScripts" : [
+        {
+          "name" : "Load secrets for tests from disk",
+          "path" : "bin\/loadTestCredentials.sh"
+        }
+      ],
+      "scheme" : {
+        "disableMainThreadChecker" : true,
+        "environmentVariables" : {
+          "ALLOWABLE_LOG_LEVELS" : "info,error",
+          "ENV" : "stage",
+          "OS_ACTIVITY_MODE" : "disable"
+        },
+        "gatherCoverageData" : true,
+        "parallelizable" : true
+      },
+      "settings" : {
+        "base" : {
+          "CODE_SIGN_IDENTITY" : "iPhone Developer",
+          "DEVELOPMENT_TEAM" : "2NC533SE3E",
+          "PRODUCT_BUNDLE_IDENTIFIER" : "com.fable.tests.stories",
+          "PRODUCT_NAME" : "FableTests"
+        }
+      },
+      "sources" : [
+        "FableTests"
+      ],
+      "type" : "bundle.unit-test"
+    },
+    "ShellApp" : {
+      "dependencies" : [
+        {
+          "embed" : true,
+          "target" : "SwiftPackage"
+        },
+        {
+          "embed" : false,
+          "target" : "AppFoundation"
+        },
+        {
+          "embed" : false,
+          "target" : "ReactiveFoundation"
+        },
+        {
+          "embed" : false,
+          "target" : "NetworkFoundation"
+        },
+        {
+          "embed" : false,
+          "target" : "Interface"
+        },
+        {
+          "embed" : false,
+          "target" : "AppUIFoundation"
+        },
+        {
+          "embed" : false,
+          "target" : "FableSDKInterface"
+        },
+        {
+          "embed" : false,
+          "target" : "FableSDKFoundation"
+        },
+        {
+          "embed" : false,
+          "target" : "FableSDKUIFoundation"
+        },
+        {
+          "embed" : false,
+          "target" : "FableSDKViews"
+        },
+        {
+          "embed" : false,
+          "target" : "FableSDKViewControllers"
+        },
+        {
+          "embed" : false,
+          "target" : "FableSDKViewPresenters"
+        },
+        {
+          "embed" : false,
+          "target" : "FableSDKViewInterfaces"
+        },
+        {
+          "embed" : false,
+          "target" : "FableSDKResolver"
+        },
+        {
+          "embed" : false,
+          "target" : "FableSDKEnums"
+        },
+        {
+          "embed" : false,
+          "target" : "FableSDKModelObjects"
+        },
+        {
+          "embed" : false,
+          "target" : "FableSDKErrorObjects"
+        },
+        {
+          "embed" : false,
+          "target" : "FableSDKModelManagers"
+        },
+        {
+          "embed" : false,
+          "target" : "FableSDKModelPresenters"
+        },
+        {
+          "embed" : false,
+          "target" : "FableSDKResourceManagers"
+        },
+        {
+          "embed" : false,
+          "target" : "FableSDKResourceTargets"
+        },
+        {
+          "embed" : false,
+          "target" : "FableSDKWireObjects"
+        }
+      ],
+      "platform" : "iOS",
+      "scheme" : {
+        "environmentVariables" : {
+          "access_token" : "",
+          "allowable_log_levels" : "info,error",
+          "ALLOWABLE_LOG_LEVELS" : "info,error",
+          "env" : "stage",
+          "ENV" : "stage",
+          "OS_ACTIVITY_MODE" : "disable",
+          "user_id" : 1
+        }
+      },
+      "settings" : {
+        "base" : {
+          "CODE_SIGN_ENTITLEMENTS" : "App\/ShellApp\/Fable.entitlements",
+          "EXECUTABLE_NAME" : "ShellApp",
+          "INFOPLIST_FILE" : "App\/ShellApp\/Info.plist",
+          "PRODUCT_BUNDLE_IDENTIFIER" : "com.shellapp",
+          "PRODUCT_NAME" : "ShellApp",
+          "TARGETED_DEVICE_FAMILY" : 1
+        },
+        "configs" : {
+          "Debug" : {
+            "DEBUG_INFORMATION_FORMAT" : "dwarf",
+            "OTHER_LDFLAGS" : [
+              "$(inherited)",
+              "-fprofile-instr-generate"
+            ],
+            "OTHER_SWIFT_FLAGS" : [
+              "$(inherited)",
+              "-Onone",
+              "-Xfrontend -warn-long-function-bodies=300",
+              "-Xfrontend -warn-long-expression-type-checking=300"
+            ],
+            "SWIFT_OPTIMIZATION_LEVEL" : "-Onone"
+          },
+          "Release" : {
+            "DEBUG_INFORMATION_FORMAT" : "dwarf-with-dsym",
+            "SWIFT_OPTIMIZATION_LEVEL" : "-Owholemodule"
+          }
+        }
+      },
+      "sources" : [
+        {
+          "path" : "App\/ShellApp"
+        }
+      ],
+      "templates" : [
+        "Application"
+      ],
+      "type" : "application"
+    }
+  }
+}

@@ -1,0 +1,16 @@
+
+# Core 
+# github "Alamofire/Alamofire" == 5.0.0
+# github "ReactiveCocoa/ReactiveSwift" == 6.1.0
+# github "ReactiveCocoa/ReactiveCocoa" == 10.1.0
+# github "SnapKit/SnapKit" == 5.0.1
+# github "onevcat/Kingfisher" == 5.7.1
+
+# Realm
+# github "realm/realm-cocoa" == 3.20.0
+
+# Firebase
+# https://github.com/firebase/firebase-ios-sdk/blob/master/Carthage.md
+# binary "https://dl.google.com/dl/firebase/ios/carthage/FirebaseAnalyticsBinary.json"
+# binary "https://dl.google.com/dl/firebase/ios/carthage/FirebaseAuthBinary.json"
+# binary "https://dl.google.com/dl/firebase/ios/carthage/FirebaseFirestoreBinary.json"

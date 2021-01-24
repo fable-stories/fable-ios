@@ -1,0 +1,14 @@
+{
+  "chapter_id": "chapter1",
+  "message_ids": [
+    "message1",
+    "message2",
+    "message3",
+    "message4",
+    "message5",
+    "message6"
+  ],
+  "tag_ids": [],
+  "title": "Chapter Title 1",
+  "description": "This is a cool chapter"
+}

@@ -1,0 +1,127 @@
+{
+  "storyId": "story1",
+  "userId": "user1",
+  "chapters": [
+    {
+      "chapterId": "chapter1",
+      "title": "The Journey Begins!",
+      "index": 0,
+      "messageGroups": [
+        {
+          "messageGroupId": "mc1",
+          "title": "Harry started playing",
+          "index": 0,
+          "createdAt": "2019-10-11T23:32:41+0000",
+          "messages": [
+            {
+              "messageId": "m1",
+              "index": 0,
+              "text": "Hello, World!"
+            },
+            {
+              "messageId": "m2",
+              "index": 1,
+              "text": "Hello, World! 2",
+              "modifiers": [
+                {
+                  "modifierId": "charMod1",
+                  "modifierKind": "character",
+                  "characterId": "char1",
+                  "name": "Andrew",
+                  "colorHexString": "#BFA4BD"
+                }
+              ]
+            },
+            {
+              "messageId": "m2",
+              "index": 1,
+              "modifiers": [
+                {
+                  "modifierId": "choiceMod1",
+                  "modifierKind": "choiceGroup",
+                  "choices": [
+                    {
+                      "choiceId": "choice1a",
+                      "choiceText": "No, thanks I think we should stay.",
+                      "targetMessageGroupId": "mc2"
+                    },
+                    {
+                      "choiceId": "choice1b",
+                      "choiceText": "Yes, let's move out.",
+                      "targetMessageGroupId": "mc3"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "messageGroupId": "mc2",
+          "title": "The team goes out into the Abyss",
+          "index": 1,
+          "createdAt": "2019-10-11T23:32:41+0000",
+          "messages": [
+            {
+              "messageId": "m3",
+              "index": 1,
+              "text": "Hello, World! 3"
+            },
+            {
+              "messageId": "m1c",
+              "index": 1,
+              "modifiers": [
+                {
+                  "modifierId": "choiceMod1b",
+                  "modifierKind": "choiceGroup",
+                  "choices": [
+                    {
+                      "choiceId": "choice2a",
+                      "choiceText": "Let's go left.",
+                      "targetMessageGroupId": ""
+                    },
+                    {
+                      "choiceId": "choice2b",
+                      "choiceText": "Let's go right.",
+                      "targetMessageGroupId": ""
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "messageGroupId": "mc3",
+          "title": "They finally face the legendary swordsman!",
+          "index": 1,
+          "createdAt": "2019-10-11T23:32:41+0000",
+          "messages": [
+            {
+              "messageId": "m1c",
+              "index": 2,
+              "modifiers": [
+                {
+                  "modifierId": "choiceMod1c",
+                  "modifierKind": "choiceGroup",
+                  "choices": [
+                    {
+                      "choiceId": "choice3a",
+                      "choiceText": "Let's fight the guy.",
+                      "targetMessageGroupId": ""
+                    },
+                    {
+                      "choiceId": "choice3b",
+                      "choiceText": "Flee!!",
+                      "targetMessageGroupId": ""
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

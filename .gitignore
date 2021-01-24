@@ -1,0 +1,48 @@
+
+.DS_Store
+
+# ENV
+/Secrets
+.env*
+
+# Projects
+.vscode
+*.xcodeproj/
+*.xcworkspace/
+
+# Carthage
+Carthage/
+
+# CocoaPods
+Pods/
+
+Rome/
+RomeDebug/
+RomeRelease/
+
+# Temp
+build/
+
+# XCodegen
+.xcodegen-firebase.yml
+.xcodegen-pods.yml
+
+# VSCode
+.idea
+
+# JetBrains
+.idea
+
+# Bitrise
+.bitrise.secrets.yml
+bitrise_template.yml
+
+# Secrets
+resources/TestCredentials.plist
+
+# Ruby
+/.vendor
+
+# Fastlane
+Fastlane/
+/GoogleService-Info.plist

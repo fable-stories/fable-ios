@@ -1,0 +1,56 @@
+//
+//  EventManager.swift
+//  FableSDKInterface
+//
+//  Created by Andrew Aquino on 1/15/20.
+//
+
+import AppFoundation
+import FableSDKFoundation
+import FableSDKErrorObjects
+import Foundation
+import ReactiveSwift
+import Combine
+
+public struct EventIdentifier: Equatable {
+  public let identifier: String
+  public init(_ identifier: String) {
+    self.identifier = identifier
+  }
+}
+
+public enum EventKind: Equatable {
+  case onError(Error)
+  case onUpdate(EventIdentifier = EventIdentifier("NOOP"))
+
+  public static func == (lhs: EventKind, rhs: EventKind) -> Bool {
+    switch (lhs, rhs) {
+    case let (.onError(lhsError), .onError(rhsError)):
+      return lhsError.localizedDescription == rhsError.localizedDescription
+    case let (.onUpdate(lhsEventIdentifier), .onUpdate(rhsEventIdentifier)):
+      return lhsEventIdentifier == rhsEventIdentifier
+    default:
+      return false
+    }
+  }
+}
+
+public struct EventSource: Equatable {
+  public let source: String
+  public init(_ source: String) {
+    self.source = source
+  }
+}
+
+
+public class EventManager {
+  private let _onEvent = PassthroughSubject<EventContext, Exception>()
+  public private(set) lazy var onEvent = _onEvent.eraseToAnyPublisher()
+
+  public init() {}
+
+  public func sendEvent(_ event: EventContext) {
+    print(event)
+    _onEvent.send(event)
+  }
+}
