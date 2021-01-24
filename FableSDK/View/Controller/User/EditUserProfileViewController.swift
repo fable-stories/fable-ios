@@ -24,6 +24,7 @@ public class EditUserProfileViewController: UIViewController {
   private let resourceManager: ResourceManager
   private let userManager: UserManager
   private let stateManager: StateManager
+  private let authManager: AuthManager
 
   public init(
     resolver: FBSDKResolver
@@ -32,6 +33,7 @@ public class EditUserProfileViewController: UIViewController {
     self.resourceManager = resolver.get()
     self.userManager = resolver.get()
     self.stateManager = resolver.get()
+    self.authManager = resolver.get()
     super.init(nibName: nil, bundle: nil)
   }
 
@@ -186,7 +188,7 @@ public class EditUserProfileViewController: UIViewController {
 
   private func setProfileImage(image: UIImage) {
     guard
-      let userId = userManager.currentUser?.userId,
+      let userId = authManager.authenticatedUserId,
       let data = image.pngData()
       else { return }
     resourceManager.uploadAsset(

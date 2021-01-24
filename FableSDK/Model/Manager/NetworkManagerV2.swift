@@ -32,46 +32,9 @@ public class NetworkManagerV2Impl: NetworkManagerV2 {
   public func networkCore<T>(networkEnvironment forResourceTarget: T) -> NetworkEnvironment where T: ResourceTargetProtocol {
     let environment = environmentManager.environment
     let authState = environmentManager.authState
-    return FableNetworkEnvironment(
+    return FableNetworkEnvironment.generateEnvironment(
       environment: environment,
-      scheme: {
-        switch environment {
-        case .local: return "http"
-        case .dev, .stage, .prod: return "https"
-        case .proxy(let url): return url.toURL()?.scheme ?? ""
-        }
-      }(),
-      host: {
-        switch environment {
-        case .local: return "localhost"
-        case .dev: return "fable-dev-api-qbl24wgkba-uw.a.run.app"
-        case .stage: return "app-api-deployable-zrcyfwwylq-uc.a.run.app"
-        case .prod: return "app-api-deployable-m24edid2pa-uc.a.run.app"
-        case .proxy(let url): return url.toURL()?.host ?? ""
-        }
-      }(),
-      port: {
-        switch environment {
-        case .local: return 8080
-        case .dev, .stage, .prod: return nil
-        case .proxy(let url): return url.toURL()?.port
-        }
-      }(),
-      path: {
-        switch environment {
-        case .local: return ""
-        case .dev, .stage, .prod: return ""
-        case .proxy(let url): return url.toURL()?.path ?? ""
-        }
-      }(),
-      headers: [
-        "Application-Platform": "ios",
-        "Application-Environment": environment.description,
-        "Application-Version": AppBuildSource.appVersion(),
-        "Application-Build": AppBuildSource.appBuild(),
-        "Application-API-Key": nil,
-        "Authorization": authState.flatMap({ "Bearer \($0.accessToken)" }),
-      ].compactMapValues { $0 }
+      authState: authState
     )
   }
 }
