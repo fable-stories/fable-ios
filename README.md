@@ -28,14 +28,13 @@ cd ~ && git clone git@github.com:DrewKiino/XcodeGenCLI.git && cd XcodeGenCLI && 
 We use Carthage and Cocoapods for dependency management. You have to install the frameworks first, the current Carthage release doesn't support
 `.xcframeworks` but the `master` branch does so you will have to clone the Carthage master branch first and then building it's CLI manaully.
 Don't worry, now you get access to `.xcframeworks` :)
-
-Build the Carthage frameworks
-```bash
-sh bin/carhage_update.sh
-```
-
 ```bash
 cd ~ && git clone https://github.com/Carthage/Carthage.git && cd Carthage && make install
+```
+
+Then build the Carthage frameworks
+```bash
+sh bin/carhage_update.sh
 ```
 
 ## Build the project
