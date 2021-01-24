@@ -46,3 +46,4 @@ resources/TestCredentials.plist
 # Fastlane
 /GoogleService-Info.plist
 /Artifacts
+/Fastlane/report.xml

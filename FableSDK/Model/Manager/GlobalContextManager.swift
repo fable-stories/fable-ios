@@ -49,8 +49,6 @@ public class GlobalContextManager {
     (self.onUpdate, self.onUpdateObserver) = Signal<Void, Never>.pipe()
     if let envString = envString("env") {
       setEnvironment(Environment(rawValue: envString))
-    } else {
-      setEnvironment(Environment.stage)
     }
   }
 
