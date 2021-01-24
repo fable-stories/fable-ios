@@ -44,5 +44,5 @@ resources/TestCredentials.plist
 /.vendor
 
 # Fastlane
-Fastlane/
 /GoogleService-Info.plist
+/Artifacts

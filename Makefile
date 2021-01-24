@@ -4,6 +4,9 @@
 all:
 	@make build
 
+deploy-beta:
+	bundle exec fastlane beta --env fastlane
+
 prod:
 	@sh bin/generate.sh Prod
 	@pod install 

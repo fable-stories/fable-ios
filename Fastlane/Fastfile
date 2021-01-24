@@ -1,0 +1,250 @@
+# This file contains the fastlane.tools configuration
+# You can find the documentation at https://docs.fastlane.tools
+#
+# For a list of all available actions, check out
+#
+#     https://docs.fastlane.tools/actions
+#
+# For a list of all available plugins, check out
+#
+#     https://docs.fastlane.tools/plugins/available-plugins
+#
+
+# Uncomment the line if you want fastlane to automatically update itself
+
+default_platform(:ios)
+
+platform :ios do
+
+  lane :codesign do
+    api_key = app_store_connect_api_key(
+      key_id: ENV["APPLE_KEY_ID"],
+      issuer_id: ENV["APPLE_ISSUER_ID"],
+      key_content: ENV["APPLE_KEY_CONTENT"],
+      in_house: false
+    )
+    match(
+      type: "development",
+      app_identifier: ENV["APP_IDENTIFIER"],
+      api_key: api_key
+    )
+    match(
+      type: "adhoc",
+      app_identifier: ENV["APP_IDENTIFIER"],
+      api_key: api_key
+    )
+    match(
+      type: "appstore",
+      app_identifier: ENV["APP_IDENTIFIER"],
+      api_key: api_key
+    )
+  end
+
+  desc "Increment the latest TestFlight build number fo the given Version."
+  lane :increment_build do
+    api_key = app_store_connect_api_key(
+      key_id: ENV["APPLE_KEY_ID"],
+      issuer_id: ENV["APPLE_ISSUER_ID"],
+      key_content: ENV["APPLE_KEY_CONTENT"],
+      in_house: false
+    )
+    _increment_build(
+      api_key: api_key
+    )
+  end
+
+  lane :_increment_build do |options|
+      api_key = options[:api_key]
+      version_string = get_info_plist_value(
+        path: options[:plist_path],
+        key: "CFBundleShortVersionString"
+      )
+      build_number = get_info_plist_value(
+        path: options[:plist_path],
+        key: "CFBundleVersion"
+      ).to_i
+      # build_number = latest_testflight_build_number(
+      #   version: version_string,
+      #   api_key: api_key,
+      #   app_identifier: options[:app_identifier],
+      #   initial_build_number: 0
+      # )
+      new_build_number = (build_number + 1).to_s
+      set_info_plist_value(
+        path: options[:plist_path],
+        key: "CFBundleVersion",
+        value: new_build_number
+      )
+      ENV[options[:build_string_env_key]] = new_build_number
+  end
+
+  lane :patch_version do |options|
+    increment_version_number_in_plist(
+      bump_type: 'patch', 
+      version_source: 'appstore',
+      scheme: options[:scheme]
+    )
+    version_string = get_info_plist_value(
+      path: options[:plist_path],
+      key: "CFBundleShortVersionString"
+    )
+    ENV[options[:version_string_env_key]] = version_string
+  end
+
+  desc "Simple build for the Fable scheme."
+  lane :build do
+    # https://docs.fastlane.tools/actions/build_app/
+    build_app(
+      workspace: "Fable.xcworkspace",
+      scheme: "Fable",
+      configuration: "Debug",
+      clean: false,
+      skip_archive: true,
+      skip_codesigning: true,
+      skip_package_ipa: true,
+      analyze_build_time: true,
+    )
+  end
+
+  desc "Run tests and then Build!"
+  lane :test_and_build do
+    run_tests(
+      workspace: "Fable.xcworkspace",
+      scheme: "SSDKManagers_iOS",
+    )
+    run_tests(
+      workspace: "Fable.xcworkspace",
+      scheme: "SSDKUiModels_iOS",
+    )
+    run_tests(
+      workspace: "Fable.xcworkspace",
+      scheme: "SSDKViewModels_iOS",
+    )
+    run_tests(
+      workspace: "Fable.xcworkspace",
+      scheme: "SSDKViews_iOS",
+    )
+    build
+  end
+
+  desc "Build the Fable app for Firebase Distribution."
+  lane :beta do
+    # http://docs.fastlane.tools/actions/app_store_connect_api_key/#app_store_connect_api_key
+    api_key = app_store_connect_api_key(
+      key_id: ENV["APPLE_KEY_ID"],
+      issuer_id: ENV["APPLE_ISSUER_ID"],
+      key_content: ENV["APPLE_KEY_CONTENT"],
+      in_house: false
+    )
+    # http://docs.fastlane.tools/actions/latest_testflight_build_number/#latest_testflight_build_number
+    _increment_build(
+      api_key: api_key,
+      scheme: "Fable", 
+      plist_path: "./Fable/Info.plist",
+      app_identifier: ENV["APP_IDENTIFIER"],
+      build_string_env_key: "FASTLANE_LATEST_BETA_BUILD"
+    )
+    # https://docs.fastlane.tools/actions/match/#match
+    match(
+      type: "adhoc",
+      app_identifier: ENV["APP_IDENTIFIER"],
+    )
+    # http://docs.fastlane.tools/actions/update_code_signing_settings/#update_code_signing_settings
+    update_code_signing_settings(
+      path: "./Fable.xcodeproj",
+      targets: "Fable",
+      build_configurations: "Release",
+      profile_name: "match AdHoc com.fable.stories",
+      code_sign_identity: "Apple Distribution: Andrew Aquino (2NC533SE3E)",
+      use_automatic_signing: false,
+    )
+    # https://docs.fastlane.tools/actions/build_app/
+    # https://stackoverflow.com/questions/2697067/symbolicate-adhoc-iphone-app-crashes
+    build_app(
+      workspace: "Fable.xcworkspace",
+      scheme: "Fable",
+      configuration: "Release",
+      export_method: "ad-hoc",
+      export_team_id: ENV["FASTLANE_TEAM_ID"],
+      export_xcargs: "-allowProvisioningUpdates",
+      output_directory: "./Artifacts/",
+      output_name: "Fable.ipa",
+      clean: false,
+      skip_archive: false,
+      skip_codesigning: true,
+      skip_package_ipa: false,
+      include_symbols: true,
+      include_bitcode: false,
+      analyze_build_time: true,
+    )
+    deploy_beta(
+      release_notes: options[:release_notes]
+    )
+  end
+
+  lane :deploy_beta do |options|
+    firebase_app_distribution(
+      app: ENV["FIREBASE_APP_ID"],
+      service_credentials_file: ENV["FIREBASE_SA_KEY_FILE"],
+      ipa_path: "./Artifacts/Fable.ipa",
+      groups_file: "./Fastlane/groups.txt",
+      release_notes: options[:release_notes] || "Bug fixes and performance updates.",
+    )
+  end
+
+  desc "Archive the Fable app for TestFlight Distribution."
+  lane :release do |options|
+    api_key = app_store_connect_api_key(
+      key_id: ENV["APPLE_KEY_ID"],
+      issuer_id: ENV["APPLE_ISSUER_ID"],
+      key_content: ENV["APPLE_KEY_CONTENT"],
+      in_house: false
+    )
+    patch_version(
+      scheme: "Fable", 
+      plist_path: "./Fable/Info.plist",
+      version_string_env_key: "FASTLANE_LATEST_DEPLOY_VERSION"
+    )
+    match(
+      type: "appstore",
+      git_bearer_authorization: ENV['MATCH_GIT_BEARER_AUTHORIZATION'],
+      force_for_new_devices: false
+    )
+    # http://docs.fastlane.tools/actions/update_code_signing_settings/#update_code_signing_settings
+    update_code_signing_settings(
+      path: "./Fable.xcodeproj",
+      targets: "Fable",
+      build_configurations: "Release",
+      profile_name: "match AppStore com.fable.stories",
+      code_sign_identity: "",
+      use_automatic_signing: false,
+    )
+    # https://docs.fastlane.tools/actions/build_app/
+    gym(
+      workspace: "Fable.xcworkspace",
+      scheme: "Fable",
+      configuration: "Release",
+      export_method: "app-store",
+      export_team_id: ENV["FASTLANE_TEAM_ID"],
+      export_xcargs: "-allowProvisioningUpdates",
+      clean: false,
+      skip_profile_detection: true,
+    )
+    deploy_release(
+      api_key: api_key
+    )
+  end
+
+  desc "Deploy the latest Fable archive for TestFlight Distribution."
+  lane :deploy_release do |options|
+    # TODO: use this for change log
+    # git log 1.8.2..HEAD --pretty=format:%s > changelog.txt
+    pilot(
+      api_key: options[:api_key],
+      skip_submission: true,
+      skip_waiting_for_build_processing: false,
+      distribute_external: false,
+      changelog: "This is my changelog of things that have changed in a log"
+    )
+  end
+end

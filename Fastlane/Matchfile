@@ -1,0 +1,4 @@
+git_url(ENV["MATCH_GIT_URL"])
+storage_mode("git")
+shallow_clone(true)
+force_for_new_devices(true)
