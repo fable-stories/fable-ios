@@ -25,11 +25,8 @@ public class GlobalContextManager {
   fileprivate static var mutableCurrentEnvironment = PersistedProperty<Environment>(
     "GlobalContext.currentEnvironment",
     {
-      switch AppBuildSource.source() {
-      case .simulator: return .stage
-      case .testFlight: return .prod
-      case .appStore: return .prod
-      }
+      /// All use `dev` environment for now
+      return .dev
     }()
   )
 

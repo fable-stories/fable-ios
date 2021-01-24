@@ -7,12 +7,19 @@
 
 import Foundation
 
-public enum AppBuildSource: String {
+public enum ApplicationMetadata: String {
   case simulator
   case testFlight
+  case adHoc
   case appStore
   
-  public static func source() -> AppBuildSource {
+  public static func source() -> ApplicationMetadata {
+    if let url = Bundle.main.url(forResource: "embedded", withExtension: "mobileprovision"),
+       let string = try? NSString(contentsOf: url, encoding: String.Encoding.isoLatin1.rawValue),
+       string.contains("ProvisionedDevices")
+    {
+      return .adHoc
+    }
     if let path = Bundle.main.appStoreReceiptURL?.path {
       if path.contains("CoreSimulator") {
         return .simulator
