@@ -1,0 +1,37 @@
+{
+   "packages": {
+      "SnapKit": {
+         "url": "https://github.com/SnapKit/SnapKit.git",
+         "from": "5.0.1"
+      }
+   },
+   "targets": {
+      "SwiftPackage": {
+         "type": "framework",
+         "platform": "iOS",
+         "info": {
+            "path": "SwiftPackage/Info.plist"
+         },
+         "settings": {
+            "groups": [
+               "Default"
+            ],
+            "base": {
+               "DEVELOPMENT_TEAM": "2NC533SE3E",
+               "PRODUCT_NAME": "SwiftPackage",
+               "PRODUCT_BUNDLE_IDENTIFIER": "com.swift.package.stories"
+            }
+         },
+         "sources": [
+            {
+               "path": "SwiftPackage"
+            }
+         ],
+         "dependencies": [
+            {
+               "package": "SnapKit"
+            }
+         ]
+      }
+   }
+}

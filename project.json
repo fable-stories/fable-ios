@@ -1,16 +1,16 @@
 {
   "include" : [
     {
-      "path" : "project-config.yml"
+      "path" : "project-config.json"
     },
     {
-      "path" : "project-module.yml"
+      "path" : "project-module.json"
     },
     {
-      "path" : "project-fablesdk.yml"
+      "path" : "project-fablesdk.json"
     },
     {
-      "path" : "project-package.yml"
+      "path" : "project-package.json"
     }
   ],
   "name" : "Fable",

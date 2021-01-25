@@ -1,0 +1,43 @@
+{
+   "settingGroups": {
+      "Default": {
+         "DEVELOPMENT_TEAM": "2NC533SE3E",
+         "IPHONEOS_DEPLOYMENT_TARGET": 13,
+         "SWIFT_TREAT_WARNINGS_AS_ERRORS": "YES",
+         "ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES": "$(inherited)",
+         "DISABLE_DIAMOND_PROBLEM_DIAGNOSTIC": "YES"
+      }
+   },
+   "targetTemplates": {
+      "Application": {
+         "deploymentTarget": {
+            "iOS": 13
+         },
+         "settings": {
+            "groups": [
+               "Default"
+            ]
+         }
+      },
+      "Module": {
+         "type": "framework.static",
+         "deploymentTarget": {
+            "iOS": 13
+         },
+         "settings": {
+            "groups": [
+               "Default"
+            ]
+         }
+      },
+      "Pod": {
+         "platform": "iOS",
+         "type": "framework",
+         "settings": {
+            "groups": [
+               "Default"
+            ]
+         }
+      }
+   }
+}
