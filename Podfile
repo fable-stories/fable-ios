@@ -104,6 +104,7 @@ target 'ShellApp' do
   lottie
   keychainaccess
   texture
+  firebase
   googlesignin
 end
 

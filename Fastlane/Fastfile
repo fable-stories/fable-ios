@@ -108,22 +108,6 @@ platform :ios do
 
   desc "Run tests and then Build!"
   lane :test_and_build do
-    run_tests(
-      workspace: "Fable.xcworkspace",
-      scheme: "SSDKManagers_iOS",
-    )
-    run_tests(
-      workspace: "Fable.xcworkspace",
-      scheme: "SSDKUiModels_iOS",
-    )
-    run_tests(
-      workspace: "Fable.xcworkspace",
-      scheme: "SSDKViewModels_iOS",
-    )
-    run_tests(
-      workspace: "Fable.xcworkspace",
-      scheme: "SSDKViews_iOS",
-    )
     build
   end
 
