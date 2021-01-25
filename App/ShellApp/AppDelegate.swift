@@ -16,15 +16,15 @@ import FableSDKResourceManagers
 import FableSDKResourceTargets
 import FableSDKViewPresenters
 import FableSDKModelPresenters
-import Firebase
 import Firebolt
 import GoogleSignIn
 import AuthenticationServices
 import FirebaseCrashlytics
 
-
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
+  
+  private let consoleOutputListener = ConsoleOutputListener.shared
   
   var window: UIWindow?
   
@@ -32,23 +32,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
   func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
     if isLaunchedFromUnitTest { return true }
+    consoleOutputListener.openConsolePipe()
     
     configureNavigationBar()
 
     window = UIWindow(frame: UIScreen.main.bounds)
     window?.backgroundColor = .white
-    let vc = StoryDetailViewController(
-      resolver: resolver,
-      storyId: 356
-    )
+    let vc = ConsoleOutputViewController()
     let navVC = UINavigationController(rootViewController: vc)
     window?.rootViewController = navVC
     window?.makeKeyAndVisible()
-
-    NSSetUncaughtExceptionHandler { exception in
-       print(exception)
-       print(exception.callStackSymbols)
-    }
 
     return true
   }
@@ -93,4 +86,8 @@ private extension AppDelegate {
   var isLaunchedFromUnitTest: Bool {
     ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
   }
+}
+
+public class ConsoleOutputViewController: UIViewController {
+  
 }
