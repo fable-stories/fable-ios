@@ -32,7 +32,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>79</string>
+	<string>80</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>NSAppTransportSecurity</key>
@@ -44,8 +44,6 @@
 	<string>This app wants to take pictures.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>This app wants to use your photos.</string>
-	<key>UIFileSharingEnabled</key>
-	<true/>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Sofia Pro Black Italic.ttf</string>
@@ -65,6 +63,8 @@
 		<string>Sofia Pro SemiBold Italic.ttf</string>
 		<string>Sofia Pro Regular.ttf</string>
 	</array>
+	<key>UIFileSharingEnabled</key>
+	<true/>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIRequiresFullScreen</key>

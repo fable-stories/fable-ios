@@ -66,6 +66,11 @@ Archive the Fable app for TestFlight Distribution.
 fastlane ios deploy_release
 ```
 Deploy the latest Fable archive for TestFlight Distribution.
+### ios upload_dsyms
+```
+fastlane ios upload_dsyms
+```
+
 
 ----
 

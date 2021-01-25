@@ -180,6 +180,7 @@ platform :ios do
     deploy_beta(
       release_notes: options[:release_notes]
     )
+    upload_dsyms
   end
 
   lane :deploy_beta do |options|
@@ -245,6 +246,15 @@ platform :ios do
       skip_waiting_for_build_processing: false,
       distribute_external: false,
       changelog: "This is my changelog of things that have changed in a log"
+    )
+  end
+
+  lane :upload_dsyms do
+    upload_symbols_to_crashlytics(
+      dsym_path: "./Artifacts/Fable.app.dSYM.zip",
+      gsp_path: "./Secrets/Dev/GoogleService-Info.plist",
+      dsym_worker_threads: 4,
+      debug: true
     )
   end
 end
