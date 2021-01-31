@@ -25,8 +25,7 @@ public class GlobalContextManager {
   fileprivate static var mutableCurrentEnvironment = PersistedProperty<Environment>(
     "GlobalContext.currentEnvironment",
     {
-      /// All use `dev` environment for now
-      return .dev
+      return .prod
     }()
   )
 
