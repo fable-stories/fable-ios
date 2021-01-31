@@ -7,10 +7,7 @@ all:
 deploy-beta:
 	bundle exec fastlane beta --env fastlane
 
-prod:
-	@sh bin/generate.sh Prod
-	@pod install 
-	@open Fable.xcworkspace
+
 
 
 update:

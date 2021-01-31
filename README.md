@@ -13,6 +13,10 @@ curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install | r
 sudo gem install bundler
 bundle installs
 ```
+---
+**NOTE**: If `bundle install` is giving you issues, it might be a ruby versioning issue. In this case install [rbenv](https://github.com/rbenv/rbenv) and configure your ruby environment to the latest version and run `bundle install` again. 
+
+---
 3. Install Swift developer tools - [Sourcery](https://github.com/krzysztofzablocki/Sourcery), [Xcodegen](https://github.com/yonaskolb/XcodeGen), [Swiftformat](https://github.com/nicklockwood/SwiftFormat)
 ```bash
 brew install xcodegen
@@ -25,17 +29,7 @@ cd ~ && git clone git@github.com:DrewKiino/XcodeGenCLI.git && cd XcodeGenCLI && 
 
 ## First Time Setup
 
-We use Carthage and Cocoapods for dependency management. You have to install the frameworks first, the current Carthage release doesn't support
-`.xcframeworks` but the `master` branch does so you will have to clone the Carthage master branch first and then building it's CLI manaully.
-Don't worry, now you get access to `.xcframeworks` :)
-```bash
-cd ~ && git clone https://github.com/Carthage/Carthage.git && cd Carthage && make install
-```
-
-Then build the Carthage frameworks
-```bash
-sh bin/carhage_update.sh
-```
+We use `Cocoapods` and some `SPM` to set up dependencies. Make sure you followed the above steps and then run
 
 ## Build the project
 
