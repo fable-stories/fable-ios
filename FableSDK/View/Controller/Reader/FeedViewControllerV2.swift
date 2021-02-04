@@ -20,6 +20,8 @@ public class FeedViewControllerV2: ASDKViewController<FeedNode> {
   /// TODO: move feed call into it's own manager
   private let networkManager: NetworkManagerV2
   private let eventManager: EventManager
+  
+  private let activityView = UIActivityIndicatorView(style: .medium)
 
   public init(resolver: FBSDKResolver) {
     self.resolver = resolver
@@ -36,14 +38,20 @@ public class FeedViewControllerV2: ASDKViewController<FeedNode> {
   public override func viewDidLoad() {
     super.viewDidLoad()
     self.title = "Fable Stories"
-    
+    self.navigationItem.rightBarButtonItems = [
+      UIBarButtonItem(customView: activityView)
+    ]
+
     self.refreshData()
   }
   
   private func refreshData() {
+    self.activityView.startAnimating()
     networkManager.request(
       GetFeed()
-    ).sinkDisposed(receiveCompletion: nil) { [weak self] wire in
+    ).sinkDisposed(receiveCompletion: { [weak self] _ in
+      self?.activityView.stopAnimating()
+    }) { [weak self] wire in
       guard let self = self else { return }
       let categories = wire?.items.compactMap { Kategory(wire: $0) } ?? []
       self.node.sections = categories.compactMap { category in
