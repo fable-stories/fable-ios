@@ -32,6 +32,7 @@ public class FBSDKResolver: Resolver {
         stateManager: $0.get(),
         environmentManager: $0.get(),
         networkManager: $0.get(),
+        networkManagerV2: $0.get(),
         eventManager: $0.get(),
         analyticsManager: $0.get(),
         delegate: $0.get(expect: GlobalContextManager.self)

@@ -15,6 +15,7 @@ import AppFoundation
 import ReactiveFoundation
 import ReactiveSwift
 import UIKit
+import Combine
 
 public enum AuthManagerEvent: EventContext {
   case userDidSignIn
@@ -55,6 +56,7 @@ public class AuthManagerImpl: NSObject, AuthManager {
   private let stateManager: StateManager
   private let environmentManager: EnvironmentManager
   private let networkManager: NetworkManager
+  private let networkManagerV2: NetworkManagerV2
   private let eventManager: EventManager
   public let analyticsManager: AnalyticsManager
   
@@ -67,6 +69,7 @@ public class AuthManagerImpl: NSObject, AuthManager {
     stateManager: StateManager,
     environmentManager: EnvironmentManager,
     networkManager: NetworkManager,
+    networkManagerV2: NetworkManagerV2,
     eventManager: EventManager,
     analyticsManager: AnalyticsManager,
     delegate: AuthManagerDelegate
@@ -74,6 +77,7 @@ public class AuthManagerImpl: NSObject, AuthManager {
     self.stateManager = stateManager
     self.environmentManager = environmentManager
     self.networkManager = networkManager
+    self.networkManagerV2 = networkManagerV2
     self.eventManager = eventManager
     self.analyticsManager = analyticsManager
     self.delegate = delegate
@@ -124,32 +128,50 @@ public class AuthManagerImpl: NSObject, AuthManager {
     })
   }
   
-  public func authenticateWithApple(
+  public func receiveAppleAuth(
     appleSub: String,
     email: String
-  ) -> SignalProducer<Int, SignInError> {
-    networkManager.request(
+  ) -> AnyPublisher<Int, Exception> {
+    networkManagerV2.request(
       SignInWithApple(),
       parameters: SignInWithApple.Request(
         appleSub: appleSub,
         email: email
       )
     )
-    .mapError { .networkError($0) }
-    .materializeResults()
-    .flatMap(.latest) { [weak self] in
-      self?.processResult($0) ?? .empty
+    .tryMap { [weak self] value in
+      guard let self = self else { throw SignInError.invalidResponseError }
+      return try self.processResultV2(.success(value))
     }
-    .on(failed: { [weak self] error in
-      self?.analyticsManager.trackEvent(AnalyticsEvent.appleSignInFailed, properties: ["error": error.localizedDescription])
-    }, value: { [weak self] _ in
-      self?.analyticsManager.trackEvent(AnalyticsEvent.appleSignInSucceeded)
-    })
+    .mapError { Exception($0) }
+    .eraseToAnyPublisher()
   }
 
   public func signOut() {
     self.delegate?.authManager(authStateDidChange: nil, authManager: self)
     self.eventManager.sendEvent(AuthManagerEvent.userDidSignOut)
+  }
+  
+  private func processResultV2(_ result: Result<WireAuthenticationResponse?, SignInError>) throws -> Int {
+    switch result {
+    
+    case let .failure(error):
+      self.isAuthenticatingObserver.send(value: false)
+      throw error
+
+    case let .success(wire):
+      guard
+        let wire = wire,
+        let accessToken = wire.accessToken,
+        let user = wire.user.flatMap(User.init(wire:))
+      else { throw SignInError.invalidResponseError }
+      
+      self.setAuthState(AuthState(userId: user.userId, accessToken: accessToken))
+      self.eventManager.sendEvent(AuthManagerEvent.userDidSignIn)
+      self.isAuthenticatingObserver.send(value: false)
+
+      return user.userId
+    }
   }
 
   private func processResult(_ result: Result<WireAuthenticationResponse?, SignInError>) -> SignalProducer<Int, SignInError> {
@@ -169,7 +191,8 @@ public class AuthManagerImpl: NSObject, AuthManager {
       
       self.setAuthState(AuthState(userId: user.userId, accessToken: accessToken))
       self.eventManager.sendEvent(AuthManagerEvent.userDidSignIn)
-
+      self.eventManager.sendEvent(AuthManagerEvent.userDidSignIn)
+      
       return SignalProducer<Int, SignInError>(value: user.userId)
     }
   }

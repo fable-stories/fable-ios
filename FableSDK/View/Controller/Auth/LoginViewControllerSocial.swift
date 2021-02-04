@@ -30,6 +30,8 @@ public class LoginViewControllerSocial: UIViewController {
   private let eventManager: EventManager
   
   public weak var delegate: LoginViewControllerSocialDelegate?
+  
+  private let activityView = UIActivityIndicatorView(style: .medium)
 
   public init(resolver: FBSDKResolver) {
     self.resolver = resolver
@@ -112,6 +114,9 @@ public class LoginViewControllerSocial: UIViewController {
 
   override public func viewDidLoad() {
     super.viewDidLoad()
+    navigationItem.rightBarButtonItems = [
+      UIBarButtonItem(customView: activityView)
+    ]
     layoutSubviews()
     configureReactive()
   }
@@ -143,6 +148,7 @@ public class LoginViewControllerSocial: UIViewController {
 
   public func configureReactive() {
     self.fableSignInMethods.reactive.isUserInteractionEnabled <~ self.authManager.isAuthenticating.map { !$0 }
+    self.activityView.reactive.isAnimating <~ self.authManager.isAuthenticating
     self.eventManager.onEvent.sinkDisposed(receiveCompletion: nil) { [weak self] event in
       guard let self = self else { return }
       switch event {

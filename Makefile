@@ -7,6 +7,8 @@ all:
 deploy-beta:
 	bundle exec fastlane beta --env fastlane
 
+prod:
+
 
 
 
@@ -20,6 +22,10 @@ test:
           -sdk iphonesimulator \
           -destination 'platform=iOS Simulator,name=iPhone 8,OS=14.0' \
           test | xcpretty
+
+release:
+	bundle exec fastlane release --env fastlane
+
 
 clean:
 	@make _clean -i

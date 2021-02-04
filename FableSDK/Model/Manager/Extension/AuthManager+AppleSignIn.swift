@@ -9,10 +9,14 @@ import CryptoKit
 import Foundation
 import KeychainAccess
 import FableSDKEnums
+import AppFoundation
 
 private var currentNonce: String?
 private let charSetString: Array = Array("0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._")
 
+public enum AppleSignInError: Error {
+  case couldNotRetrieveEmail
+}
 
 extension AuthManagerImpl: ASAuthorizationControllerDelegate, ASAuthorizationControllerPresentationContextProviding {
   public func randomNonceString(length: Int = 32) -> String {
@@ -57,6 +61,7 @@ extension AuthManagerImpl: ASAuthorizationControllerDelegate, ASAuthorizationCon
 
   
   public func authenticateWithApple() {
+    self.isAuthenticatingObserver.send(value: true)
     let nonce = randomNonceString()
     currentNonce = nonce
     let provider = ASAuthorizationAppleIDProvider()
@@ -74,16 +79,26 @@ extension AuthManagerImpl: ASAuthorizationControllerDelegate, ASAuthorizationCon
     if let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential {
       let keychain = Keychain(service: "com.fable.stories")
       let key = "appleIDCredential.user:\(appleIDCredential.user)"
-      guard
-        let email = appleIDCredential.email ?? keychain[key],
-        email.isNotEmpty
-        else { return }
-      self.authenticateWithApple(
+      if let email = appleIDCredential.email {
+        keychain[key] = email
+      }
+      guard let email = appleIDCredential.email ?? keychain[key], email.isNotEmpty else {
+        print(AppleSignInError.couldNotRetrieveEmail)
+        return self.isAuthenticatingObserver.send(value: false)
+      }
+      self.receiveAppleAuth(
         appleSub: appleIDCredential.user,
         email: email
-      ).on(value: { user in
-        keychain[key] = email
-      }).start()
+      ).sinkDisposed(receiveCompletion: { [weak self] (completion) in
+        switch completion {
+        case .failure:
+          self?.isAuthenticatingObserver.send(value: false)
+        case .finished:
+          break
+        }
+      }, receiveValue: { [weak self] (userId) in
+        self?.isAuthenticatingObserver.send(value: false)
+      })
     }
   }
 

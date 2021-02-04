@@ -32,7 +32,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>6</string>
+	<string>8</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>NSAppTransportSecurity</key>
@@ -41,9 +41,9 @@
 		<true/>
 	</dict>
 	<key>NSCameraUsageDescription</key>
-	<string>This app wants to take pictures.</string>
+	<string>Fable allows you to post cover artwork for your Stories and change your User&#39;s profile!</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>This app wants to use your photos.</string>
+	<string>Fable allows you to post cover artwork for your Stories and change your User&#39;s profile!</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Sofia Pro Black Italic.ttf</string>
