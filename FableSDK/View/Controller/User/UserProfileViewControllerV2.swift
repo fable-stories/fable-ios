@@ -41,6 +41,8 @@ public class UserProfileViewControllerV2: ASDKViewController<UserProfileNode> {
     }
     return initialUserId
   }
+  
+  private let activityView = UIActivityIndicatorView(style: .medium)
 
   public init(resolver: FBSDKResolver, userId: Int) {
     let authManager: AuthManager = resolver.get()
@@ -84,7 +86,8 @@ public class UserProfileViewControllerV2: ASDKViewController<UserProfileNode> {
     
     self.title = "User Profile"
     self.neverShowPlaceholders = true
-    
+    self.navigationItem.rightBarButtonItems?.append(UIBarButtonItem(customView: activityView))
+
     self.eventManager.onEvent.sinkDisposed(receiveCompletion: nil) { [weak self] event in
       switch event {
       case AuthManagerEvent.userDidSignIn, AuthManagerEvent.userDidSignOut,
@@ -106,7 +109,11 @@ public class UserProfileViewControllerV2: ASDKViewController<UserProfileNode> {
       return
     }
     
-    self.presenter.refreshData(userId: userId).sinkDisposed(receiveCompletion: nil) { [weak self] (viewModel) in
+    self.activityView.startAnimating()
+    
+    self.presenter.refreshData(userId: userId).sinkDisposed(receiveCompletion: { [weak self] completion in
+      self?.activityView.stopAnimating()
+    }) { [weak self] (viewModel) in
       guard let self = self, let viewModel = viewModel else { return }
       let user = viewModel.user
       let stories = viewModel.stories
