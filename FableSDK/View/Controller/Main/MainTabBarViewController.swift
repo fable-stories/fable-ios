@@ -32,6 +32,7 @@ public enum RouterRequestEvent: EventContext {
     case storyDetail(storyId: Int)
     case storyReader(datastore: DataStore)
     case userList(userIds: [Int], title: String)
+    case login
   }
 }
 
@@ -178,6 +179,13 @@ public class MainTabBarViewController: UITabBarController {
           })
           let navVC = UINavigationController(rootViewController: vc)
           viewController.present(navVC, animated: true, completion: nil)
+        case .login:
+          let vc = LoginViewControllerSocial(resolver: self.resolver)
+          let navVC = UINavigationController(rootViewController: vc)
+          vc.navigationItem.leftBarButtonItem = .makeCloseButton(onSelect: { [weak vc] in
+            vc?.dismiss(animated: true, completion: nil)
+          })
+          viewController.present(navVC, animated: true, completion: nil)
         }
       case let RouterRequestEvent.push(screen, navigationController):
         switch screen {
@@ -209,6 +217,8 @@ public class MainTabBarViewController: UITabBarController {
             navigationController?.popViewController(animated: true)
           })
           navigationController.pushViewController(vc, animated: true)
+        case .login:
+          break
         }
       default:
         break

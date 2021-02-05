@@ -224,4 +224,8 @@ extension UserProfileViewControllerV2: UserProfileNodeDelegate {
         followButton?.isFollowing = isFollowing
       }, receiveValue: nil)
   }
+  
+  public func userProfileNode(didTapBackgroundImage node: UserProfileNode) {
+    self.eventManager.sendEvent(RouterRequestEvent.present(.login, viewController: self))
+  }
 }

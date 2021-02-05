@@ -10,7 +10,7 @@ import AsyncDisplayKit
 import Lottie
 
 public class AnimationNode: ASDisplayNode {
-  private let animationView: AnimationView
+  public let animationView: AnimationView
   private let animationName: String
   
   public init(animationName: String) {

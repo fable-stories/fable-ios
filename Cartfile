@@ -9,6 +9,8 @@
 # Realm
 # github "realm/realm-cocoa" == 3.20.0
 
+git "https://bitbucket.org/rmonkey/papertraillumberjack.git"
+
 # Firebase
 # https://github.com/firebase/firebase-ios-sdk/blob/master/Carthage.md
 # binary "https://dl.google.com/dl/firebase/ios/carthage/FirebaseAnalyticsBinary.json"

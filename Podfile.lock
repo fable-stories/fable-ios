@@ -5,6 +5,12 @@ PODS:
     - AppAuth/ExternalUserAgent (= 1.4.0)
   - AppAuth/Core (1.4.0)
   - AppAuth/ExternalUserAgent (1.4.0)
+  - CocoaAsyncSocket (7.6.5)
+  - CocoaLumberjack (3.7.0):
+    - CocoaLumberjack/Core (= 3.7.0)
+  - CocoaLumberjack/Core (3.7.0)
+  - CocoaLumberjack/Swift (3.7.0):
+    - CocoaLumberjack/Core
   - Down (0.9.3)
   - Firebase/Analytics (6.28.1):
     - Firebase/Core
@@ -103,6 +109,12 @@ PODS:
     - nanopb/encode (= 1.30905.0)
   - nanopb/decode (1.30905.0)
   - nanopb/encode (1.30905.0)
+  - PaperTrailLumberjack/Core (0.1.9):
+    - CocoaAsyncSocket (~> 7.6)
+    - CocoaLumberjack (~> 3.4)
+  - PaperTrailLumberjack/Swift (0.1.9):
+    - CocoaLumberjack/Swift (~> 3.4)
+    - PaperTrailLumberjack/Core
   - PINCache (3.0.2):
     - PINCache/Arc-exception-safe (= 3.0.2)
     - PINCache/Core (= 3.0.2)
@@ -156,6 +168,7 @@ DEPENDENCIES:
   - KeychainAccess (~> 4.2.1)
   - Kingfisher (~> 5.13.2)
   - lottie-ios
+  - PaperTrailLumberjack/Swift
   - ReactiveCocoa (~> 10.1.0)
   - ReactiveSwift (~> 6.3.0)
   - Texture
@@ -164,6 +177,8 @@ SPEC REPOS:
   trunk:
     - Alamofire
     - AppAuth
+    - CocoaAsyncSocket
+    - CocoaLumberjack
     - Down
     - Firebase
     - FirebaseAnalytics
@@ -183,6 +198,7 @@ SPEC REPOS:
     - Kingfisher
     - lottie-ios
     - nanopb
+    - PaperTrailLumberjack
     - PINCache
     - PINOperation
     - PINRemoteImage
@@ -194,6 +210,8 @@ SPEC REPOS:
 SPEC CHECKSUMS:
   Alamofire: df2f8f826963b08b9a870791ad48e07a10090b2e
   AppAuth: 31bcec809a638d7bd2f86ea8a52bd45f6e81e7c7
+  CocoaAsyncSocket: 065fd1e645c7abab64f7a6a2007a48038fdc6a99
+  CocoaLumberjack: e8955b9d337ac307103b0a34fd141c32f27e53c5
   Down: 4553b984236807e384fa0ef7c7e360ef9f7c425d
   Firebase: ed042590caa0029392257529a8003c25ee82bc18
   FirebaseAnalytics: 5fa308e1b13f838d0f6dc74719ac2a72e8c5afc4
@@ -213,6 +231,7 @@ SPEC CHECKSUMS:
   Kingfisher: d2279a7abece3c7f25a80cd2b7f363ca5cf3f44c
   lottie-ios: 48fac6be217c76937e36e340e2d09cf7b10b7f5f
   nanopb: c43f40fadfe79e8b8db116583945847910cbabc9
+  PaperTrailLumberjack: 449587968d5aeb3eab2d4de041ffc61ee2d49f25
   PINCache: bea7c404c360f6fe0f6ee783c5cd14e778fa2aab
   PINOperation: 3a967a927e7867e61976c6cc23e5770416449fbc
   PINRemoteImage: 3b7cedb118c2d357f87e9eabc7c81ba0202cb236
@@ -221,6 +240,6 @@ SPEC CHECKSUMS:
   ReactiveSwift: 7937f26ec18d555e2a99352bd0a8b2817d1f042d
   Texture: 2f109e937850d94d1d07232041c9c7313ccddb81
 
-PODFILE CHECKSUM: e0874e3a30214eed30083a9322ce5e9d76f98630
+PODFILE CHECKSUM: 9d5aa1f4a60828d905fbe6800c09650fb9712547
 
 COCOAPODS: 1.10.0

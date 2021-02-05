@@ -23,6 +23,7 @@ public protocol UserProfileNodeDelegate: class {
   func userProfileNode(didSelectFollowersCount node: UserProfileNode)
   func userProfileNode(didSelectFollowingCount node: UserProfileNode)
   func userProfileNode(didTapFollowButton followButton: FBSDKFollowButton, node: UserProfileNode, userId: Int, isFollowing: Bool)
+  func userProfileNode(didTapBackgroundImage node: UserProfileNode)
 }
 
 public class UserProfileNode: ASDisplayNode {
@@ -101,6 +102,7 @@ public class UserProfileNode: ASDisplayNode {
   public var sections: [Section] = [] {
     didSet {
       ASPerformBlockOnMainThread {
+        self.tableNode.isHidden = self.sections.isEmpty
         self.tableNode.reloadData()
       }
     }
@@ -122,10 +124,26 @@ public class UserProfileNode: ASDisplayNode {
     }
     return node
   }
+  
+  private lazy var placeholderLabel: ASTextNode = .new {
+    let node = ASTextNode()
+    node.attributedText = "Tap to log in!".toAttributedString([
+      .font: UIFont.systemFont(ofSize: 12.0, weight: .semibold)
+    ])
+    return node
+  }
+  
+  private lazy var animationNode: AnimationNode = .new {
+    let node = AnimationNode(animationName: "empty_desk")
+    node.animationView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(tapBackgroundImage)))
+    node.play()
+    return node
+  }
 
   public override init() {
     super.init()
     self.automaticallyManagesSubnodes = true
+    self.tableNode.isHidden = true
   }
   
   public func reloadData() {
@@ -133,7 +151,25 @@ public class UserProfileNode: ASDisplayNode {
   }
 
   public override func layoutSpecThatFits(_ constrainedSize: ASSizeRange) -> ASLayoutSpec {
-    return ASWrapperLayoutSpec(layoutElement: tableNode)
+    placeholderLabel.style.height = .init(unit: .points, value: 44.0)
+    animationNode.style.preferredSize = .sizeWithConstantDimensions(constrainedSize.max.width)
+    return ASOverlayLayoutSpec(
+      child: ASStackLayoutSpec(
+        direction: .vertical,
+        spacing: 8.0,
+        justifyContent: .center,
+        alignItems: .center,
+        children: [
+          placeholderLabel,
+          animationNode
+        ]
+      ),
+      overlay: ASWrapperLayoutSpec(layoutElement: tableNode)
+    )
+  }
+  
+  @objc private func tapBackgroundImage() {
+    self.delegate?.userProfileNode(didTapBackgroundImage: self)
   }
 }
 

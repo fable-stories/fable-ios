@@ -76,6 +76,10 @@ def realm
   pod 'RealmSwift'
 end
 
+def papertrail
+  pod "PaperTrailLumberjack/Swift"
+end
+
 def lottie
   pod 'lottie-ios'
 end
@@ -92,6 +96,7 @@ target 'Fable' do
   texture
   firebase
   googlesignin
+  papertrail
 end
 
 target 'FableTests' do 
@@ -184,6 +189,7 @@ target 'FableSDKModelManagers' do
   keychainaccess
   firebolt
   googlesignin
+  papertrail
 end
 
 target 'FableSDKResourceManagers' do 
