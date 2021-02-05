@@ -102,7 +102,7 @@ public class UserProfileViewControllerV2: ASDKViewController<UserProfileNode> {
 
     self.refreshData()
   }
-  
+
   public func refreshData() {
     guard let userId = userId else {
       self.node.sections.removeAll()

@@ -198,6 +198,7 @@ public class AuthManagerImpl: NSObject, AuthManager {
   }
   
   private func setAuthState(_ authState: AuthState?) {
+    RemoteLogger.shared.setMachineName(authState.flatMap { $0.userId.toString() })
     self.delegate?.authManager(authStateDidChange: authState, authManager: self)
   }
 }

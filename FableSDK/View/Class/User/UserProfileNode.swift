@@ -136,7 +136,6 @@ public class UserProfileNode: ASDisplayNode {
   private lazy var animationNode: AnimationNode = .new {
     let node = AnimationNode(animationName: "empty_desk")
     node.animationView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(tapBackgroundImage)))
-    node.play()
     return node
   }
 
@@ -146,6 +145,11 @@ public class UserProfileNode: ASDisplayNode {
     self.tableNode.isHidden = true
   }
   
+  public override func didEnterDisplayState() {
+    super.didEnterDisplayState()
+    self.animationNode.play()
+  }
+
   public func reloadData() {
     self.tableNode.reloadData()
   }

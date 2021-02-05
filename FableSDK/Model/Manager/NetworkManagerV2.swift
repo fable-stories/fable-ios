@@ -47,5 +47,10 @@ extension NetworkManagerV2 {
   
   public func request<T>(_ target: T, parameters: T.RequestBodyType? = nil) -> AnyPublisher<T.ResponseBodyType?, Exception> where T: ResourceTargetProtocol {
     NetworkCoreV2.request(target, parameters: parameters, delegate: self)
+      .mapError { error in
+        RemoteLogger.shared.log(error)
+        return error
+      }
+      .eraseToAnyPublisher()
   }
 }

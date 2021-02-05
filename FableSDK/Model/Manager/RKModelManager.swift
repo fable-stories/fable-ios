@@ -37,12 +37,24 @@ public class RemoteLogger {
   public static let shared = RemoteLogger()
   
   public var isEnabled: Bool = false
+  
+  public func setMachineName(_ name: String?) {
+    let args: [String] = [
+      ApplicationMetadata.source().rawValue,
+      ApplicationMetadata.versionBuild(),
+      name
+    ].compactMap { $0 }.filter { $0.isNotEmpty }
+    self.paperTrailLogger?.machineName = args.joined(separator: "-")
+  }
+  
+  private var paperTrailLogger: RMPaperTrailLogger?
 
   private init() {
     if let paperTrailLogger = RMPaperTrailLogger.sharedInstance() {
       paperTrailLogger.host = "logs5.papertrailapp.com"
       paperTrailLogger.port = 53487
-      paperTrailLogger.machineName = Bundle.main.bundleIdentifier
+      self.paperTrailLogger = paperTrailLogger
+      self.setMachineName("")
       DDLog.add(paperTrailLogger)
     }
   }
