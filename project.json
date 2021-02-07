@@ -130,7 +130,7 @@
         },
         "environmentVariables" : {
           "ALLOWABLE_LOG_LEVELS" : "info,error",
-          "ENV" : "local",
+          "ENV" : "prod",
           "OS_ACTIVITY_MODE" : "disable"
         },
         "testTargets" : [

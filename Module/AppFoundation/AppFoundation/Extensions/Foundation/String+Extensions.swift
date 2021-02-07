@@ -76,7 +76,7 @@ public extension String {
     return "application/octet-stream"
   }
   
-  func toURL() -> URL? { URL(string: self) }
+  func toURL() -> URL? { URL(string: self.trimmingCharacters(in: .whitespacesAndNewlines)) }
   
   func index(from: Int) -> Index {
     return self.index(startIndex, offsetBy: from)

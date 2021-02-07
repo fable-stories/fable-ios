@@ -66,4 +66,8 @@ extension FeedViewControllerV2: FeedNodeDelegate {
   public func feedNode(didSelectStory storyId: Int) {
     self.eventManager.sendEvent(RouterRequestEvent.present(.storyDetail(storyId: storyId), viewController: self))
   }
+  
+  public func feedNode(didTapBackgroundImage node: FeedNode) {
+    self.eventManager.sendEvent(RouterRequestEvent.present(.storyEditor(storyId: nil), viewController: self))
+  }
 }

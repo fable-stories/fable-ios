@@ -11,6 +11,7 @@ import FableSDKModelObjects
 
 public protocol FeedNodeDelegate: class {
   func feedNode(didSelectStory storyId: Int)
+  func feedNode(didTapBackgroundImage node: FeedNode)
 }
 
 public class FeedNode: ASDisplayNode {
@@ -47,6 +48,7 @@ public class FeedNode: ASDisplayNode {
   public var sections: [Section] = [] {
     didSet {
       ASPerformBlockOnMainThread {
+        self.tableNode.isHidden = self.sections.isEmpty
         self.tableNode.reloadData()
       }
     }
@@ -70,9 +72,29 @@ public class FeedNode: ASDisplayNode {
     return node
   }
   
+  private lazy var placeholderLabel: ASTextNode = .new {
+    let node = ASTextNode()
+    node.attributedText = "Tap to start a Story!".toAttributedString([
+      .font: UIFont.systemFont(ofSize: 12.0, weight: .semibold)
+    ])
+    return node
+  }
+  
+  private lazy var animationNode: AnimationNode = .new {
+    let node = AnimationNode(animationName: "book_search")
+    node.animationView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(tapBackgroundImage)))
+    return node
+  }
+
   public override init() {
     super.init()
     self.automaticallyManagesSubnodes = true
+    self.tableNode.isHidden = true
+  }
+  
+  public override func didEnterDisplayState() {
+    super.didEnterDisplayState()
+    self.animationNode.play()
   }
   
   public func reloadData() {
@@ -80,7 +102,24 @@ public class FeedNode: ASDisplayNode {
   }
   
   public override func layoutSpecThatFits(_ constrainedSize: ASSizeRange) -> ASLayoutSpec {
-    return ASWrapperLayoutSpec(layoutElement: tableNode)
+    animationNode.style.preferredSize = .sizeWithConstantDimensions(constrainedSize.max.width)
+    return ASOverlayLayoutSpec(
+      child: ASStackLayoutSpec(
+        direction: .vertical,
+        spacing: 8.0,
+        justifyContent: .center,
+        alignItems: .center,
+        children: [
+          placeholderLabel,
+          animationNode
+        ]
+      ),
+      overlay: ASWrapperLayoutSpec(layoutElement: tableNode)
+    )
+  }
+  
+  @objc private func tapBackgroundImage() {
+    self.delegate?.feedNode(didTapBackgroundImage: self)
   }
 }
 

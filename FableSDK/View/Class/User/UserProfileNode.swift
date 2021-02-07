@@ -155,7 +155,6 @@ public class UserProfileNode: ASDisplayNode {
   }
 
   public override func layoutSpecThatFits(_ constrainedSize: ASSizeRange) -> ASLayoutSpec {
-    placeholderLabel.style.height = .init(unit: .points, value: 44.0)
     animationNode.style.preferredSize = .sizeWithConstantDimensions(constrainedSize.max.width)
     return ASOverlayLayoutSpec(
       child: ASStackLayoutSpec(

@@ -27,7 +27,7 @@ public enum RouterRequestEvent: EventContext {
   public enum Screen {
     case story(storyId: Int)
     case userProfile(userId: Int)
-    case storyEditor(storyId: Int)
+    case storyEditor(storyId: Int?)
     case storyEditorDetails(modelPresenter: StoryDraftModelPresenter)
     case storyDetail(storyId: Int)
     case storyReader(datastore: DataStore)
@@ -162,7 +162,21 @@ public class MainTabBarViewController: UITabBarController {
         case .storyDetail(let storyId):
           self.presentStoryDetail(storyId: storyId, presenter: viewController)
         case .storyEditor(let storyId):
-          self.presentStoryEditor(storyId: storyId, presenter: viewController)
+          if let storyId = storyId {
+            self.presentStoryEditor(storyId: storyId, presenter: viewController)
+          } else {
+            let vc = StoryEditorViewController(resolver: self.resolver)
+            let navVC = UINavigationController(rootViewController: vc)
+            navVC.modalTransitionStyle = .coverVertical
+            navVC.modalPresentationStyle = .fullScreen
+            vc.navigationItem.leftBarButtonItem = .makeCloseButton(onSelect: { [weak vc] in
+              vc?.dismiss(animated: true, completion: nil)
+            })
+            viewController.present(navVC, animated: true) { [weak self] in
+              self?.eventManager.sendEvent(WriterDashboardEvent.didStartNewStory)
+            }
+
+          }
         case .storyEditorDetails:
           break
         case .story(let storyId):
@@ -181,6 +195,7 @@ public class MainTabBarViewController: UITabBarController {
           viewController.present(navVC, animated: true, completion: nil)
         case .login:
           let vc = LoginViewControllerSocial(resolver: self.resolver)
+          vc.delegate = self
           let navVC = UINavigationController(rootViewController: vc)
           vc.navigationItem.leftBarButtonItem = .makeCloseButton(onSelect: { [weak vc] in
             vc?.dismiss(animated: true, completion: nil)
