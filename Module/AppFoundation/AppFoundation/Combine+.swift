@@ -36,7 +36,7 @@ extension AnyPublisher {
   public func mapVoid() -> AnyPublisher<Void, Failure> {
     return self.map { _ in () }.eraseToAnyPublisher()
   }
-  
+
   /// A self-disposing sink function
   public func sinkDisposed(
     receiveCompletion: ((Subscribers.Completion<Failure>) -> Void)? = nil,

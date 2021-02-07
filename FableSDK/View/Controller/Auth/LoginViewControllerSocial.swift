@@ -147,14 +147,25 @@ public class LoginViewControllerSocial: UIViewController {
   }
 
   public func configureReactive() {
-    self.fableSignInMethods.reactive.isUserInteractionEnabled <~ self.authManager.isAuthenticating.map { !$0 }
-    self.activityView.reactive.isAnimating <~ self.authManager.isAuthenticating
+    self.fableSignInMethods.reactive.isUserInteractionEnabled <~ self.authManager.isAuthenticating
+      .mapNever()
+      .map { !$0 }
+    self.activityView.reactive.isAnimating <~ self.authManager.isAuthenticating.mapNever()
     self.eventManager.onEvent.sinkDisposed(receiveCompletion: nil) { [weak self] event in
       guard let self = self else { return }
       switch event {
       case AuthManagerEvent.userDidSignIn:
         self.delegate?.loginViewController(dismissViewController: self)
       default:
+        break
+      }
+    }
+    self.authManager.isAuthenticating.observeResult { [weak self] result in
+      switch result {
+      case let .failure(error):
+        RemoteLogger.shared.log(error)
+        self?.presentAlert(error: error)
+      case .success:
         break
       }
     }

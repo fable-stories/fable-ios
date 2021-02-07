@@ -25,7 +25,11 @@ public class GlobalContextManager {
   fileprivate static var mutableCurrentEnvironment = PersistedProperty<Environment>(
     "GlobalContext.currentEnvironment",
     {
-      return .prod
+      switch ApplicationMetadata.source() {
+      case .appStore: return .prod
+      case .adHoc, .testFlight: return .dev
+      case .simulator: return .local
+      }
     }()
   )
 

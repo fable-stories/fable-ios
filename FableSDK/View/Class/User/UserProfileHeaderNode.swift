@@ -72,6 +72,7 @@ public class UserProfileHeaderNode: ASDisplayNode {
     node.shadowOpacity = 0.15
     node.clipsToBounds = false
     node.contentMode = .scaleAspectFill
+    node.image = UIImage(.fableLightGray, size: .sizeWithConstantDimensions(44.0))
     return node
   }
 
@@ -245,13 +246,14 @@ public class UserProfileHeaderNode: ASDisplayNode {
   }
   
   public func updateWithViewModel(_ viewModel: ViewModel) {
+    let avatarPlaceholderImage = UIImage(.fableLightGray, size: .sizeWithConstantDimensions(44.0))
     self.viewModel = viewModel
     if let image = viewModel.avatarAsset?.image() {
       self.avatarImage.image = image
     } else if let url = viewModel.avatarAsset?.url() {
-      self.avatarImage.setImage(url: url)
+      self.avatarImage.setImage(url: url, placeholderImage: avatarPlaceholderImage)
     } else {
-      self.avatarImage.image = UIImage(.fableLightGray, size: .sizeWithConstantDimensions(44.0))
+      self.avatarImage.image = avatarPlaceholderImage
     }
     if viewModel.userName.isNotEmpty {
       self.userNameLabel.attributedText = "@\(viewModel.userName.localizedLowercase)".toAttributedString([

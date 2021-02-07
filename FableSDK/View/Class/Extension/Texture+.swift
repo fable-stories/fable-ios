@@ -11,7 +11,7 @@ import Kingfisher
 import AsyncDisplayKit
 
 public extension ASImageNode {
-  func setImage(url: URL?) {
+  func setImage(url: URL?, placeholderImage: UIImage? = nil) {
     guard let url = url else {
       self.image = nil
       return
@@ -22,6 +22,8 @@ public extension ASImageNode {
         switch result {
         case .failure(let error):
           print(error)
+          self?.image = placeholderImage
+          break
         case .success(let image):
           if let image = image {
             ImageCache.default.store(image, forKey: key)
@@ -35,6 +37,7 @@ public extension ASImageNode {
       switch result {
       case .failure(let error):
         print(error)
+        self?.image = placeholderImage
       case .success(let result):
         let image = result.image
         if let data = image.pngData() {

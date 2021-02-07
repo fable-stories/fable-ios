@@ -47,6 +47,7 @@ public final class MiniUserDetailNode: ASControlNode {
     node.imageModificationBlock = RoundedCornersModificationBlock(cornerRadius: 44.0 / 4.0)
     node.addTarget(self, action: #selector(didSelectUser), forControlEvents: .touchUpInside)
     node.addShadow()
+    node.image = UIImage(.fableLightGray, size: .sizeWithConstantDimensions(44.0))
     return node
   }
   
@@ -62,10 +63,11 @@ public final class MiniUserDetailNode: ASControlNode {
   }
   
   public func setViewModel(_ viewModel: ViewModel?) {
+    let avatarPlaceholderImage = UIImage(.fableLightGray, size: .sizeWithConstantDimensions(44.0))
     self.viewModel = viewModel
     guard let viewModel = viewModel else { return }
     if let url = viewModel.avatarAsset?.url() {
-      self.avatarImage.setImage(url: url)
+      self.avatarImage.setImage(url: url, placeholderImage: avatarPlaceholderImage)
     } else {
       self.avatarImage.image = UIImage(.fableLightGray, size: .sizeWithConstantDimensions(44.0))
     }

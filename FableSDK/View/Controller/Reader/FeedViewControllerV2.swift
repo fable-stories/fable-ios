@@ -20,6 +20,7 @@ public class FeedViewControllerV2: ASDKViewController<FeedNode> {
   /// TODO: move feed call into it's own manager
   private let networkManager: NetworkManagerV2
   private let eventManager: EventManager
+  private let authManager: AuthManager
   
   private let activityView = UIActivityIndicatorView(style: .medium)
 
@@ -27,6 +28,7 @@ public class FeedViewControllerV2: ASDKViewController<FeedNode> {
     self.resolver = resolver
     self.networkManager = resolver.get()
     self.eventManager = resolver.get()
+    self.authManager = resolver.get()
     super.init(node: .init())
     self.node.delegate = self
   }
@@ -64,7 +66,11 @@ public class FeedViewControllerV2: ASDKViewController<FeedNode> {
 
 extension FeedViewControllerV2: FeedNodeDelegate {
   public func feedNode(didSelectStory storyId: Int) {
-    self.eventManager.sendEvent(RouterRequestEvent.present(.storyDetail(storyId: storyId), viewController: self))
+    if authManager.isLoggedIn {
+      self.eventManager.sendEvent(RouterRequestEvent.present(.storyDetail(storyId: storyId), viewController: self))
+    } else {
+      self.eventManager.sendEvent(RouterRequestEvent.present(.login, viewController: self))
+    }
   }
   
   public func feedNode(didTapBackgroundImage node: FeedNode) {

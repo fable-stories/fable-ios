@@ -62,6 +62,10 @@ extension Signal {
   public func mapVoid() -> Signal<(), Error> {
     return map { _ in () }
   }
+  
+  public func mapNever() -> Signal<Value, Never> {
+    return flatMapError { _ in Signal<Value, Never>.empty }
+  }
 
   public func optionalize() -> Signal<Value?, Error> {
     return map { Optional<Value>($0) }

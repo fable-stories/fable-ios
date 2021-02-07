@@ -30,7 +30,7 @@ public protocol AuthManagerDelegate: class {
 }
 
 public protocol AuthManager {
-  var isAuthenticating: Signal<Bool, Never> { get }
+  var isAuthenticating: Signal<Bool, Exception> { get }
   var isLoggedIn: Bool { get }
   var authenticatedUserId: Int? { get }
 
@@ -60,8 +60,8 @@ public class AuthManagerImpl: NSObject, AuthManager {
   private let eventManager: EventManager
   public let analyticsManager: AnalyticsManager
   
-  public let isAuthenticating: Signal<Bool, Never>
-  internal let isAuthenticatingObserver: Signal<Bool, Never>.Observer
+  public let isAuthenticating: Signal<Bool, Exception>
+  internal let isAuthenticatingObserver: Signal<Bool, Exception>.Observer
   
   public weak var delegate: AuthManagerDelegate?
 
@@ -81,7 +81,7 @@ public class AuthManagerImpl: NSObject, AuthManager {
     self.eventManager = eventManager
     self.analyticsManager = analyticsManager
     self.delegate = delegate
-    (self.isAuthenticating, self.isAuthenticatingObserver) = Signal<Bool, Never>.pipe()
+    (self.isAuthenticating, self.isAuthenticatingObserver) = Signal<Bool, Exception>.pipe()
     super.init()
     
     /// Local development tooling
