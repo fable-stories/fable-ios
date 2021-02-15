@@ -83,16 +83,16 @@ extension AuthManagerImpl: ASAuthorizationControllerDelegate, ASAuthorizationCon
         keychain[key] = email
       }
       guard let email = appleIDCredential.email ?? keychain[key], email.isNotEmpty else {
-        print(AppleSignInError.couldNotRetrieveEmail)
-        return self.isAuthenticatingObserver.send(value: false)
+        return self.isAuthenticatingObserver
+          .send(error: Exception(AppleSignInError.couldNotRetrieveEmail))
       }
       self.receiveAppleAuth(
         appleSub: appleIDCredential.user,
         email: email
       ).sinkDisposed(receiveCompletion: { [weak self] (completion) in
         switch completion {
-        case .failure:
-          self?.isAuthenticatingObserver.send(value: false)
+        case .failure(let error):
+          self?.isAuthenticatingObserver.send(error: error)
         case .finished:
           break
         }
@@ -103,7 +103,7 @@ extension AuthManagerImpl: ASAuthorizationControllerDelegate, ASAuthorizationCon
   }
 
   public func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
-    print(error)
+    self.isAuthenticatingObserver.send(error: Exception(error))
     self.analyticsManager.trackEvent(AnalyticsEvent.appleSignInFailed, properties: ["error": error.localizedDescription])
   }
 

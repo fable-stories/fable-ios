@@ -20,6 +20,10 @@ import FirebaseAnalytics
 import ReactiveSwift
 import UIKit
 
+public enum FBLUserDefaults: String {
+  case didShowOnboarding
+}
+
 public enum RouterRequestEvent: EventContext {
   case present(Screen, viewController: UIViewController)
   case push(Screen, navigationController: UINavigationController)
@@ -33,6 +37,7 @@ public enum RouterRequestEvent: EventContext {
     case storyReader(datastore: DataStore)
     case userList(userIds: [Int], title: String)
     case login
+    case onboarding
   }
 }
 
@@ -80,6 +85,11 @@ public class MainTabBarViewController: UITabBarController {
 
   override public func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
+    /// present onboarding once on app launch
+    if UserDefaults.standard.bool(forKey: FBLUserDefaults.didShowOnboarding.rawValue) != true {
+      UserDefaults.standard.setValue(true, forKey: FBLUserDefaults.didShowOnboarding.rawValue)
+      self.eventManager.sendEvent(RouterRequestEvent.present(.onboarding, viewController: self))
+    }
   }
 
   private func configureSelf() {
@@ -201,6 +211,11 @@ public class MainTabBarViewController: UITabBarController {
             vc?.dismiss(animated: true, completion: nil)
           })
           viewController.present(navVC, animated: true, completion: nil)
+        case .onboarding:
+          let vc = OnboardViewController(resolver: self.resolver)
+          viewController.present(vc.wrapInNavigationController { [weak self] in
+            self?.dismiss(animated: true, completion: nil)
+          }, animated: true, completion: nil)
         }
       case let RouterRequestEvent.push(screen, navigationController):
         switch screen {
@@ -232,7 +247,7 @@ public class MainTabBarViewController: UITabBarController {
             navigationController?.popViewController(animated: true)
           })
           navigationController.pushViewController(vc, animated: true)
-        case .login:
+        case .login, .onboarding:
           break
         }
       default:

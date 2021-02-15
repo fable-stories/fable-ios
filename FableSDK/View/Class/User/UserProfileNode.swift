@@ -102,6 +102,7 @@ public class UserProfileNode: ASDisplayNode {
   public var sections: [Section] = [] {
     didSet {
       ASPerformBlockOnMainThread {
+        self.animationNode.isHidden = self.sections.isNotEmpty
         self.tableNode.isHidden = self.sections.isEmpty
         self.tableNode.reloadData()
       }
@@ -136,6 +137,7 @@ public class UserProfileNode: ASDisplayNode {
   private lazy var animationNode: AnimationNode = .new {
     let node = AnimationNode(animationName: "empty_desk")
     node.animationView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(tapBackgroundImage)))
+    node.isHidden = true
     return node
   }
 
@@ -143,6 +145,7 @@ public class UserProfileNode: ASDisplayNode {
     super.init()
     self.automaticallyManagesSubnodes = true
     self.tableNode.isHidden = true
+    self.backgroundColor = .white
   }
   
   public override func didEnterDisplayState() {

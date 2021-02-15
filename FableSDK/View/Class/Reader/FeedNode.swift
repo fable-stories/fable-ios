@@ -71,15 +71,7 @@ public class FeedNode: ASDisplayNode {
     }
     return node
   }
-  
-  private lazy var placeholderLabel: ASTextNode = .new {
-    let node = ASTextNode()
-    node.attributedText = "Tap to start a Story!".toAttributedString([
-      .font: UIFont.systemFont(ofSize: 12.0, weight: .semibold)
-    ])
-    return node
-  }
-  
+
   private lazy var animationNode: AnimationNode = .new {
     let node = AnimationNode(animationName: "book_search")
     node.animationView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(tapBackgroundImage)))
@@ -110,7 +102,6 @@ public class FeedNode: ASDisplayNode {
         justifyContent: .center,
         alignItems: .center,
         children: [
-          placeholderLabel,
           animationNode
         ]
       ),
