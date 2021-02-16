@@ -20,6 +20,8 @@ public class UserProfileViewPresenter {
   private let networkManager: NetworkManagerV2
   private let storyManager: StoryManager
   
+  private var userProfileByUserId: [Int: UserProfile] = [:]
+  
   public init(resolver: FBSDKResolver) {
     self.resolver = resolver
     self.networkManager = resolver.get()
@@ -27,16 +29,24 @@ public class UserProfileViewPresenter {
   }
   
   public func refreshData(userId: Int) -> AnyPublisher<UserProfile?, Exception> {
-    self.networkManager.request(
-      UserProfileResource(userId: userId)
+    let publisher: AnyPublisher<UserProfile?, Exception> = self.networkManager.request(
+      path: "/mobile/user/\(userId)/user-profile",
+      method: .get,
+      expect: WireUserProfile.self
     ).map { [weak self] wire in
-      if let wire = wire, let model = UserProfile(wire: wire) {
+      if let model = UserProfile(wire: wire) {
         for story in model.stories {
           self?.storyManager.cacheStory(story: story)
         }
+        self?.userProfileByUserId[userId] = model
         return model
       }
       return nil
     }.eraseToAnyPublisher()
+    if let userProfile = self.userProfileByUserId[userId] {
+      publisher.sinkDisposed()
+      return .singleValue(userProfile)
+    }
+    return publisher
   }
 }

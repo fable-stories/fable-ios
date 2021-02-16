@@ -14,6 +14,8 @@ import FableSDKEnums
 import FableSDKResourceTargets
 import FableSDKModelManagers
 import FableSDKViewPresenters
+import FableSDKWireObjects
+import NetworkFoundation
 import FableSDKViews
 import Firebolt
 import Kingfisher
@@ -163,10 +165,12 @@ public class FeedViewController: UIViewController {
 
   private func refresh() {
     networkManager.request(
-      GetFeed()
+      path: "/mobile/feed",
+      method: .get,
+      expect: WireCollection<WireKategory>.self
     ).sinkDisposed(receiveCompletion: nil) { [weak self] wire in
       guard let self = self else { return }
-      let categories = wire?.items.compactMap { Kategory(wire: $0) } ?? []
+      let categories = wire.items.compactMap { Kategory(wire: $0) } 
       self.feed = Feed(
         categories: categories,
         stories: categories.reduce([:]) { acc, i in

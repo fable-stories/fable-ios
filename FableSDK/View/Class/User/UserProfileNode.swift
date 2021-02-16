@@ -137,7 +137,6 @@ public class UserProfileNode: ASDisplayNode {
   private lazy var animationNode: AnimationNode = .new {
     let node = AnimationNode(animationName: "empty_desk")
     node.animationView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(tapBackgroundImage)))
-    node.isHidden = true
     return node
   }
 
@@ -176,6 +175,11 @@ public class UserProfileNode: ASDisplayNode {
   
   @objc private func tapBackgroundImage() {
     self.delegate?.userProfileNode(didTapBackgroundImage: self)
+  }
+  
+  public func setIsMyUser(_ isMyUser: Bool) {
+    self.animationNode.isHidden = !isMyUser
+    self.placeholderLabel.isHidden = !isMyUser
   }
 }
 

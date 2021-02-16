@@ -133,11 +133,13 @@ public class AuthManagerImpl: NSObject, AuthManager {
     email: String
   ) -> AnyPublisher<Int, Exception> {
     networkManagerV2.request(
-      SignInWithApple(),
+      path: "/auth/apple",
+      method: .post,
       parameters: SignInWithApple.Request(
         appleSub: appleSub,
         email: email
-      )
+      ),
+      expect: WireAuthenticationResponse.self
     )
     .tryMap { [weak self] value in
       guard let self = self else { throw SignInError.invalidResponseError }

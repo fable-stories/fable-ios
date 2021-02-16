@@ -38,6 +38,14 @@ public final class StoryDetailViewController: ASDKViewController<StoryDetailNode
   public override func viewDidLoad() {
     super.viewDidLoad()
     self.title = "Story Detail"
+    self.navigationItem.rightBarButtonItem = UIBarButtonItem(
+      image: UIImage(named: "more")?
+        .resized(to: .sizeWithConstantDimensions(32.0))?
+        .tinted(.black),
+      style: .plain,
+      target: self,
+      action: #selector(didSelectMore(barButton:))
+    )
     
     self.eventManager.onEvent.sinkDisposed(receiveCompletion: nil) { (event) in
       switch event {
@@ -70,6 +78,17 @@ public final class StoryDetailViewController: ASDKViewController<StoryDetailNode
       )
       self.node.setViewModel(viewModel)
     }
+  }
+  
+  @objc private func didSelectMore(barButton: UIBarButtonItem) {
+    let alert = UIAlertController(title: "More", message: nil, preferredStyle: .actionSheet)
+    alert.addAction(.init(title: "Hide", style: .default, handler: { _ in
+      
+    }))
+    alert.addAction(.init(title: "Report", style: .destructive, handler: { _ in
+    }))
+    alert.addAction(.init(title: "Cancel", style: .default, handler: nil))
+    self.present(alert, animated: true, completion: nil)
   }
 }
 

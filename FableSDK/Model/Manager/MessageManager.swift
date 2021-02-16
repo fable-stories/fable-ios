@@ -10,6 +10,8 @@ import AppFoundation
 import Combine
 import FableSDKModelObjects
 import FableSDKResourceTargets
+import NetworkFoundation
+import FableSDKWireObjects
 
 public protocol MessageManager {
   func findCachedById(messageId: Int) -> Message?
@@ -53,37 +55,34 @@ public class MessageManagerImpl: MessageManager {
   
   public func listByStoryId(storyId: Int) -> AnyPublisher<[Message], Exception> {
     self.networkManager.request(
-      RefreshMessagesByStoryId(storyId: storyId)
-    ).map { [weak self] wires in
-      if let items = wires?.items.compactMap({ wire -> Message? in
+      path: "/story/\(storyId)/message",
+      method: .get
+    ).map { [weak self] (wires: WireCollection<WireMessage>) in
+      return wires.items.compactMap({ wire -> Message? in
         if let message = MutableMessage(wire: wire) {
           self?.messageById[message.messageId] = message
           return message
         }
         return nil
-      }) {
-        return items
-      }
-      return []
+      })
     }
     .eraseToAnyPublisher()
   }
   
   public func listByChapterId(_ chapterId: Int) -> AnyPublisher<[Message], Exception> {
-    self.networkManager.request(RefreshMessages(chapterId: chapterId))
-      .map { [weak self] wires in
-        if let items = wires?.items.compactMap({ wire -> Message? in
-          if let message = MutableMessage(wire: wire) {
-            self?.messageById[message.messageId] = message
-            return message
-          }
-          return nil
-        }) {
-          return items
+    self.networkManager.request(
+      path: "/chapter/\(chapterId)/message",
+      method: .get
+    ).map { [weak self] (wires: WireCollection<WireMessage>) in
+      return wires.items.compactMap({ wire -> Message? in
+        if let message = MutableMessage(wire: wire) {
+          self?.messageById[message.messageId] = message
+          return message
         }
-        return []
-      }
-      .eraseToAnyPublisher()
+        return nil
+      })
+    }
+    .eraseToAnyPublisher()
   }
   
   public func insert(
@@ -96,7 +95,8 @@ public class MessageManagerImpl: MessageManager {
   ) -> AnyPublisher<Message?, Exception> {
     guard let userId = authManager.authenticatedUserId else { return .singleValue(nil) }
     return self.networkManager.request(
-      CreateMessage(),
+      path: "/message",
+      method: .post,
       parameters: CreateMessageRequestBody(
         userId: userId,
         storyId: storyId,
@@ -109,8 +109,8 @@ public class MessageManagerImpl: MessageManager {
       )
     )
     .mapException()
-    .map { [weak self] wire in
-      if let message = wire.flatMap(MutableMessage.init(wire:)) {
+    .map { [weak self] (wire: WireMessage) in
+      if let message = MutableMessage(wire: wire) {
         self?.messageById[message.messageId] = message
         return message
       }
@@ -120,26 +120,35 @@ public class MessageManagerImpl: MessageManager {
   }
   
   public func remove(messageId: Int) -> AnyPublisher<Void, Exception> {
-    self.networkManager.request(DeleteDraftMessage(messageId: messageId))
-      .mapException().mapVoid().eraseToAnyPublisher()
+    self.networkManager.request(
+      path: "/message/\(messageId)",
+      method: .delete,
+      expect: EmptyResponseBody.self
+    )
+    .mapVoid()
+    .eraseToAnyPublisher()
   }
   
   public func update(messageId: Int, text: String?, displayIndex: Int?) -> AnyPublisher<Void, Exception> {
     self.networkManager.request(
-      UpdateMessage(messageId: messageId),
+      path: "/message/\(messageId)",
+      method: .put,
       parameters: UpdateMessage.Request(
         text: text,
         displayIndex: displayIndex,
         nextMessageId: nil,
         active: nil
-      )
-    ).mapException().mapVoid().eraseToAnyPublisher()
+      ),
+      expect: EmptyResponseBody.self
+    ).mapVoid().eraseToAnyPublisher()
   }
   
   public func setCharacter(messageId: Int, characterId: Int?) -> AnyPublisher<Void, Exception> {
     self.networkManager.request(
-      AttachCharacterToMessage(messageId: messageId),
-      parameters: AttachCharacterToMessage.RequestBody(characterId: characterId)
-    ).mapException().mapVoid()
+      path: "/message/\(messageId)/character",
+      method: .put,
+      parameters: AttachCharacterToMessage.RequestBody(characterId: characterId),
+      expect: WireModifier.self
+    ).mapVoid()
   }
 }

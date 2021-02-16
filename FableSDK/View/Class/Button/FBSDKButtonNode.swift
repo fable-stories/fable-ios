@@ -112,7 +112,7 @@ public class FBSDKButtonNode: ASButtonNode, FBSDKUIComponent {
           title?.mergingAttributes(
             [
               .paragraphStyle: NSMutableParagraphStyle(alignment: .center),
-              .foregroundColor: UIColor.white
+              .foregroundColor: primaryColor
             ]
           ),
           for: .normal
@@ -136,7 +136,7 @@ public class FBSDKButtonNode: ASButtonNode, FBSDKUIComponent {
           title?.mergingAttributes(
             [
               .paragraphStyle: NSMutableParagraphStyle(alignment: .center),
-              .foregroundColor: primaryColor
+              .foregroundColor: UIColor.white
             ]
           ),
           for: .selected
@@ -160,7 +160,7 @@ public class FBSDKButtonNode: ASButtonNode, FBSDKUIComponent {
           title?.mergingAttributes(
             [
               .paragraphStyle: NSMutableParagraphStyle(alignment: .center),
-              .foregroundColor: isSelected ? primaryColor :  UIColor.white
+              .foregroundColor: isSelected ? UIColor.white : primaryColor
             ]
           ),
           for: .highlighted
@@ -176,11 +176,11 @@ public class FBSDKButtonNode: ASButtonNode, FBSDKUIComponent {
       self.borderColor = ((isHighlighted || isSelected) ? primaryColor : UIColor.clear).cgColor
     case .toggle:
       if self.isHighlighted {
-        self.backgroundColor = isSelected ? UIColor.white : primaryColor
-        self.borderColor = (isSelected ? UIColor.clear : primaryColor).cgColor
-      } else {
-        self.backgroundColor = isSelected ? UIColor.white : primaryColor
+        self.backgroundColor = isSelected ? primaryColor : UIColor.white
         self.borderColor = (isSelected ? primaryColor : UIColor.clear).cgColor
+      } else {
+        self.backgroundColor = isSelected ? primaryColor : UIColor.white
+        self.borderColor = (isSelected ? UIColor.clear : primaryColor).cgColor
       }
     }
   }

@@ -29,12 +29,15 @@ public class AssetManagerImpl: AssetManager {
   public func uploadAsset(asset: Data, fileName: String, tags: [String]) -> AnyPublisher<Asset?, Exception> {
     guard let userId = authManager.authenticatedUserId else { return .singleValue(nil) }
     return self.networkManager.upload(
-      UploadAssetRequest(
-        userId: userId,
-        file: asset,
-        fileName: fileName,
-        tags: tags
-      )
+      path: "/user/\(userId)/asset",
+      method: .post,
+      multipartFormData: { form in
+        form.append(asset, withName: "file", fileName: fileName, mimeType: asset.mimeType)
+        form.append("ios", withName: "objectSouce")
+        if tags.isNotEmpty {
+          form.append(tags.joined(separator: ","), withName: "tags")
+        }
+      }
     )
     .mapException()
     .map { (wire: WireAsset?) -> Asset? in

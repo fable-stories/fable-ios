@@ -12,6 +12,8 @@ import FableSDKResolver
 import FableSDKModelManagers
 import FableSDKResourceTargets
 import FableSDKModelObjects
+import FableSDKWireObjects
+import NetworkFoundation
 
 public class FeedViewControllerV2: ASDKViewController<FeedNode> {
   
@@ -50,12 +52,14 @@ public class FeedViewControllerV2: ASDKViewController<FeedNode> {
   private func refreshData() {
     self.activityView.startAnimating()
     networkManager.request(
-      GetFeed()
+      path: "/mobile/feed",
+      method: .get,
+      expect: WireCollection<WireKategory>.self
     ).sinkDisposed(receiveCompletion: { [weak self] _ in
       self?.activityView.stopAnimating()
     }) { [weak self] wire in
       guard let self = self else { return }
-      let categories = wire?.items.compactMap { Kategory(wire: $0) } ?? []
+      let categories = wire.items.compactMap { Kategory(wire: $0) }
       self.node.sections = categories.compactMap { category in
         if category.stories.isEmpty { return nil }
         return FeedNode.Section.category(.init(category: category, stories: category.stories))

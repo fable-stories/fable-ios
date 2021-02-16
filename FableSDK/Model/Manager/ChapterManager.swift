@@ -10,6 +10,8 @@ import AppFoundation
 import Combine
 import FableSDKModelObjects
 import FableSDKResourceTargets
+import FableSDKWireObjects
+import NetworkFoundation
 
 public protocol ChapterManager {
   func fetchById(chapterId: Int) -> Chapter?
@@ -31,28 +33,28 @@ public class ChapterManagerImpl: ChapterManager {
   }
   
   public func findById(chapterId: Int) -> AnyPublisher<Chapter?, Exception> {
-    self.networkManager.request(GetDraftChapter(chapterId: chapterId))
-      .map { [weak self] wire in
-        if let chapter = wire.flatMap(Chapter.init(wire:)) {
-          self?.chapterById[chapter.chapterId] = chapter
-          return chapter
-        }
-        return nil
+    self.networkManager.request(
+      path: "/chapter/\(chapterId)",
+      method: .get
+    ).map { [weak self] (wire: WireChapter?) in
+      if let chapter = wire.flatMap(Chapter.init(wire:)) {
+        self?.chapterById[chapter.chapterId] = chapter
+        return chapter
       }
-      .eraseToAnyPublisher()
+      return nil
+    }.eraseToAnyPublisher()
   }
   
   public func listByStoryId(storyId: Int) -> AnyPublisher<[Chapter], Exception> {
     self.networkManager.request(
-      RefreshChapters(storyId: storyId)
-    ).map { [weak self] wire in
-      if let chapters = wire?.items.compactMap(Chapter.init(wire:)) {
-        for chapter in chapters {
-          self?.chapterById[chapter.chapterId] = chapter
-        }
-        return chapters
+      path: "/story/\(storyId)/chapter",
+      method: .get
+    ).map { [weak self] (wire: WireCollection<WireChapter>) in
+      let chapters = wire.items.compactMap(Chapter.init(wire:))
+      for chapter in chapters {
+        self?.chapterById[chapter.chapterId] = chapter
       }
-      return []
+      return chapters
     }
     .eraseToAnyPublisher()
   }

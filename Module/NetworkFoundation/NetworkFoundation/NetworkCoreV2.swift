@@ -23,70 +23,90 @@ private let jsonDecoder: JSONDecoder = {
 }()
 
 public protocol NetworkCoreV2Delegate: class {
-  func networkCore<T: ResourceTargetProtocol>(
-    networkEnvironment forResourceTarget: T
+  func networkCore(
+    networkEnvironment path: String, method: ResourceTargetHTTPMethod
   ) -> NetworkEnvironment
-  func networkCore<T: ResourceTargetProtocol>(
-    stubRequest target: T,
-    parameters: T.RequestBodyType?
-  ) -> AnyPublisher<T.ResponseBodyType?, Exception>?
+  func networkCore<T: Codable, V: Codable>(
+    path: String,
+    method: ResourceTargetHTTPMethod,
+    parameters: V?
+  ) -> AnyPublisher<T, Exception>?
 }
 
 public extension NetworkCoreV2Delegate {
-  func networkCore<T: ResourceTargetProtocol>(
-    stubRequest target: T,
-    parameters: T.RequestBodyType?
-  ) -> AnyPublisher<T.ResponseBodyType?, Exception>? { nil }
+  func networkCore<T: Codable, V: Codable>(
+    path: String,
+    method: ResourceTargetHTTPMethod,
+    parameters: V?
+  ) -> AnyPublisher<T, Exception>? { nil }
 }
 
-
 public protocol NetworkCoreV2Protocol {
-  func upload<T: ResourceTargetProtocol>(
-    _ target: T,
-    parameters: T.RequestBodyType?
-  ) -> AnyPublisher<T.ResponseBodyType?, Exception>
-  func request<T: ResourceTargetProtocol>(
-    _ target: T,
-    parameters: T.RequestBodyType?
-  ) -> AnyPublisher<T.ResponseBodyType?, Exception>
+  func upload<T: Codable, V: Codable>(
+    path: String,
+    method: ResourceTargetHTTPMethod,
+    parameters: V?,
+    multipartFormData: @escaping (MultiPartFormDataProtocol) -> Void,
+    expect: T.Type
+  ) -> AnyPublisher<T, Exception>
+  func request<T: Codable, V: Codable>(
+    path: String,
+    method: ResourceTargetHTTPMethod,
+    parameters: V?,
+    expect: T.Type
+  ) -> AnyPublisher<T, Exception>
 }
 
 
 public final class NetworkCoreV2 {
   public let shared = NetworkCore()
   
-  public static func upload<T: ResourceTargetProtocol>(
-    _ target: T,
-    parameters: T.RequestBodyType?,
+  public static func upload<T: Codable, V: Codable>(
+    path: String,
+    method: ResourceTargetHTTPMethod,
+    parameters: V? = nil,
+    multipartFormData: @escaping (MultiPartFormDataProtocol) -> Void,
+    expect: T.Type,
     delegate: NetworkCoreV2Delegate
-  ) -> AnyPublisher<T.ResponseBodyType?, Exception> {
+  ) -> AnyPublisher<T, Exception> {
     let logger = Logger()
-    let publisher: AnyPublisher<T.ResponseBodyType?, Exception> = Future { callback in
-      let parameters: [String: Any]? = self.getParameters(target, parameters: parameters, logger: logger, callback: callback)
-      let networkEnvironment = delegate.networkCore(networkEnvironment: target)
-      let absoluteUrl: String = self.makeAbsoluteUrl(
-        target,
+    let publisher: AnyPublisher<T, Exception> = Future { callback in
+      let parameters: [String: Any] = self.getParameters(
+        path: path,
+        method: method,
         parameters: parameters,
+        logger: logger,
+        callback: callback
+      ) ?? [:]
+      let networkEnvironment = delegate.networkCore(
+        networkEnvironment: path,
+        method: method
+      )
+      let absoluteUrl: String = self.makeAbsoluteUrl(
+        path: path,
+        method: method,
+        parameters: method == .get ? parameters : nil,
         logger: logger,
         networkEnvironment: networkEnvironment,
         callback: callback
       )
       let startTime = Date.now
       
-      logger.enqueue("\n\(target.method) \(absoluteUrl)", logLevel: .info)
+      logger.enqueue("\n\(method) \(absoluteUrl)", logLevel: .info)
       
       AF.upload(
-        multipartFormData: target.multipartFormdata(),
+        multipartFormData: multipartFormData,
         to: absoluteUrl,
         usingThreshold: UInt64(),
-        method: target.method.alamofireMethodBridge,
+        method: method.alamofireMethodBridge,
         headers: HTTPHeaders(networkEnvironment.headers),
         interceptor: nil,
         fileManager: .default
       ).responseData { response in
         self.handleResponse(
           response: response,
-          target: target,
+          path: path,
+          method: method,
           logger: logger,
           startTime: startTime,
           callback: callback
@@ -102,30 +122,39 @@ public final class NetworkCoreV2 {
     return publisher
   }
   
-  public static func request<T: ResourceTargetProtocol>(
-    _ target: T,
-    parameters: T.RequestBodyType? = nil,
+  public static func request<T: Codable, V: Codable>(
+    path: String,
+    method: ResourceTargetHTTPMethod,
+    parameters: V? = nil,
+    expect: T.Type,
     delegate: NetworkCoreV2Delegate
-  ) -> AnyPublisher<T.ResponseBodyType?, Exception> {
-    if let stubRequest = delegate.networkCore(stubRequest: target, parameters: parameters) {
-      return stubRequest
-    }
+  ) -> AnyPublisher<T, Exception> {
     let logger = Logger()
-    let publisher: AnyPublisher<T.ResponseBodyType?, Exception> = Future { callback in
+    let publisher: AnyPublisher<T, Exception> = Future { callback in
       do {
-        let parameters: [String: Any] = self.getParameters(target, parameters: parameters, logger: logger, callback: callback) ?? [:]
-        let networkEnvironment = delegate.networkCore(networkEnvironment: target)
+        let parameters: [String: Any] = self.getParameters(
+          path: path,
+          method: method,
+          parameters: parameters,
+          logger: logger,
+          callback: callback
+        ) ?? [:]
+        let networkEnvironment = delegate.networkCore(
+          networkEnvironment: path,
+          method: method
+        )
         let absoluteUrl: String = self.makeAbsoluteUrl(
-          target,
-          parameters: target.method == .get ? parameters : nil,
+          path: path,
+          method: method,
+          parameters: method == .get ? parameters : nil,
           logger: logger,
           networkEnvironment: networkEnvironment,
           callback: callback
         )
         let startTime = Date.now
 
-        logger.enqueue("\n\(target.method) \(absoluteUrl)", logLevel: .info)
-        if parameters.isNotEmpty, target.method != .get {
+        logger.enqueue("\n\(method) \(absoluteUrl)", logLevel: .info)
+        if parameters.isNotEmpty, method != .get {
           logger.enqueue("\n-- REQUEST --\n")
           let data = try JSONSerialization.data(withJSONObject: parameters, options: .prettyPrinted)
           if let jsonString = String(data: data, encoding: .utf8) {
@@ -137,15 +166,16 @@ public final class NetworkCoreV2 {
         
         AF.request(
           absoluteUrl,
-          method: target.method.alamofireMethodBridge,
-          parameters: target.method == .get ? nil : parameters,
+          method: method.alamofireMethodBridge,
+          parameters: method == .get ? nil : parameters,
           encoding: JSONEncoding.default,
           headers: HTTPHeaders(networkEnvironment.headers),
           interceptor: nil
         ).responseData { response in
           self.handleResponse(
             response: response,
-            target: target,
+            path: path,
+            method: method,
             logger: logger,
             startTime: startTime,
             callback: callback
@@ -164,19 +194,19 @@ public final class NetworkCoreV2 {
     return publisher
   }
   
-  private static func handleResponse<T: ResourceTargetProtocol>(
+  private static func handleResponse<T: Codable>(
     response: AFDataResponse<Data>,
-    target: T,
+    path: String,
+    method: ResourceTargetHTTPMethod,
     logger: Logger,
     startTime: Date,
-    callback: (Result<T.ResponseBodyType?, Exception>) -> Void
+    callback: (Result<T, Exception>) -> Void
   ) {
     let requestDuration = Date.now.timeIntervalSince(startTime).rounded(toPlaces: 2)
     let statusCode = response.response.flatMap {
       "\($0.statusCode)"
     } ?? ""
     logger.enqueue("\n-- RESPONSE \(requestDuration)s \(statusCode) --\n")
-    let targetType = type(of: target)
     if let error = response.error, response.response?.hasSuccessfulStatusCode != true {
       logger.enqueue(error, logLevel: .error)
       callback(.failure(Exception(NetworkError.network(error, nil))))
@@ -190,7 +220,7 @@ public final class NetworkCoreV2 {
         }()
         if json.isEmpty {
           logger.enqueue("no data", logLevel: .error)
-          callback(.success(nil))
+          callback(.success(Optional<T>.none ?? (() as! T)))
         } else if let error = json["error"] as? String {
           logger.enqueue(error, logLevel: .error)
           callback(.failure(Exception(NetworkError.network(nil, error))))
@@ -201,7 +231,7 @@ public final class NetworkCoreV2 {
           } else {
             logger.enqueue("could not parse response JSON", logLevel: .error)
           }
-          let json = try jsonDecoder.decode(targetType.ResponseBodyType.self, from: data)
+          let json = try jsonDecoder.decode(T.self, from: data)
           callback(.success(json))
         }
       } catch let error {
@@ -209,26 +239,27 @@ public final class NetworkCoreV2 {
         if let data = response.data, let string = String(data: data, encoding: .utf8) {
           logger.enqueue(string, logLevel: .error)
         }
-        callback(.success(nil))
+        callback(.success(Optional<T>.none ?? (() as! T)))
       }
     } else {
       logger.enqueue("No Content", logLevel: .error)
-      callback(.success(nil))
+      callback(.success(Optional<T>.none ?? (() as! T)))
     }
   }
   
-  public static func getParameters<T: ResourceTargetProtocol>(
-    _ target: T,
-    parameters: T.RequestBodyType?,
+  public static func getParameters<T: Codable, V: Codable>(
+    path: String,
+    method: ResourceTargetHTTPMethod,
+    parameters: V?,
     logger: Logger,
-    callback: (Result<T.ResponseBodyType?, Exception>) -> Void
+    callback: (Result<T, Exception>) -> Void
   ) -> [String: Any]? {
     let parameters: [String: Any]? = {
       if let parameters = parameters {
         do {
           let data = try jsonEncoder.encode(parameters)
           if let json = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as? [String: Any] {
-            if target.method == .get {
+            if method == .get {
               return json.map { key, value -> (String, Any) in
                 /// The API currently only accepts camelCase query parameters
                 let key = key.toCamelCase
@@ -251,12 +282,13 @@ public final class NetworkCoreV2 {
     return parameters
   }
   
-  private static func makeAbsoluteUrl<T: ResourceTargetProtocol>(
-    _ target: T,
+  private static func makeAbsoluteUrl<T: Codable>(
+    path: String,
+    method: ResourceTargetHTTPMethod,
     parameters: [String: Any]?,
     logger: Logger,
     networkEnvironment: NetworkEnvironment,
-    callback: (Result<T.ResponseBodyType?, Exception>) -> Void
+    callback: (Result<T, Exception>) -> Void
   ) -> String {
     let absoluteUrl: String = {
       do {
@@ -264,7 +296,7 @@ public final class NetworkCoreV2 {
         urlComponents.scheme = networkEnvironment.scheme
         urlComponents.host = networkEnvironment.host
         urlComponents.port = networkEnvironment.port
-        urlComponents.path = networkEnvironment.path + target.url
+        urlComponents.path = networkEnvironment.path + path
         if let parameters = parameters {
           let queryItems = parameters.compactMap { key, value -> URLQueryItem? in
             return URLQueryItem(name: key, value: String(describing: value))

@@ -25,9 +25,12 @@ public final class StoryStatsManagerImpl: StoryStatsManager {
   
   public func incrementViews(storyId: Int) -> AnyPublisher<Int, Exception> {
     networkManager.request(
-      IncrementStoryViewsResource(storyId: storyId)
+      path: "/story/\(storyId)/stats/views",
+      method: .post
     )
-    .map { $0?.views ?? 0 }
+    .map { (wire: IncrementStoryViewsResource.Response) in
+      wire.views
+    }
     .eraseToAnyPublisher()
   }
 }

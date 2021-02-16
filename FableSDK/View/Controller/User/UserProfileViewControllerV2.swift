@@ -62,6 +62,7 @@ public class UserProfileViewControllerV2: ASDKViewController<UserProfileNode> {
     }()
     super.init(node: .init())
     self.node.delegate = self
+    self.node.setIsMyUser(isMyUser)
   }
   
   public init(resolver: FBSDKResolver) {
@@ -75,6 +76,7 @@ public class UserProfileViewControllerV2: ASDKViewController<UserProfileNode> {
     self.initialUserId = Constants.myUserId
     super.init(node: .init())
     self.node.delegate = self
+    self.node.setIsMyUser(isMyUser)
   }
   
   public required init?(coder: NSCoder) {

@@ -13,6 +13,7 @@ import Interface
 import NetworkFoundation
 import ReactiveSwift
 import Combine
+import FableSDKWireObjects
 
 public class ConfigManager {
   private let networkManager: NetworkManager
@@ -34,8 +35,11 @@ public class ConfigManager {
   }
 
   public func refreshConfigV2() -> AnyPublisher<Config?, Exception> {
-    self.networkManagerV2.request(GetConfig()).mapException().map { wire in
-      if let config = wire.flatMap(Config.init(wire:)) {
+    self.networkManagerV2.request(
+      path: "/config",
+      method: .get
+    ).mapException().map { (wire: WireConfig) in
+      if let config = Config(wire: wire) {
         return config
       }
       return nil

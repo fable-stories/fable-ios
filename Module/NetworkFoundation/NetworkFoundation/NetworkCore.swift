@@ -34,8 +34,8 @@ extension ResourceTargetProtocol {
   public func multipartFormdata() -> (MultiPartFormDataProtocol) -> Void {{ _ in }}
 }
 
-public struct EmptyRequestBody: Codable {}
-public struct EmptyResponseBody: Codable {}
+public struct EmptyRequestBody: Codable { public init() {} }
+public struct EmptyResponseBody: Codable { public init() {} }
 
 public enum ResourceTargetHTTPMethod: CustomStringConvertible {
   case get

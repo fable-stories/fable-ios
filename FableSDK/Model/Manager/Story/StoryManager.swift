@@ -11,6 +11,7 @@ import NetworkFoundation
 import Combine
 import FableSDKModelObjects
 import FableSDKResourceTargets
+import FableSDKWireObjects
 
 public protocol StoryManager {
   func findById(storyId: Int) -> AnyPublisher<Story?, Exception>
@@ -40,7 +41,11 @@ public class StoryManagerImpl: StoryManager {
     if let cache = self.storyById[storyId], abs(cache.cachedAt.timeIntervalSinceNow) <= 30 {
       return .singleValue(cache.value)
     }
-    return self.networkManager.request(GetStory(storyId: storyId)).map { [weak self] wire in
+    return self.networkManager.request(
+      path: "/story/\(storyId)",
+      method: .get,
+      expect: WireStory?.self
+    ).map { [weak self] wire in
       if let wire = wire, let story = MutableStory(wire: wire) {
         self?.storyById[story.storyId] = CachedItem(story)
         if let user = wire.user.flatMap(User.init(wire:)) {
@@ -62,7 +67,8 @@ public class StoryManagerImpl: StoryManager {
   
   public func updatebyId(storyId: Int, parameters: UpdateStoryParameters) -> AnyPublisher<Void, Exception> {
     self.networkManager.request(
-      UpdateStory(storyId: storyId),
+      path: "/story/\(storyId)",
+      method: .put,
       parameters: UpdateStoryRequestBody(
         categoryId: parameters.categoryId,
         title: parameters.title,
@@ -71,7 +77,8 @@ public class StoryManagerImpl: StoryManager {
         portraitImageAssetId: parameters.portraitImageAssetId,
         landscapeImageAssetId: parameters.landscapeImageAssetId,
         squareImageAssetId: parameters.squareImageAssetId
-      )
+      ),
+      expect: EmptyResponseBody.self
     ).map { [weak self] _ in
       if let story = self?.storyById[storyId]?.value as? MutableStory {
         parameters.apply(story: story)
@@ -82,15 +89,19 @@ public class StoryManagerImpl: StoryManager {
   
   public func deleteStory(storyId: Int) -> AnyPublisher<Void, Exception> {
     self.networkManager.request(
-      DeleteStoryDraft(storyId: storyId)
-    ).mapException().mapVoid().eraseToAnyPublisher()
+      path: "/story/\(storyId)",
+      method: .delete,
+      expect: EmptyResponseBody.self
+    ).mapVoid().eraseToAnyPublisher()
   }
   
   public func listByUserId(userId: Int) -> AnyPublisher<[Story], Exception> {
     self.networkManager.request(
-      GetStoriesByUser(userId: userId)
-    ).mapException().map { wire in
-      return wire?.items.compactMap(MutableStory.init(wire:)) ?? []
+      path: "/user/\(userId)/story",
+      method: .delete,
+      expect: WireCollection<WireStory>.self
+    ).map { wire in
+      wire.items.compactMap(MutableStory.init(wire:)) 
     }.eraseToAnyPublisher()
   }
 }

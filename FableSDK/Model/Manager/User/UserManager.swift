@@ -8,6 +8,8 @@ import Foundation
 import Combine
 import AppFoundation
 import FableSDKFoundation
+import FableSDKWireObjects
+import NetworkFoundation
 
 public enum UserManagerEvent: EventContext, Equatable {
   case didRefreshMyUser
@@ -77,7 +79,11 @@ public class UserManagerImpl: UserManager {
   }
   
   public func refreshUser(userId: Int) -> AnyPublisher<User?, Exception> {
-    networkManager.request(GetUser(userId: userId)).mapException().map { [weak self] wire in
+    networkManager.request(
+      path: "/user/\(userId)",
+      method: .get,
+      expect: WireUser?.self
+    ).mapException().map { [weak self] wire in
       if let user = wire.flatMap(User.init(wire:)) {
         self?.usersById[userId] = user
         self?.eventManager.sendEvent(UserManagerEvent.didRefreshUser(userId: userId))
@@ -89,44 +95,44 @@ public class UserManagerImpl: UserManager {
   
   public func refreshUsers(userIds: Set<Int>) -> AnyPublisher<[User], Exception> {
     self.networkManager.request(
-      GetUsers(),
-      parameters: GetUsers.Request(userIds: userIds)
+      path: "/user",
+      method: .get,
+      parameters: GetUsers.Request(userIds: userIds),
+      expect: WireCollection<WireUser>.self
     ).map { [weak self] wire in
-      if let users = wire?.items.compactMap(User.init(wire:)) {
-        for user in users {
-          self?.cacheUser(user: user)
-        }
-        return users
+      let users = wire.items.compactMap(User.init(wire:))
+      for user in users {
+        self?.cacheUser(user: user)
       }
-      return []
+      return users
     }.eraseToAnyPublisher()
   }
   
   public func refreshUsers(followedByuserId userId: Int) -> AnyPublisher<[User], Exception> {
     self.networkManager.request(
-      GetUsersFollowedByUserId(userId: userId)
+      path: "/user/\(userId)/followed",
+      method: .get,
+      expect: WireCollection<WireUser>.self
     ).map { [weak self] wire in
-      if let users = wire?.items.compactMap(User.init(wire:)) {
-        for user in users {
-          self?.cacheUser(user: user)
-        }
-        return users
+      let users = wire.items.compactMap(User.init(wire:))
+      for user in users {
+        self?.cacheUser(user: user)
       }
-      return []
+      return users
     }.eraseToAnyPublisher()
   }
   
   public func refreshUsers(followingUserId userId: Int) -> AnyPublisher<[User], Exception> {
     self.networkManager.request(
-      GetUsersFollowingUserId(userId: userId)
+      path: "/user/\(userId)/followers",
+      method: .get,
+      expect: WireCollection<WireUser>.self
     ).map { [weak self] wire in
-      if let users = wire?.items.compactMap(User.init(wire:)) {
-        for user in users {
-          self?.cacheUser(user: user)
-        }
-        return users
+      let users = wire.items.compactMap(User.init(wire:))
+      for user in users {
+        self?.cacheUser(user: user)
       }
-      return []
+      return users
     }.eraseToAnyPublisher()
   }
 
@@ -139,24 +145,27 @@ public class UserManagerImpl: UserManager {
       }
       return
     }
-    networkManager.request(GetUser(userId: userId))
-      .sinkDisposed(receiveCompletion: nil, receiveValue: { [weak self] wire in
-        guard let user = wire.flatMap({ User(wire: $0) }) else { return }
-        self?.cacheUser(user: user)
-        self?.stateManager.modifyState { state in
-          state.currentUser = user
-        }
-        self?.eventManager.sendEvent(UserManagerEvent.didRefreshMyUser)
-      })
+    networkManager.request(
+      path: "/user/\(userId)",
+      method: .get,
+      expect: WireUser?.self
+    ).sinkDisposed(receiveCompletion: nil, receiveValue: { [weak self] wire in
+      guard let user = wire.flatMap({ User(wire: $0) }) else { return }
+      self?.cacheUser(user: user)
+      self?.stateManager.modifyState { state in
+        state.currentUser = user
+      }
+      self?.eventManager.sendEvent(UserManagerEvent.didRefreshMyUser)
+    })
   }
   
   public func setFollowStatus(userId: Int, isFollowing: Bool) -> AnyPublisher<Void, Exception> {
     guard let selfUserId = authManager.authenticatedUserId, selfUserId != userId else { return .singleValue(()) }
     return networkManager.request(
-      UpsertUserToUserResource(
-        userId: selfUserId,
-        toUserId: userId),
-      parameters: UpsertUserToUserResource.Request(isFollowing: isFollowing)
+      path: "/user/\(selfUserId)/to/user/\(userId)",
+      method: .post,
+      parameters: UpsertUserToUserResource.Request(isFollowing: isFollowing),
+      expect: EmptyResponseBody.self
     ).mapException().mapVoid().also { [weak self] in
       if var user = self?.fetchUser(userId: userId), let userToUser = user.userToUser {
         user.userToUser = userToUser.copy({ $0["isFollowing"] = isFollowing })

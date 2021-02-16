@@ -12,7 +12,7 @@ import FableSDKResourceTargets
 import FableSDKModelObjects
 import ReactiveSwift
 import Combine
-
+import FableSDKWireObjects
 
 public protocol StoryDraftManager {
   func fetchByStoryId(storyId: Int) -> StoryDraft?
@@ -46,8 +46,9 @@ public class StoryDraftManagerImpl: StoryDraftManager {
     storyId: Int
   ) -> AnyPublisher<StoryDraft?, Exception> {
     let publisher: AnyPublisher<StoryDraft?, Exception> = networkManager.request(
-      GetStoryDraft(storyId: storyId)
-    ).map { [weak self] wire in
+      path: "/story/\(storyId)",
+      method: .get
+    ).map { [weak self] (wire: WireStoryDraft?) in
       if let wire = wire, let storyDraft = StoryDraft(wire: wire) {
         self?.storyDraftByStoryId[storyId] = storyDraft
         return storyDraft
@@ -65,9 +66,10 @@ public class StoryDraftManagerImpl: StoryDraftManager {
   public func createStoryDraft() -> AnyPublisher<StoryDraft?, Exception> {
     guard let userId = authManager.authenticatedUserId else { return .singleValue(nil) }
     return networkManager.request(
-      CreateStoryDraft(userId: userId)
-    ).map { [weak self] wire in
-      if let wire = wire, let storyDraft = StoryDraft(wire: wire) {
+      path: "/user/\(userId)/draft/story",
+      method: .post
+    ).map { [weak self] (wire: WireStoryDraft) in
+      if let storyDraft = StoryDraft(wire: wire) {
         self?.storyDraftByStoryId[storyDraft.storyId] = storyDraft
         return storyDraft
       }

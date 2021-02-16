@@ -10,6 +10,8 @@ import AppFoundation
 import Combine
 import FableSDKModelObjects
 import FableSDKResourceTargets
+import FableSDKWireObjects
+import NetworkFoundation
 
 public protocol CharacterManager {
   func listCachedByStoryId(storyId: Int) -> [Character]
@@ -38,17 +40,18 @@ public class CharacterManagerImpl: CharacterManager {
   }
   
   public func listByStoryId(_ storyId: Int) -> AnyPublisher<[Character], Exception> {
-    return self.networkManager.request(GetCharactersByStoryId(storyId: storyId))
-      .map { [weak self] wires in
-        if let items = wires?.items.compactMap(MutableCharacter.init(wire:)) {
-          for item in items {
-            self?.characterById[item.characterId] = item
-          }
-          return items
-        }
-        return []
+    return self.networkManager.request(
+      path: "/story/\(storyId)/character",
+      method: .get,
+      expect: WireCollection<WireCharacter>.self
+    ).map { [weak self] wires in
+      let items = wires.items.compactMap(MutableCharacter.init(wire:))
+      for item in items {
+        self?.characterById[item.characterId] = item
       }
-      .eraseToAnyPublisher()
+      return items
+    }
+    .eraseToAnyPublisher()
   }
   
   public func insert(
@@ -59,18 +62,20 @@ public class CharacterManagerImpl: CharacterManager {
   ) -> AnyPublisher<Character?, Exception> {
     guard let userId = self.authManager.authenticatedUserId else { return .singleValue(nil) }
     return self.networkManager.request(
-      CreateCharacter(),
+      path: "/character",
+      method: .post,
       parameters: CreateCharacterRequestBody(
         storyId: storyId,
         userId: userId,
         name: name,
         colorHexString: colorHexString,
         messageAlignment: messageAlignment
-      )
+      ),
+      expect: WireCharacter.self
     )
     .mapException()
     .map { [weak self] wire in
-      if let character = wire.flatMap(MutableCharacter.init(wire:)) {
+      if let character = MutableCharacter(wire: wire) {
         self?.characterById[character.characterId] = character
         return character
       }
@@ -80,18 +85,23 @@ public class CharacterManagerImpl: CharacterManager {
   }
   
   public func remove(characterId: Int) -> AnyPublisher<Void, Exception> {
-    self.networkManager.request(DeleteDraftCharacter(characterId: characterId))
-      .mapVoid().mapException()
+    self.networkManager.request(
+      path: "/character/\(characterId)",
+      method: .delete,
+      expect: EmptyResponseBody.self
+    ).mapVoid().mapException()
   }
   
   public func update(characterId: Int, name: String?, colorHexString: String?, messageAlignment: String?) -> AnyPublisher<Void, Exception> {
     self.networkManager.request(
-      UpdateDraftCharacter(characterId: characterId),
+      path: "/character/\(characterId)",
+      method: .put,
       parameters: UpdateCharacterRequestBody(
         name: name,
         colorHexString: colorHexString,
         messageAlignment: messageAlignment
-      )
+      ),
+      expect: EmptyResponseBody.self
     ).mapVoid().mapException()
   }
 }

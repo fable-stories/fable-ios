@@ -29,7 +29,10 @@ public class NetworkManagerV2Impl: NetworkManagerV2 {
     self.environmentManager = environmentManager
   }
   
-  public func networkCore<T>(networkEnvironment forResourceTarget: T) -> NetworkEnvironment where T: ResourceTargetProtocol {
+  public func networkCore(
+    networkEnvironment path: String,
+    method: ResourceTargetHTTPMethod
+  ) -> NetworkEnvironment {
     let environment = environmentManager.environment
     let authState = environmentManager.authState
     return FableNetworkEnvironment.generateEnvironment(
@@ -41,16 +44,71 @@ public class NetworkManagerV2Impl: NetworkManagerV2 {
 
 
 extension NetworkManagerV2 {
-  public func upload<T>(_ target: T, parameters: T.RequestBodyType? = nil) -> AnyPublisher<T.ResponseBodyType?, Exception> where T: ResourceTargetProtocol {
-    NetworkCoreV2.upload(target, parameters: parameters, delegate: self)
+  public func upload<T>(
+    path: String,
+    method: ResourceTargetHTTPMethod,
+    multipartFormData: @escaping (MultiPartFormDataProtocol) -> Void,
+    expect: T.Type = T.self
+  ) -> AnyPublisher<T, Exception> where T : Decodable, T : Encodable {
+    NetworkCoreV2.upload(
+      path: path,
+      method: method,
+      parameters: EmptyParameters(),
+      multipartFormData: multipartFormData,
+      expect: expect,
+      delegate: self
+    )
   }
   
-  public func request<T>(_ target: T, parameters: T.RequestBodyType? = nil) -> AnyPublisher<T.ResponseBodyType?, Exception> where T: ResourceTargetProtocol {
-    NetworkCoreV2.request(target, parameters: parameters, delegate: self)
-      .mapError { error in
-        RemoteLogger.shared.log(error)
-        return error
-      }
-      .eraseToAnyPublisher()
+  public func upload<T, V>(
+    path: String,
+    method: ResourceTargetHTTPMethod,
+    parameters: V?,
+    multipartFormData: @escaping (MultiPartFormDataProtocol) -> Void,
+    expect: T.Type = T.self
+  ) -> AnyPublisher<T, Exception> where T : Decodable, T : Encodable, V : Decodable, V : Encodable {
+    NetworkCoreV2.upload(
+      path: path,
+      method: method,
+      parameters: parameters,
+      multipartFormData: multipartFormData,
+      expect: expect,
+      delegate: self
+    )
+  }
+  
+  public func request<T>(
+    path: String,
+    method: ResourceTargetHTTPMethod,
+    expect: T.Type = T.self
+  ) -> AnyPublisher<T, Exception> where T : Decodable, T : Encodable {
+    self.request(
+      path: path,
+      method: method,
+      parameters: EmptyParameters(),
+      expect: expect
+    )
+  }
+  
+  public func request<T, V>(
+    path: String,
+    method: ResourceTargetHTTPMethod,
+    parameters: V?,
+    expect: T.Type = T.self
+  ) -> AnyPublisher<T, Exception> where T : Decodable, T : Encodable, V : Decodable, V : Encodable {
+    NetworkCoreV2.request(
+      path: path,
+      method: method,
+      parameters: parameters,
+      expect: expect,
+      delegate: self
+    )
+    .mapError { error in
+      RemoteLogger.shared.log(error)
+      return error
+    }
+    .eraseToAnyPublisher()
   }
 }
+
+private class EmptyParameters: Codable {}

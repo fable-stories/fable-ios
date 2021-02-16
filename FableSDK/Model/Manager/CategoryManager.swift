@@ -10,6 +10,8 @@ import Combine
 import AppFoundation
 import FableSDKModelObjects
 import FableSDKResourceTargets
+import FableSDKWireObjects
+import NetworkFoundation
 
 public protocol CategoryManager {
   func fetchById(categoryId: Int) -> Kategory?
@@ -32,19 +34,23 @@ public class CategoryManagerImpl: CategoryManager {
   }
 
   public func list() -> AnyPublisher<[Kategory], Exception> {
-    self.networkManager.request(GetCategories()).map { [weak self] wire -> [Kategory] in
-      if let categories = wire?.items.compactMap(Kategory.init(wire:)) {
-        for category in categories {
-          self?.categoryById[category.categoryId] = category
-        }
-        return categories
+    self.networkManager.request(
+      path: "/category",
+      method: .get
+    ).map { [weak self] (wire: WireCollection<WireKategory>) -> [Kategory] in
+      let categories = wire.items.compactMap(Kategory.init(wire:))
+      for category in categories {
+        self?.categoryById[category.categoryId] = category
       }
-      return []
+      return categories
     }.eraseToAnyPublisher().mapException()
   }
   
   public func findById(categoryId: Int) -> AnyPublisher<Kategory?, Exception> {
-    self.networkManager.request(GetSingleCategory(categoryId: categoryId)).map { [weak self] wire in
+    self.networkManager.request(
+      path: "/category/\(categoryId)",
+      method: .get
+    ).map { [weak self] (wire: WireKategory?) in
       if let category = wire.flatMap(Kategory.init(wire:)) {
         self?.categoryById[category.categoryId] = category
         return category
