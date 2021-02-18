@@ -1103,7 +1103,7 @@ public struct User: Codable {
   public let biography: String?
   public let avatarAsset: Asset?
   /// transients
-  public var userToUser: UserToUser?
+  public var userToUser: MutableUserToUser
 
   public init(
     userId: Int,
@@ -1114,7 +1114,7 @@ public struct User: Codable {
     password: String? = nil,
     biography: String? = nil,
     avatarAsset: Asset? = nil,
-    userToUser: UserToUser? = nil
+    userToUser: MutableUserToUser? = nil
   ) {
     self.userId = userId
     self.firstName = firstName
@@ -1124,7 +1124,7 @@ public struct User: Codable {
     self.password = password
     self.biography = biography
     self.avatarAsset = avatarAsset
-    self.userToUser = userToUser
+    self.userToUser = userToUser ?? MutableUserToUser(isFollowing: false, isBlocked: false)
   }
 
   public func copy(

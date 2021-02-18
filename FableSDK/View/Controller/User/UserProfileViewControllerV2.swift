@@ -27,6 +27,7 @@ public class UserProfileViewControllerV2: ASDKViewController<UserProfileNode> {
   private let eventManager: EventManager
   private let storyManager: StoryManager
   private let authManager: AuthManager
+  private let userToUserManager: UserToUserManager
   
   private let presenter: UserProfileViewPresenter
   
@@ -35,9 +36,9 @@ public class UserProfileViewControllerV2: ASDKViewController<UserProfileNode> {
   private var isMyUser: Bool {
     initialUserId == Constants.myUserId
   }
-  private var userId: Int? {
-    if isMyUser {
-      return authManager.authenticatedUserId
+  private var userId: Int {
+    if let userId = authManager.authenticatedUserId, isMyUser {
+      return userId
     }
     return initialUserId
   }
@@ -50,6 +51,7 @@ public class UserProfileViewControllerV2: ASDKViewController<UserProfileNode> {
     self.userManager = resolver.get()
     self.eventManager = resolver.get()
     self.storyManager = resolver.get()
+    self.userToUserManager = resolver.get()
     self.authManager = authManager
     self.presenter = UserProfileViewPresenter(resolver: resolver)
     self.isMainProfileScreen = false
@@ -71,6 +73,7 @@ public class UserProfileViewControllerV2: ASDKViewController<UserProfileNode> {
     self.eventManager = resolver.get()
     self.storyManager = resolver.get()
     self.authManager = resolver.get()
+    self.userToUserManager = resolver.get()
     self.presenter = UserProfileViewPresenter(resolver: resolver)
     self.isMainProfileScreen = true
     self.initialUserId = Constants.myUserId
@@ -88,7 +91,18 @@ public class UserProfileViewControllerV2: ASDKViewController<UserProfileNode> {
     
     self.title = "User Profile"
     self.neverShowPlaceholders = true
-    self.navigationItem.rightBarButtonItem = UIBarButtonItem(customView: activityView)
+    let moreButton = UIBarButtonItem(
+      image: UIImage(named: "more")?
+        .resized(to: .sizeWithConstantDimensions(32.0))?
+        .tinted(.black),
+      style: .plain,
+      target: self,
+      action: #selector(didSelectMore(barButton:))
+    )
+    self.navigationItem.rightBarButtonItems = [
+      moreButton,
+      UIBarButtonItem(customView: activityView)
+    ]
 
     self.eventManager.onEvent.sinkDisposed(receiveCompletion: nil) { [weak self] event in
       switch event {
@@ -106,11 +120,6 @@ public class UserProfileViewControllerV2: ASDKViewController<UserProfileNode> {
   }
 
   public func refreshData() {
-    guard let userId = userId else {
-      self.node.sections.removeAll()
-      return
-    }
-    
     self.activityView.startAnimating()
     
     self.presenter.refreshData(userId: userId).sinkDisposed(receiveCompletion: { [weak self] completion in
@@ -129,7 +138,7 @@ public class UserProfileViewControllerV2: ASDKViewController<UserProfileNode> {
           followCount: viewModel.followCount,
           followerCount: viewModel.followerCount,
           storyCount: stories.count,
-          isFollowing: self.isMyUser ? nil : (viewModel.user.userToUser?.isFollowing ?? false),
+          isFollowing: self.isMyUser ? nil : viewModel.user.userToUser.isFollowing,
           isMyUser: self.isMyUser
         )
       ))
@@ -173,6 +182,19 @@ public class UserProfileViewControllerV2: ASDKViewController<UserProfileNode> {
   private func presentStoryReader(storyId: Int) {
     self.eventManager.sendEvent(RouterRequestEvent.present(.storyDetail(storyId: storyId), viewController: self))
   }
+  
+  @objc private func didSelectMore(barButton: UIBarButtonItem) {
+    guard let userToUser = userToUserManager.fetchUserToUser(userId: userId) else { return }
+    let isBlocked = userToUser.isBlocked
+    let alert = UIAlertController(title: "More", message: nil, preferredStyle: .actionSheet)
+    alert.addAction(.init(title: isBlocked ? "Unblock" : "Block", style: .default, handler: { [weak self] _ in
+      guard let self = self else { return }
+      let newValue = !isBlocked
+      self.userToUserManager.setUserBlocked(userId: self.userId, isBlocked: newValue).sinkDisposed()
+    }))
+    alert.addAction(.init(title: "Cancel", style: .default, handler: nil))
+    self.present(alert, animated: true, completion: nil)
+  }
 }
 
 extension UserProfileViewControllerV2: UserProfileNodeDelegate {
@@ -185,7 +207,6 @@ extension UserProfileViewControllerV2: UserProfileNodeDelegate {
   }
   
   public func userProfileNode(didSelectFollowersCount node: UserProfileNode) {
-    guard let userId = self.userId else { return }
     self.userManager.refreshUsers(followingUserId: userId)
       .sinkDisposed(receiveCompletion: nil) { [weak self] users in
         guard let self = self, users.isNotEmpty else { return }
@@ -199,7 +220,6 @@ extension UserProfileViewControllerV2: UserProfileNodeDelegate {
   }
   
   public func userProfileNode(didSelectFollowingCount node: UserProfileNode) {
-    guard let userId = self.userId else { return }
     self.userManager.refreshUsers(followedByuserId: userId)
       .sinkDisposed(receiveCompletion: nil) { [weak self] (users) in
         guard let self = self, users.isNotEmpty else { return }

@@ -26,7 +26,16 @@ public class FBSDKResolver: Resolver {
     register { EnvironmentManager(delegate: $0.get(expect: GlobalContextManager.self)) }
     register(expect: AnalyticsManager.self) { AnalyticsManagerImpl(networkManager: $0.get(), delegate: firebaseAnalyticsDelegate) }
     register { StateManager(environmentManager: $0.get()) }
-    register(expect: UserManager.self) { UserManagerImpl(stateManager: $0.get(), networkManager: $0.get(), environmentManager: $0.get(), authManager: $0.get(), eventManager: $0.get()) }
+    register(expect: UserManager.self) {
+      UserManagerImpl(
+        stateManager: $0.get(),
+        networkManager: $0.get(),
+        environmentManager: $0.get(),
+        authManager: $0.get(),
+        eventManager: $0.get(),
+        userToUserManager: $0.get()
+      )
+    }
     register(expect: AuthManager.self) {
       AuthManagerImpl(
         stateManager: $0.get(),
@@ -80,6 +89,13 @@ public class FBSDKResolver: Resolver {
     register(expect: StoryStatsManager.self) { StoryStatsManagerImpl(networkManager: $0.get()) }
     register(expect: UserToStoryManager.self) {
       UserToStoryManagerImpl(
+        networkManager: $0.get(),
+        eventManager: $0.get(),
+        authManager: $0.get()
+      )
+    }
+    register(expect: UserToUserManager.self) {
+      UserToUserManagerImpl(
         networkManager: $0.get(),
         eventManager: $0.get(),
         authManager: $0.get()

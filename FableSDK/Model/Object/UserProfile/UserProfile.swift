@@ -7,10 +7,17 @@
 
 import Foundation
 
-public struct UserToUser: Codable {
-  public let isFollowing: Bool
-  public init(isFollowing: Bool) {
+public protocol UserToUser: Codable {
+  var isFollowing: Bool { get }
+  var isBlocked: Bool { get }
+}
+
+public struct MutableUserToUser: UserToUser {
+  public var isFollowing: Bool
+  public var isBlocked: Bool
+  public init(isFollowing: Bool, isBlocked: Bool) {
     self.isFollowing = isFollowing
+    self.isBlocked = isBlocked
   }
 }
 

@@ -44,19 +44,22 @@ public class UserManagerImpl: UserManager {
   private let environmentManager: EnvironmentManager
   private let authManager: AuthManager
   private let eventManager: EventManager
+  private let userToUserManager: UserToUserManager
 
   public init(
     stateManager: StateManager,
     networkManager: NetworkManagerV2,
     environmentManager: EnvironmentManager,
     authManager: AuthManager,
-    eventManager: EventManager
+    eventManager: EventManager,
+    userToUserManager: UserToUserManager
   ) {
     self.stateManager = stateManager
     self.networkManager = networkManager
     self.environmentManager = environmentManager
     self.authManager = authManager
     self.eventManager = eventManager
+    self.userToUserManager = userToUserManager
 
     refreshMyUser()
 
@@ -85,6 +88,7 @@ public class UserManagerImpl: UserManager {
       expect: WireUser?.self
     ).mapException().map { [weak self] wire in
       if let user = wire.flatMap(User.init(wire:)) {
+        self?.userToUserManager.cacheUserToUser(userId: user.userId, userToUser: user.userToUser)
         self?.usersById[userId] = user
         self?.eventManager.sendEvent(UserManagerEvent.didRefreshUser(userId: userId))
         return user
@@ -167,8 +171,8 @@ public class UserManagerImpl: UserManager {
       parameters: UpsertUserToUserResource.Request(isFollowing: isFollowing),
       expect: EmptyResponseBody.self
     ).mapException().mapVoid().also { [weak self] in
-      if var user = self?.fetchUser(userId: userId), let userToUser = user.userToUser {
-        user.userToUser = userToUser.copy({ $0["isFollowing"] = isFollowing })
+      if var user = self?.fetchUser(userId: userId) {
+        user.userToUser = user.userToUser.copy({ $0["isFollowing"] = isFollowing })
         self?.cacheUser(user: user)
       }
       self?.eventManager.sendEvent(UserManagerEvent.didSetFollowStatus(userId: userId, isFollowing: isFollowing))

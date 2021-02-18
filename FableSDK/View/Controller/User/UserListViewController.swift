@@ -64,7 +64,7 @@ public class UserListViewController: ASDKViewController<UserListNode> {
         avatarAsset: user.avatarAsset?.objectUrl,
         userName: user.displayName,
         biography: user.biography ?? "",
-        isFollowing: user.userToUser?.isFollowing ?? false
+        isFollowing: user.userToUser.isFollowing
       )
     }
   }

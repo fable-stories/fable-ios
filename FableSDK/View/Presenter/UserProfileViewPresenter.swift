@@ -19,6 +19,7 @@ public class UserProfileViewPresenter {
   private let resolver: FBSDKResolver
   private let networkManager: NetworkManagerV2
   private let storyManager: StoryManager
+  private let userToUserManager: UserToUserManager
   
   private var userProfileByUserId: [Int: UserProfile] = [:]
   
@@ -26,6 +27,7 @@ public class UserProfileViewPresenter {
     self.resolver = resolver
     self.networkManager = resolver.get()
     self.storyManager = resolver.get()
+    self.userToUserManager = resolver.get()
   }
   
   public func refreshData(userId: Int) -> AnyPublisher<UserProfile?, Exception> {
@@ -35,6 +37,10 @@ public class UserProfileViewPresenter {
       expect: WireUserProfile.self
     ).map { [weak self] wire in
       if let model = UserProfile(wire: wire) {
+        self?.userToUserManager.cacheUserToUser(
+          userId: model.user.userId,
+          userToUser: model.user.userToUser
+        )
         for story in model.stories {
           self?.storyManager.cacheStory(story: story)
         }

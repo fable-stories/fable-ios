@@ -10,11 +10,12 @@ import FableSDKModelObjects
 
 public struct WireUserToUser: Codable {
   public let isFollowing: Bool
+  public let isBlocked: Bool
 }
 
-public extension UserToUser {
+public extension MutableUserToUser {
   init?(wire: WireUserToUser) {
-    self.init(isFollowing: wire.isFollowing)
+    self.init(isFollowing: wire.isFollowing, isBlocked: wire.isBlocked)
   }
 }
 

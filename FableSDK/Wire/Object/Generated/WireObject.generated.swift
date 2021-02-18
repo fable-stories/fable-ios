@@ -734,7 +734,7 @@ extension User {
       password: wire.password,
       biography: wire.biography,
       avatarAsset: wire.avatarAsset.flatMap { Asset(wire: $0) },
-      userToUser: wire.userToUser.flatMap(UserToUser.init(wire:))
+      userToUser: wire.userToUser.flatMap(MutableUserToUser.init(wire:))
     )
   }
 

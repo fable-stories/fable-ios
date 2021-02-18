@@ -81,7 +81,7 @@ public final class StoryDetailViewController: ASDKViewController<StoryDetailNode
           avatarAsset: user?.avatarAsset?.objectUrl,
           userName: user?.displayName ?? "User",
           isFollowing: self.userManager.currentUser?.userId == user?.userId ? nil :
-            user?.userToUser?.isFollowing == true
+            user?.userToUser.isFollowing == true
         ),
         landscapeAsset: story.landscapeImageAsset?.objectUrl,
         title: story.title,
