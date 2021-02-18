@@ -63,7 +63,14 @@ public class FBSDKResolver: Resolver {
       )
     }
     register(expect: ImageManager.self) { ImageManagerImpl() }
-    register(expect: StoryManager.self) { StoryManagerImpl(networkManager: $0.get(), userManager: $0.get()) }
+    register(expect: StoryManager.self) {
+      StoryManagerImpl(
+        networkManager: $0.get(),
+        userManager: $0.get(),
+        userToStoryManager: $0.get(),
+        authManager: $0.get()
+      )
+    }
     register(expect: ChapterManager.self) { ChapterManagerImpl(networkManager: $0.get()) }
     register(expect: MessageManager.self) { MessageManagerImpl(networkManager: $0.get(), authManager: $0.get()) }
     register(expect: CharacterManager.self) { CharacterManagerImpl(networkManager: $0.get(), authManager: $0.get()) }
@@ -71,6 +78,13 @@ public class FBSDKResolver: Resolver {
     register(expect: CategoryManager.self) { CategoryManagerImpl(networkManager: $0.get()) }
     register(expect: AssetManager.self) { AssetManagerImpl(networkManager: $0.get(), authManager: $0.get()) }
     register(expect: StoryStatsManager.self) { StoryStatsManagerImpl(networkManager: $0.get()) }
+    register(expect: UserToStoryManager.self) {
+      UserToStoryManagerImpl(
+        networkManager: $0.get(),
+        eventManager: $0.get(),
+        authManager: $0.get()
+      )
+    }
   }
 }
 

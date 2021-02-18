@@ -220,7 +220,11 @@ public final class NetworkCoreV2 {
         }()
         if json.isEmpty {
           logger.enqueue("no data", logLevel: .error)
-          callback(.success(Optional<T>.none ?? (() as! T)))
+          if let response = EmptyResponseBody() as? T {
+            callback(.success(response))
+          } else {
+            callback(.failure(Exception(NetworkError.noData)))
+          }
         } else if let error = json["error"] as? String {
           logger.enqueue(error, logLevel: .error)
           callback(.failure(Exception(NetworkError.network(nil, error))))
@@ -239,11 +243,19 @@ public final class NetworkCoreV2 {
         if let data = response.data, let string = String(data: data, encoding: .utf8) {
           logger.enqueue(string, logLevel: .error)
         }
-        callback(.success(Optional<T>.none ?? (() as! T)))
+        if let response = EmptyResponseBody() as? T {
+          callback(.success(response))
+        } else {
+          callback(.failure(Exception(NetworkError.noData)))
+        }
       }
     } else {
       logger.enqueue("No Content", logLevel: .error)
-      callback(.success(Optional<T>.none ?? (() as! T)))
+      if let response = EmptyResponseBody() as? T {
+        callback(.success(response))
+      } else {
+        callback(.failure(Exception(NetworkError.noData)))
+      }
     }
   }
   

@@ -18,14 +18,20 @@ public final class StoryDetailViewController: ASDKViewController<StoryDetailNode
   private let storyManager: StoryManager
   private let userManager: UserManager
   private let eventManager: EventManager
+  private let authManager: AuthManager
+  private let userToStoryManager: UserToStoryManager
 
   private let storyId: Int
+  
+  private let activityView = UIActivityIndicatorView(style: .medium)
   
   public init(resolver: FBSDKResolver, storyId: Int) {
     self.resolver = resolver
     self.storyManager = resolver.get()
     self.userManager = resolver.get()
+    self.authManager = resolver.get()
     self.eventManager = resolver.get()
+    self.userToStoryManager = resolver.get()
     self.storyId = storyId
     super.init(node: .init())
     self.node.delegate = self
@@ -38,7 +44,7 @@ public final class StoryDetailViewController: ASDKViewController<StoryDetailNode
   public override func viewDidLoad() {
     super.viewDidLoad()
     self.title = "Story Detail"
-    self.navigationItem.rightBarButtonItem = UIBarButtonItem(
+    let moreButton = UIBarButtonItem(
       image: UIImage(named: "more")?
         .resized(to: .sizeWithConstantDimensions(32.0))?
         .tinted(.black),
@@ -46,6 +52,10 @@ public final class StoryDetailViewController: ASDKViewController<StoryDetailNode
       target: self,
       action: #selector(didSelectMore(barButton:))
     )
+    self.navigationItem.rightBarButtonItems = [
+      moreButton,
+      UIBarButtonItem(customView: activityView),
+    ]
     
     self.eventManager.onEvent.sinkDisposed(receiveCompletion: nil) { (event) in
       switch event {
@@ -60,6 +70,7 @@ public final class StoryDetailViewController: ASDKViewController<StoryDetailNode
   }
   
   public func refreshData() {
+    self.activityView.startAnimating()
     self.storyManager.findById(storyId: storyId).sinkDisposed(receiveCompletion: nil) { [weak self] story in
       guard let self = self, let story = story else { return }
       let user = self.userManager.fetchUser(userId: story.userId)
@@ -76,16 +87,31 @@ public final class StoryDetailViewController: ASDKViewController<StoryDetailNode
         title: story.title,
         synopsis: story.synopsis
       )
+      self.activityView.stopAnimating()
       self.node.setViewModel(viewModel)
     }
   }
   
   @objc private func didSelectMore(barButton: UIBarButtonItem) {
+    let storyId = self.storyId
+    guard let myUserId = authManager.authenticatedUserId else { return }
+    guard let userToStory = userToStoryManager.fetchUserToStory(userId: myUserId, storyId: storyId) else { return }
+    let isHidden = userToStory.isHidden
+    let isReported = userToStory.isReported
     let alert = UIAlertController(title: "More", message: nil, preferredStyle: .actionSheet)
-    alert.addAction(.init(title: "Hide", style: .default, handler: { _ in
-      
+    alert.addAction(.init(title: isHidden ? "Unhide" : "Hide", style: .default, handler: { [weak self] _ in
+      let newValue = !isHidden
+      self?.userToStoryManager.setStoryHidden(
+        storyId: storyId,
+        isHidden: newValue
+      ).sinkDisposed()
     }))
-    alert.addAction(.init(title: "Report", style: .destructive, handler: { _ in
+    alert.addAction(.init(title: isReported ? "Unreport" : "Report", style: .destructive, handler: { [weak self] _ in
+      let newValue = !isReported
+      self?.userToStoryManager.setStoryReported(
+        storyId: storyId,
+        isReported: newValue
+      ).sinkDisposed()
     }))
     alert.addAction(.init(title: "Cancel", style: .default, handler: nil))
     self.present(alert, animated: true, completion: nil)

@@ -23,7 +23,7 @@ public struct WireStory: Codable {
 
   /// transinets
   public let user: WireUser?
-
+  public let userToStory: WireUserToStory?
 
   public init(
     storyId: Int? = nil,
@@ -36,7 +36,8 @@ public struct WireStory: Codable {
     synopsis: String? = nil,
     chapterIds: Set<Int>? = nil,
     isPublished: Bool? = nil,
-    user: WireUser? = nil
+    user: WireUser? = nil,
+    userToStory: WireUserToStory? = nil
   ) {
     self.storyId = storyId
     self.userId = userId
@@ -50,6 +51,7 @@ public struct WireStory: Codable {
     self.chapterIds = chapterIds
     self.published = isPublished
     self.user = user
+    self.userToStory = userToStory
   }
 }
 
@@ -77,5 +79,17 @@ extension Story {
       squareImageAssetId: wire.squareImageAsset?.assetId,
       squareImageAsset: wire.squareImageAsset.flatMap(Asset.init(wire:))
     )
+  }
+}
+
+public struct WireUserToStory: Codable {
+  public let liked: Bool
+  public let hide: Bool
+  public let reported: Bool
+}
+
+public extension MutableUserToStory {
+  init(wire: WireUserToStory) {
+    self.init(liked: wire.liked, isHidden: wire.hide, isReported: wire.reported)
   }
 }

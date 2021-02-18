@@ -48,6 +48,7 @@ public final class MiniUserDetailNode: ASControlNode {
     node.addTarget(self, action: #selector(didSelectUser), forControlEvents: .touchUpInside)
     node.addShadow()
     node.image = UIImage(.fableLightGray, size: .sizeWithConstantDimensions(44.0))
+    node.isHidden = true
     return node
   }
   
@@ -81,6 +82,7 @@ public final class MiniUserDetailNode: ASControlNode {
       self.followButton.isFollowing = isFollowing
     }
     self.transitionLayout(withAnimation: false, shouldMeasureAsync: true, measurementCompletion: nil)
+    self.avatarImage.isHidden = false
   }
   
   public override func layoutSpecThatFits(_ constrainedSize: ASSizeRange) -> ASLayoutSpec {

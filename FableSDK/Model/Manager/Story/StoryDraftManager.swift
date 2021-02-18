@@ -46,7 +46,7 @@ public class StoryDraftManagerImpl: StoryDraftManager {
     storyId: Int
   ) -> AnyPublisher<StoryDraft?, Exception> {
     let publisher: AnyPublisher<StoryDraft?, Exception> = networkManager.request(
-      path: "/story/\(storyId)",
+      path: "/story/\(storyId)/draft",
       method: .get
     ).map { [weak self] (wire: WireStoryDraft?) in
       if let wire = wire, let storyDraft = StoryDraft(wire: wire) {

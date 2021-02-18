@@ -83,11 +83,13 @@ public class AuthManagerImpl: NSObject, AuthManager {
     self.delegate = delegate
     (self.isAuthenticating, self.isAuthenticatingObserver) = Signal<Bool, Exception>.pipe()
     super.init()
-    
+
     /// Local development tooling
     if let userId = envInt("user_id"), let accessToken = envString("access_token") {
       self.setAuthState(AuthState(userId: userId, accessToken: accessToken))
     }
+    
+    print(self.environmentManager.authState?.prettyJSONString ?? "No Auth State")
   }
 
   public func authenticate(email: String, password: String) -> SignalProducer<Int, SignInError> {

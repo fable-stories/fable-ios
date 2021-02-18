@@ -88,7 +88,7 @@ public class UserProfileViewControllerV2: ASDKViewController<UserProfileNode> {
     
     self.title = "User Profile"
     self.neverShowPlaceholders = true
-    self.navigationItem.rightBarButtonItems?.append(UIBarButtonItem(customView: activityView))
+    self.navigationItem.rightBarButtonItem = UIBarButtonItem(customView: activityView)
 
     self.eventManager.onEvent.sinkDisposed(receiveCompletion: nil) { [weak self] event in
       switch event {

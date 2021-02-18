@@ -16,6 +16,7 @@ import FableSDKWireObjects
 public protocol StoryManager {
   func findById(storyId: Int) -> AnyPublisher<Story?, Exception>
   func fetchById(storyId: Int) -> Story?
+  func updateCacheById(storyId: Int, closure: (inout MutableStory) -> Void) 
   func updatebyId(storyId: Int, parameters: UpdateStoryParameters) -> AnyPublisher<Void, Exception>
   func deleteStory(storyId: Int) -> AnyPublisher<Void, Exception>
   func listByUserId(userId: Int) -> AnyPublisher<[Story], Exception>
@@ -26,14 +27,22 @@ public class StoryManagerImpl: StoryManager {
   
   private let networkManager: NetworkManagerV2
   private let userManager: UserManager
+  private let userToStoryManager: UserToStoryManager
+  private let authManager: AuthManager
+  
   private var storyById: [Int: CachedItem<Story>] = [:]
   
   public init(
     networkManager: NetworkManagerV2,
-    userManager: UserManager
+    userManager: UserManager,
+    userToStoryManager: UserToStoryManager,
+    authManager: AuthManager
+  
   ) {
     self.networkManager = networkManager
     self.userManager = userManager
+    self.userToStoryManager = userToStoryManager
+    self.authManager = authManager
   }
   
   public func findById(storyId: Int) -> AnyPublisher<Story?, Exception> {
@@ -51,6 +60,14 @@ public class StoryManagerImpl: StoryManager {
         if let user = wire.user.flatMap(User.init(wire:)) {
           self?.userManager.cacheUser(user: user)
         }
+        if let userToStory = wire.userToStory.flatMap(MutableUserToStory.init(wire:)),
+           let myUserId = self?.authManager.authenticatedUserId {
+          self?.userToStoryManager.cacheUserToStory(
+            userId: myUserId,
+            storyId: story.storyId,
+            userToStory: userToStory
+          )
+        }
         return story
       }
       return nil
@@ -63,6 +80,13 @@ public class StoryManagerImpl: StoryManager {
 
   public func cacheStory(story: Story) {
     storyById[story.storyId] = CachedItem(story)
+  }
+  
+  public func updateCacheById(storyId: Int, closure: (inout MutableStory) -> Void) {
+    if var story = self.storyById[storyId]?.value as? MutableStory {
+      closure(&story)
+      self.cacheStory(story: story)
+    }
   }
   
   public func updatebyId(storyId: Int, parameters: UpdateStoryParameters) -> AnyPublisher<Void, Exception> {
@@ -100,8 +124,23 @@ public class StoryManagerImpl: StoryManager {
       path: "/user/\(userId)/story",
       method: .delete,
       expect: WireCollection<WireStory>.self
-    ).map { wire in
-      wire.items.compactMap(MutableStory.init(wire:)) 
+    ).map { [weak self] wire in
+      return wire.items.compactMap { wire in
+        guard let story = MutableStory(wire: wire) else { return nil }
+        self?.storyById[story.storyId] = CachedItem(story)
+        if let user = wire.user.flatMap(User.init(wire:)) {
+          self?.userManager.cacheUser(user: user)
+        }
+        if let userToStory = wire.userToStory.flatMap(MutableUserToStory.init(wire:)),
+           let myUserId = self?.authManager.authenticatedUserId {
+          self?.userToStoryManager.cacheUserToStory(
+            userId: myUserId,
+            storyId: story.storyId,
+            userToStory: userToStory
+          )
+        }
+        return story
+      }
     }.eraseToAnyPublisher()
   }
 }

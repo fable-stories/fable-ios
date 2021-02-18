@@ -54,6 +54,7 @@ public class MainTabBarViewController: UITabBarController {
   private let dataStoreManager: DataStoreManager
   private let resourceManager: ResourceManager
   private let userManager: UserManager
+  private let authManager: AuthManager
 
   public init(resolver: FBSDKResolver) {
     self.resolver = resolver
@@ -62,6 +63,7 @@ public class MainTabBarViewController: UITabBarController {
     self.dataStoreManager = resolver.get()
     self.resourceManager = resolver.get()
     self.userManager = resolver.get()
+    self.authManager = resolver.get()
     super.init(nibName: nil, bundle: nil)
   }
 

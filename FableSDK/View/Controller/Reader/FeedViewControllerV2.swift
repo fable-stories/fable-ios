@@ -13,6 +13,7 @@ import FableSDKModelManagers
 import FableSDKResourceTargets
 import FableSDKModelObjects
 import FableSDKWireObjects
+import FableSDKFoundation
 import NetworkFoundation
 
 public class FeedViewControllerV2: ASDKViewController<FeedNode> {
@@ -23,6 +24,7 @@ public class FeedViewControllerV2: ASDKViewController<FeedNode> {
   private let networkManager: NetworkManagerV2
   private let eventManager: EventManager
   private let authManager: AuthManager
+  private let userToStoryManager: UserToStoryManager
   
   private let activityView = UIActivityIndicatorView(style: .medium)
 
@@ -31,6 +33,7 @@ public class FeedViewControllerV2: ASDKViewController<FeedNode> {
     self.networkManager = resolver.get()
     self.eventManager = resolver.get()
     self.authManager = resolver.get()
+    self.userToStoryManager = resolver.get()
     super.init(node: .init())
     self.node.delegate = self
   }
@@ -45,6 +48,15 @@ public class FeedViewControllerV2: ASDKViewController<FeedNode> {
     self.navigationItem.rightBarButtonItems = [
       UIBarButtonItem(customView: activityView)
     ]
+    
+    self.eventManager.onEvent.sinkDisposed(receiveCompletion: nil) { [weak self] (event) in
+      switch event {
+      case UserToStoryManagerEvent.didReportStory, UserToStoryManagerEvent.didSetStoryHidden:
+        self?.refreshData()
+      default:
+        break
+      }
+    }
 
     self.refreshData()
   }
@@ -59,10 +71,34 @@ public class FeedViewControllerV2: ASDKViewController<FeedNode> {
       self?.activityView.stopAnimating()
     }) { [weak self] wire in
       guard let self = self else { return }
-      let categories = wire.items.compactMap { Kategory(wire: $0) }
+      let categories = wire.items.compactMap { wireCategory -> Kategory? in
+        let stories = wireCategory.stories?.compactMap { (wireStory: WireStory) -> Story? in
+          guard let story = MutableStory.init(wire: wireStory) else { return nil }
+          /// parse metadata
+          if let myUserId = self.authManager.authenticatedUserId,
+             let userToStory = wireStory.userToStory.flatMap(MutableUserToStory.init(wire:)) {
+            self.userToStoryManager.cacheUserToStory(
+              userId: myUserId,
+              storyId: story.storyId,
+              userToStory: userToStory
+            )
+          }
+          return story
+        }
+        return Kategory(wire: wireCategory)?.copy(stories: stories)
+      }
       self.node.sections = categories.compactMap { category in
-        if category.stories.isEmpty { return nil }
-        return FeedNode.Section.category(.init(category: category, stories: category.stories))
+        let stories = category.stories.filter { story in
+          if let userId = self.authManager.authenticatedUserId {
+            if let userToStory = self.userToStoryManager.fetchUserToStory(userId: userId, storyId: story.storyId) {
+              /// don't show the story in the User's feed if the User hid it or reported it
+              if userToStory.isHidden || userToStory.isReported { return false }
+            }
+          }
+          return true
+        }
+        if stories.isEmpty { return nil }
+        return FeedNode.Section.category(.init(category: category, stories: stories))
       }
     }
   }
@@ -78,6 +114,5 @@ extension FeedViewControllerV2: FeedNodeDelegate {
   }
   
   public func feedNode(didTapBackgroundImage node: FeedNode) {
-    self.eventManager.sendEvent(RouterRequestEvent.present(.storyEditor(storyId: nil), viewController: self))
   }
 }

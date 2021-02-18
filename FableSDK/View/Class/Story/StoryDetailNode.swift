@@ -75,6 +75,7 @@ public final class StoryDetailNode: ASScrollNode {
   private lazy var startStoryButton: FBSDKButtonNode = .new {
     let node = FBSDKButtonNode(title: "Start Story")
     node.addTarget(self, action: #selector(didSelectStartStory), forControlEvents: .touchUpInside)
+    node.isHidden = true
     return node
   }
 
@@ -131,6 +132,7 @@ public final class StoryDetailNode: ASScrollNode {
       .font: UIFont.systemFont(ofSize: 14.0, weight: .medium),
       .foregroundColor: textColor
     ])
+    self.startStoryButton.isHidden = false
   }
   
   @objc private func didSelectStartStory() {
