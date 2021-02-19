@@ -102,7 +102,7 @@ public class UserProfileViewControllerV2: ASDKViewController<UserProfileNode> {
     self.navigationItem.rightBarButtonItems = [
       moreButton,
       UIBarButtonItem(customView: activityView)
-    ]
+    ].compactMap { $0 }
 
     self.eventManager.onEvent.sinkDisposed(receiveCompletion: nil) { [weak self] event in
       switch event {
@@ -184,6 +184,14 @@ public class UserProfileViewControllerV2: ASDKViewController<UserProfileNode> {
   }
   
   @objc private func didSelectMore(barButton: UIBarButtonItem) {
+    if isMyUser {
+      self.presentMoreForMyUser()
+    } else {
+      self.presentMoreForOtherUser()
+    }
+  }
+  
+  private func presentMoreForOtherUser() {
     guard let userToUser = userToUserManager.fetchUserToUser(userId: userId) else { return }
     let isBlocked = userToUser.isBlocked
     let alert = UIAlertController(title: "More", message: nil, preferredStyle: .actionSheet)
@@ -194,6 +202,11 @@ public class UserProfileViewControllerV2: ASDKViewController<UserProfileNode> {
     }))
     alert.addAction(.init(title: "Cancel", style: .default, handler: nil))
     self.present(alert, animated: true, completion: nil)
+  }
+  
+  private func presentMoreForMyUser() {
+    guard let navVC = self.navigationController else { return }
+    self.eventManager.sendEvent(RouterRequestEvent.push(.userSettings, navigationController: navVC))
   }
 }
 

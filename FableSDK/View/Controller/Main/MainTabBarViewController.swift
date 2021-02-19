@@ -36,6 +36,7 @@ public enum RouterRequestEvent: EventContext {
     case storyDetail(storyId: Int)
     case storyReader(datastore: DataStore)
     case userList(userIds: [Int], title: String)
+    case userSettings
     case login
     case onboarding
   }
@@ -134,12 +135,6 @@ public class MainTabBarViewController: UITabBarController {
     let userProfileVC: UserProfileViewControllerV2 = UserProfileViewControllerV2(resolver: resolver)
     userProfileVC.navigationItem.title = "FABLE"
     userProfileVC.navigationController?.setNavigationBarHidden(false, animated: false)
-    let menuButton = UIButton()
-    userProfileVC.navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(named: "menuIconBlack")) { [weak userProfileVC] in
-      guard let userProfileVC = userProfileVC else { return }
-      menuButton.setImage(UIImage(imageLiteralResourceName: "menuIconGray"), for: UIControl.State.highlighted)
-      self.presentSettingsMenu(viewController: userProfileVC)
-    }
     userProfileVC.tabBarItem = UITabBarItem(
       title: nil,
       image: UIImage(named: "userProfileTabIcon")?.withRenderingMode(.alwaysOriginal),
@@ -189,7 +184,7 @@ public class MainTabBarViewController: UITabBarController {
             }
 
           }
-        case .storyEditorDetails:
+        case .storyEditorDetails, .userSettings:
           break
         case .story(let storyId):
           self.presentStory(storyId: storyId, presenter: viewController)
@@ -249,6 +244,13 @@ public class MainTabBarViewController: UITabBarController {
             navigationController?.popViewController(animated: true)
           })
           navigationController.pushViewController(vc, animated: true)
+        case .userSettings:
+          let settingsVC = UserSettingsViewController(resolver: self.resolver)
+          settingsVC.delegate = self
+          settingsVC.navigationItem.leftBarButtonItem = .makeBackButton(onSelect: { [weak settingsVC] in
+            settingsVC?.navigationController?.popViewController(animated: true)
+          })
+          navigationController.pushViewController(settingsVC, animated: true)
         case .login, .onboarding:
           break
         }
@@ -335,17 +337,6 @@ public class MainTabBarViewController: UITabBarController {
     let vc = UserListViewController(resolver: resolver, users: users)
     vc.title = title
     return vc
-  }
-}
-
-extension MainTabBarViewController {
-  func presentSettingsMenu(viewController: UIViewController) {
-    let settingsVC = UserSettingsViewController(resolver: resolver)
-    settingsVC.delegate = self
-    settingsVC.navigationItem.leftBarButtonItem = .makeBackButton(onSelect: { [weak viewController] in
-      viewController?.navigationController?.popViewController(animated: true)
-    })
-    viewController.navigationController?.pushViewController(settingsVC, animated: true)
   }
 }
 
