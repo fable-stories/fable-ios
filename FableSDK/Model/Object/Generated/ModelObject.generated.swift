@@ -405,19 +405,25 @@ public struct Config: Codable {
   public let enableInteractiveStories: Bool
   public let admins: [String]
   public let resourceConfig: ResourceConfig?
+  public let eulaAgreement: String
+  public let privacyPolicy: String
 
   public init(
     configId: Int,
     colorHexStrings: [String]? = nil,
     enableInteractiveStories: Bool? = nil,
     admins: [String]? = nil,
-    resourceConfig: ResourceConfig? = nil
+    resourceConfig: ResourceConfig? = nil,
+    eulaAgreement: String = "",
+    privacyPolicy: String = ""
   ) {
     self.configId = configId
     self.colorHexStrings = colorHexStrings ?? []
     self.enableInteractiveStories = enableInteractiveStories ?? false
     self.admins = admins ?? []
     self.resourceConfig = resourceConfig
+    self.eulaAgreement = eulaAgreement
+    self.privacyPolicy = privacyPolicy
   }
 
   public func copy(
@@ -1101,8 +1107,9 @@ public struct User: Codable {
   public let email: String?
   public let password: String?
   public let biography: String?
-  public let avatarAsset: Asset?
+  public let eulaAgreedAt: Date?
   /// transients
+  public let avatarAsset: Asset?
   public var userToUser: MutableUserToUser
 
   public init(
@@ -1113,6 +1120,7 @@ public struct User: Codable {
     email: String? = nil,
     password: String? = nil,
     biography: String? = nil,
+    eulaAgreedAt: Date? = nil,
     avatarAsset: Asset? = nil,
     userToUser: MutableUserToUser? = nil
   ) {
@@ -1123,6 +1131,7 @@ public struct User: Codable {
     self.email = email
     self.password = password
     self.biography = biography
+    self.eulaAgreedAt = eulaAgreedAt
     self.avatarAsset = avatarAsset
     self.userToUser = userToUser ?? MutableUserToUser(isFollowing: false, isBlocked: false)
   }

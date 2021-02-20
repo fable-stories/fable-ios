@@ -169,20 +169,15 @@ public class MainTabBarViewController: UITabBarController {
         case .storyDetail(let storyId):
           self.presentStoryDetail(storyId: storyId, presenter: viewController)
         case .storyEditor(let storyId):
-          if let storyId = storyId {
+          guard let user = self.userManager.currentUser else {
+            return self.presentLogin(viewController: viewController)
+          }
+          if user.eulaAgreedAt == nil {
+            self.presentEulaAgreement(presenter: viewController)
+          } else if let storyId = storyId {
             self.presentStoryEditor(storyId: storyId, presenter: viewController)
           } else {
-            let vc = StoryEditorViewController(resolver: self.resolver)
-            let navVC = UINavigationController(rootViewController: vc)
-            navVC.modalTransitionStyle = .coverVertical
-            navVC.modalPresentationStyle = .fullScreen
-            vc.navigationItem.leftBarButtonItem = .makeCloseButton(onSelect: { [weak vc] in
-              vc?.dismiss(animated: true, completion: nil)
-            })
-            viewController.present(navVC, animated: true) { [weak self] in
-              self?.eventManager.sendEvent(WriterDashboardEvent.didStartNewStory)
-            }
-
+            self.presentNewStoryEditor(presenter: viewController)
           }
         case .storyEditorDetails, .userSettings:
           break
@@ -309,6 +304,19 @@ public class MainTabBarViewController: UITabBarController {
     presenter.present(navVC, animated: true, completion: nil)
   }
   
+  private func presentNewStoryEditor(presenter viewController: UIViewController) {
+    let vc = StoryEditorViewController(resolver: self.resolver)
+    let navVC = UINavigationController(rootViewController: vc)
+    navVC.modalTransitionStyle = .coverVertical
+    navVC.modalPresentationStyle = .fullScreen
+    vc.navigationItem.leftBarButtonItem = .makeCloseButton(onSelect: { [weak vc] in
+      vc?.dismiss(animated: true, completion: nil)
+    })
+    viewController.present(navVC, animated: true) { [weak self] in
+      self?.eventManager.sendEvent(WriterDashboardEvent.didStartNewStory)
+    }
+  }
+  
   private func presentStoryEditor(storyId: Int, presenter: UIViewController) {
     let vc = StoryEditorViewController(resolver: resolver, storyId: storyId)
     let navVC = UINavigationController(rootViewController: vc)
@@ -337,6 +345,21 @@ public class MainTabBarViewController: UITabBarController {
     let vc = UserListViewController(resolver: resolver, users: users)
     vc.title = title
     return vc
+  }
+  
+  public func presentEulaAgreement(presenter: UIViewController) {
+    let vc = MarkdownViewController(
+      initialString: """
+      # Hello World!
+      ## Hi World!
+      """,
+      navigationTitle: "End-User Agreement License"
+    )
+    let navVC = UINavigationController(rootViewController: vc)
+    vc.navigationItem.leftBarButtonItem = .makeCloseButton(onSelect: { [weak vc] in
+      vc?.dismiss(animated: true, completion: nil)
+    })
+    presenter.present(navVC, animated: true, completion: nil)
   }
 }
 

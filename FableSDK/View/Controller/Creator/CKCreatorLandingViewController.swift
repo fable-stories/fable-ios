@@ -122,35 +122,20 @@ public class CKLandingViewController: UIViewController {
   }
   
   @objc private func createStoryButtonTapped(button: UIButton) {
-    button.isEnabled = false
-    maybePresentCreatorKit { button.isEnabled = true }
-  }
-
-  private func maybePresentCreatorKit(onComplete: VoidClosure? = nil) {
     if authManager.isLoggedIn {
-      let vc = StoryEditorViewController(resolver: resolver)
-      let navVC = UINavigationController(rootViewController: vc)
-      navVC.modalTransitionStyle = .coverVertical
-      navVC.modalPresentationStyle = .fullScreen
-      vc.navigationItem.leftBarButtonItem = .makeCloseButton(onSelect: { [weak vc] in
-        vc?.dismiss(animated: true, completion: onComplete)
-      })
-      present(navVC, animated: true) { [weak self] in
-        self?.eventManager.sendEvent(WriterDashboardEvent.didStartNewStory)
-        onComplete?()
-      }
+      self.eventManager.sendEvent(RouterRequestEvent.present(.storyEditor(storyId: nil), viewController: self))
     } else {
-      presentLogin(onComplete: onComplete)
+      self.presentLogin()
     }
   }
 
-  private func presentLogin(onComplete: VoidClosure? = nil) {
+  private func presentLogin() {
     let vc = LoginViewControllerSocial(resolver: self.resolver)
     vc.navigationItem.leftBarButtonItem = .makeCloseButton(onSelect: { [weak self] in
-      self?.dismiss(animated: true, completion: onComplete)
+      self?.dismiss(animated: true, completion: nil)
     })
     let navVC = UINavigationController(rootViewController: vc)
-    self.present(navVC, animated: true, completion: onComplete)
+    self.present(navVC, animated: true, completion: nil)
   }
 
   private func presentCreatorKit(onComplete: VoidClosure? = nil) {

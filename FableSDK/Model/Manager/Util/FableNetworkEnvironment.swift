@@ -73,6 +73,5 @@ public struct FableNetworkEnvironment: NetworkEnvironment {
         "Authorization": authState.flatMap({ "Bearer \($0.accessToken)" }),
       ].compactMapValues { $0 }
     )
-
   }
 }

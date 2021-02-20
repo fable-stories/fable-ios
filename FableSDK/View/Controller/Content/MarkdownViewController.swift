@@ -54,9 +54,9 @@ class MarkdownViewController: UIViewController, UITextViewDelegate {
         view.addSubview(markdownText)
         /// Set the constraints for the UITextView
         markdownText.snp.makeConstraints { (make) in
-            make.top.equalTo(view.snp.top).inset(5)
-            make.leading.equalTo(view.snp.leading).inset(15)
-            make.trailing.equalTo(view.snp.trailing).inset(15)
+            make.top.equalTo(view.snp.top).inset(12)
+            make.leading.equalTo(view.snp.leading).inset(16)
+            make.trailing.equalTo(view.snp.trailing).inset(16)
             make.bottom.equalTo(view.snp.bottom)
         }
         

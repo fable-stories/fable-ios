@@ -284,6 +284,8 @@ public struct WireConfig: Codable {
   public let enableInteractiveStories: Bool?
   public let admins: [String]?
   public let resourceConfig: WireResourceConfig?
+  public let eulaAgreement: String
+  public let privacyPolicy: String
 
   public init(
     configId: Int? = nil,
@@ -291,7 +293,9 @@ public struct WireConfig: Codable {
     colorHexStrings: [String]? = nil,
     enableInteractiveStories: Bool? = nil,
     admins: [String]? = nil,
-    resourceConfig: WireResourceConfig? = nil
+    resourceConfig: WireResourceConfig? = nil,
+    eulaAgreement: String = "",
+    privacyPolicy: String = ""
   ) {
     self.configId = configId
     self.categories = categories
@@ -299,6 +303,8 @@ public struct WireConfig: Codable {
     self.enableInteractiveStories = enableInteractiveStories
     self.admins = admins
     self.resourceConfig = resourceConfig
+    self.eulaAgreement = eulaAgreement
+    self.privacyPolicy = privacyPolicy
   }
 }
 
@@ -690,6 +696,7 @@ public struct WireUser: Codable {
   public let email: String?
   public let password: String?
   public let biography: String?
+  public let eulaAgreedAt: Date?
   public let avatarAsset: WireAsset?
 
   /// transients
@@ -703,6 +710,7 @@ public struct WireUser: Codable {
     email: String? = nil,
     password: String? = nil,
     biography: String? = nil,
+    eulaAgreedAt: Date? = nil,
     avatarAsset: WireAsset? = nil,
     userToUser: WireUserToUser? = nil
   ) {
@@ -713,6 +721,7 @@ public struct WireUser: Codable {
     self.email = email
     self.password = password
     self.biography = biography
+    self.eulaAgreedAt = eulaAgreedAt
     self.avatarAsset = avatarAsset
     self.userToUser = userToUser
   }
