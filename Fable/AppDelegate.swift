@@ -34,15 +34,24 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
     if isLaunchedFromUnitTest { return true }
     
+    let configManager: ConfigManager = resolver.get()
+    configManager.refreshConfigV2().sinkDisposed()
+    
     consoleOutputListener.openConsolePipe()
 
     configureFirebaseManager()
     configureNavigationBar()
+    configureLaunchViewController()
 
-    window = UIWindow(frame: UIScreen.main.bounds)
-    window?.backgroundColor = .white
-    window?.rootViewController = MainTabBarViewController(resolver: resolver)
-    window?.makeKeyAndVisible()
+    configManager.initialLaunchConfig.eraseToAnyPublisher().sinkDisposed(receiveCompletion: nil) { [weak self] (state) in
+      switch state {
+      case .received, .receivedNone:
+        self?.configureInitialRootViewController()
+      case .unknown:
+        /// We haven't fetched the Config yet
+        break
+      }
+    }
 
     NSSetUncaughtExceptionHandler { exception in
        print(exception)
@@ -52,6 +61,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     return true
   }
   
+  private func configureLaunchViewController() {
+    window = UIWindow(frame: UIScreen.main.bounds)
+    window?.backgroundColor = .white
+    window?.rootViewController = LandingViewController()
+    window?.makeKeyAndVisible()
+  }
+  
+  private func configureInitialRootViewController() {
+    window?.rootViewController = MainTabBarViewController(resolver: resolver)
+    window?.makeKeyAndVisible()
+  }
+
   func applicationWillResignActive(_ application: UIApplication) {
     // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
     // Use this method to pause ongoing tasks, disable timers, and invalidate graphics rendering callbacks. Games should use this method to pause the game.
@@ -99,3 +120,10 @@ private extension AppDelegate {
   }
 }
 
+
+private class LandingViewController: UIViewController {
+  override func viewDidLoad() {
+    super.viewDidLoad()
+    self.view.backgroundColor = .white
+  }
+}

@@ -1107,7 +1107,7 @@ public struct User: Codable {
   public let email: String?
   public let password: String?
   public let biography: String?
-  public let eulaAgreedAt: Date?
+  public var eulaAgreedAt: Date?
   /// transients
   public let avatarAsset: Asset?
   public var userToUser: MutableUserToUser

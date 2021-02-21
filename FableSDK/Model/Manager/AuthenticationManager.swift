@@ -89,7 +89,9 @@ public class AuthManagerImpl: NSObject, AuthManager {
       self.setAuthState(AuthState(userId: userId, accessToken: accessToken))
     }
     
-    print(self.environmentManager.authState?.prettyJSONString ?? "No Auth State")
+    if let authState = self.environmentManager.authState {
+      print(authState.prettyJSONString)
+    }
   }
 
   public func authenticate(email: String, password: String) -> SignalProducer<Int, SignInError> {
@@ -194,7 +196,6 @@ public class AuthManagerImpl: NSObject, AuthManager {
         else { return SignalProducer<Int, SignInError>(error: .invalidResponseError) }
       
       self.setAuthState(AuthState(userId: user.userId, accessToken: accessToken))
-      self.eventManager.sendEvent(AuthManagerEvent.userDidSignIn)
       self.eventManager.sendEvent(AuthManagerEvent.userDidSignIn)
       
       return SignalProducer<Int, SignInError>(value: user.userId)

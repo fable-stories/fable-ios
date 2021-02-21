@@ -12,7 +12,7 @@ import FableSDKWireObjects
 import NetworkFoundation
 
 public enum UserManagerEvent: EventContext, Equatable {
-  case didRefreshMyUser
+  case didRefreshMyUser(count: Int)
   case didRefreshUser(userId: Int)
   case didSetFollowStatus(userId: Int, isFollowing: Bool)
 }
@@ -32,10 +32,11 @@ public protocol UserManager {
   
   func refreshMyUser()
   func setFollowStatus(userId: Int, isFollowing: Bool) -> AnyPublisher<Void, Exception>
+  func agreeToEULA() -> AnyPublisher<Void, Exception>
 }
 
 public class UserManagerImpl: UserManager {
-  public var currentUser: User? { stateManager.state().currentUser }
+  public var currentUser: User? { authManager.authenticatedUserId.flatMap(fetchUser(userId:)) }
   
   private var usersById: [Int: User] = [:]
 
@@ -45,6 +46,8 @@ public class UserManagerImpl: UserManager {
   private let authManager: AuthManager
   private let eventManager: EventManager
   private let userToUserManager: UserToUserManager
+
+  private var myUserRefreshCount = 0
 
   public init(
     stateManager: StateManager,
@@ -154,12 +157,14 @@ public class UserManagerImpl: UserManager {
       method: .get,
       expect: WireUser?.self
     ).sinkDisposed(receiveCompletion: nil, receiveValue: { [weak self] wire in
+      guard let self = self else { return }
       guard let user = wire.flatMap({ User(wire: $0) }) else { return }
-      self?.cacheUser(user: user)
-      self?.stateManager.modifyState { state in
+      self.cacheUser(user: user)
+      self.stateManager.modifyState { state in
         state.currentUser = user
       }
-      self?.eventManager.sendEvent(UserManagerEvent.didRefreshMyUser)
+      self.myUserRefreshCount += 1
+      self.eventManager.sendEvent(UserManagerEvent.didRefreshMyUser(count: self.myUserRefreshCount))
     })
   }
   
@@ -176,6 +181,26 @@ public class UserManagerImpl: UserManager {
         self?.cacheUser(user: user)
       }
       self?.eventManager.sendEvent(UserManagerEvent.didSetFollowStatus(userId: userId, isFollowing: isFollowing))
+    }
+  }
+  
+  public func agreeToEULA() -> AnyPublisher<Void, Exception> {
+    guard let myUserId = authManager.authenticatedUserId else { return .singleValue(()) }
+    return networkManager.request(
+      path: "/user/\(myUserId)",
+      method: .put,
+      parameters: [
+        "eula_agreed_at": Date.now
+      ],
+      expect: EmptyResponseBody.self
+    )
+    .mapException()
+    .mapVoid()
+    .also { [weak self] in
+      if var user = self?.fetchUser(userId: myUserId) {
+        user.eulaAgreedAt = .now
+        self?.cacheUser(user: user)
+      }
     }
   }
 }

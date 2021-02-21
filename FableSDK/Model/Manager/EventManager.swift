@@ -46,11 +46,14 @@ public struct EventSource: Equatable {
 public class EventManager {
   private let _onEvent = PassthroughSubject<EventContext, Exception>()
   public private(set) lazy var onEvent = _onEvent.eraseToAnyPublisher()
+  
+  private var eventCount: Int = 0
 
   public init() {}
 
   public func sendEvent(_ event: EventContext) {
-    print(event)
+    self.eventCount += 1
+    print("Event \(self.eventCount): \(event)")
     _onEvent.send(event)
   }
 }

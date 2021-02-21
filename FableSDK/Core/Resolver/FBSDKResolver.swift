@@ -51,8 +51,8 @@ public class FBSDKResolver: Resolver {
     register(expect: NetworkManager.self) { NetworkManagerImpl(environmentManager: $0.get()) }
     register(expect: NetworkManagerV2.self) { NetworkManagerV2Impl(environmentManager: $0.get()) }
     
-    register {
-      ConfigManager(
+    register(expect: ConfigManager.self) {
+      ConfigManagerImpl(
         networkManager: $0.get(),
         networkManagerV2: $0.get(),
         environmentManager: $0.get(),

@@ -15,12 +15,33 @@ import ReactiveSwift
 import Combine
 import FableSDKWireObjects
 
-public class ConfigManager {
+public protocol ConfigManager {
+  func refreshConfig()
+  func refreshConfigV2() -> AnyPublisher<Config?, Exception>
+  
+  var initialLaunchConfig: CurrentValueSubject<LaunchConfigState, Exception> { get }
+}
+
+public enum LaunchConfigState: Equatable {
+  case received(Config)
+  case receivedNone
+  case unknown
+  public static func == (lhs: LaunchConfigState, rhs: LaunchConfigState) -> Bool {
+    switch (lhs, rhs) {
+    case (.unknown, .unknown), (.receivedNone, .receivedNone), (.received, .received): return true
+    default: return false
+    }
+  }
+}
+
+public class ConfigManagerImpl: ConfigManager {
   private let networkManager: NetworkManager
   private let networkManagerV2: NetworkManagerV2
   private let stateManager: StateManager
   private let environmentManager: EnvironmentManager
   
+  public let initialLaunchConfig: CurrentValueSubject<LaunchConfigState, Exception>
+
   public init(
     networkManager: NetworkManager,
     networkManagerV2: NetworkManagerV2,
@@ -31,16 +52,23 @@ public class ConfigManager {
     self.networkManagerV2 = networkManagerV2
     self.environmentManager = environmentManager
     self.stateManager = stateManager
-    refreshConfig()
+    self.initialLaunchConfig = CurrentValueSubject<LaunchConfigState, Exception>(.unknown)
   }
 
   public func refreshConfigV2() -> AnyPublisher<Config?, Exception> {
     self.networkManagerV2.request(
       path: "/config",
       method: .get
-    ).mapException().map { (wire: WireConfig) in
+    ).mapException().map { [weak self] (wire: WireConfig) in
+      guard let self = self else { return nil }
       if let config = Config(wire: wire) {
+        if self.initialLaunchConfig.value == .unknown {
+          self.initialLaunchConfig.value = .received(config)
+        }
         return config
+      }
+      if self.initialLaunchConfig.value == .unknown {
+        self.initialLaunchConfig.value = .receivedNone
       }
       return nil
     }.eraseToAnyPublisher()

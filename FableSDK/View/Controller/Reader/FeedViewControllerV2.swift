@@ -15,6 +15,7 @@ import FableSDKModelObjects
 import FableSDKWireObjects
 import FableSDKFoundation
 import NetworkFoundation
+import FableSDKEnums
 
 public class FeedViewControllerV2: ASDKViewController<FeedNode> {
   
@@ -25,6 +26,7 @@ public class FeedViewControllerV2: ASDKViewController<FeedNode> {
   private let eventManager: EventManager
   private let authManager: AuthManager
   private let userToStoryManager: UserToStoryManager
+  private let analyticsManager: AnalyticsManager
   
   private let activityView = UIActivityIndicatorView(style: .medium)
 
@@ -34,6 +36,7 @@ public class FeedViewControllerV2: ASDKViewController<FeedNode> {
     self.eventManager = resolver.get()
     self.authManager = resolver.get()
     self.userToStoryManager = resolver.get()
+    self.analyticsManager = resolver.get()
     super.init(node: .init())
     self.node.delegate = self
   }
@@ -107,6 +110,7 @@ public class FeedViewControllerV2: ASDKViewController<FeedNode> {
 extension FeedViewControllerV2: FeedNodeDelegate {
   public func feedNode(didSelectStory storyId: Int) {
     if authManager.isLoggedIn {
+      self.analyticsManager.trackEvent(AnalyticsEvent.didSelectStoryInFeed, properties: ["story_id": storyId])
       self.eventManager.sendEvent(RouterRequestEvent.present(.storyDetail(storyId: storyId), viewController: self))
     } else {
       self.eventManager.sendEvent(RouterRequestEvent.present(.login, viewController: self))

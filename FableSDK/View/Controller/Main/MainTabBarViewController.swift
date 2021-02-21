@@ -15,6 +15,7 @@ import FableSDKEnums
 import FableSDKModelManagers
 import FableSDKFoundation
 import FableSDKModelPresenters
+import Pods_FableSDKViews
 import Firebolt
 import FirebaseAnalytics
 import ReactiveSwift
@@ -80,6 +81,21 @@ public class MainTabBarViewController: UITabBarController {
     configureReactive()
 
     selectedIndex = envInt("starting_index") ?? 0
+    
+    self.eventManager.onEvent.sinkDisposed(receiveCompletion: nil) { [weak self] (event) in
+      guard let self = self else { return }
+      switch event {
+      case UserManagerEvent.didRefreshMyUser(let count):
+        /// First time refresh
+        if count == 1 {
+          if self.userManager.currentUser?.eulaAgreedAt == nil {
+            self.presentEulaAgreement(presenter: self, userDidAgree: false)
+          }
+        }
+      default:
+        break
+      }
+    }
   }
 
   override public func viewWillAppear(_ animated: Bool) {
@@ -173,7 +189,7 @@ public class MainTabBarViewController: UITabBarController {
             return self.presentLogin(viewController: viewController)
           }
           if user.eulaAgreedAt == nil {
-            self.presentEulaAgreement(presenter: viewController)
+            self.presentEulaAgreement(presenter: viewController, userDidAgree: false)
           } else if let storyId = storyId {
             self.presentStoryEditor(storyId: storyId, presenter: viewController)
           } else {
@@ -347,19 +363,40 @@ public class MainTabBarViewController: UITabBarController {
     return vc
   }
   
-  public func presentEulaAgreement(presenter: UIViewController) {
+  public func presentEulaAgreement(presenter: UIViewController, userDidAgree: Bool) {
+    let initialString: String = {
+      if let filepath = Bundle.main.path(forResource: "terms_of_service", ofType: "md") {
+        do {
+          return try String(contentsOfFile: filepath)
+        } catch let error {
+          print(error)
+        }
+      }
+      return ""
+    }()
+    // TODO: log this
+    if initialString.isEmpty { return }
+    let actionButton = Button(FableButtonViewModel.primaryButton())
+    actionButton.setTitle("Agree", for: .normal)
+    actionButton.addTarget(self, action: #selector(didTapEulaButton), for: .touchUpInside)
     let vc = MarkdownViewController(
-      initialString: """
-      # Hello World!
-      ## Hi World!
-      """,
-      navigationTitle: "End-User Agreement License"
+      viewModel: .init(
+        initialString: initialString,
+        navigationTitle: "Terms of Service",
+        actionButton: userDidAgree ? nil : actionButton
+      )
     )
     let navVC = UINavigationController(rootViewController: vc)
     vc.navigationItem.leftBarButtonItem = .makeCloseButton(onSelect: { [weak vc] in
       vc?.dismiss(animated: true, completion: nil)
     })
     presenter.present(navVC, animated: true, completion: nil)
+  }
+  
+  @objc private func didTapEulaButton() {
+    self.userManager.agreeToEULA().sinkDisposed(receiveCompletion: nil) { [weak self] _ in
+      self?.dismiss(animated: true, completion: nil)
+    }
   }
 }
 
@@ -387,3 +424,4 @@ extension MainTabBarViewController: LoginViewControllerSocialDelegate {
     viewController.presentingViewController?.dismiss(animated: true, completion: nil)
   }
 }
+

@@ -696,7 +696,7 @@ public struct WireUser: Codable {
   public let email: String?
   public let password: String?
   public let biography: String?
-  public let eulaAgreedAt: Date?
+  public let eulaAgreedAt: String?
   public let avatarAsset: WireAsset?
 
   /// transients
@@ -721,7 +721,7 @@ public struct WireUser: Codable {
     self.email = email
     self.password = password
     self.biography = biography
-    self.eulaAgreedAt = eulaAgreedAt
+    self.eulaAgreedAt = eulaAgreedAt?.iso8601String
     self.avatarAsset = avatarAsset
     self.userToUser = userToUser
   }
@@ -742,6 +742,7 @@ extension User {
       email: wire.email,
       password: wire.password,
       biography: wire.biography,
+      eulaAgreedAt: wire.eulaAgreedAt?.iso8601Date,
       avatarAsset: wire.avatarAsset.flatMap { Asset(wire: $0) },
       userToUser: wire.userToUser.flatMap(MutableUserToUser.init(wire:))
     )

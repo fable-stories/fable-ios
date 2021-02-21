@@ -10,6 +10,8 @@ import AppUIFoundation
 import FableSDKResolver
 import FableSDKModelObjects
 import FableSDKModelManagers
+import FableSDKViews
+import FableSDKUIFoundation
 import Firebolt
 import ReactiveSwift
 import UIKit
@@ -26,6 +28,8 @@ public class UserSettingsViewController: UITableViewController {
     case logout = "Logout"
     case onboarding = "Onboarding"
     case adminPanel = "Admin Panel"
+    case privacyPolicy = "Privacy Policy"
+    case termsOfService = "Terms of Service"
   }
 
   private let resolver: FBSDKResolver
@@ -85,6 +89,68 @@ public class UserSettingsViewController: UITableViewController {
       self?.dismiss(animated: true, completion: nil)
     }, animated: true, completion: nil)
   }
+  
+  private func presentPrivacyPolicy() {
+    let initialString: String = {
+      if let filepath = Bundle.main.path(forResource: "privacy_policy", ofType: "md") {
+        do {
+          return try String(contentsOfFile: filepath)
+        } catch let error {
+          print(error)
+        }
+      }
+      return ""
+    }()
+    let vc = MarkdownViewController(
+      viewModel: .init(
+        initialString: initialString,
+        navigationTitle: "Fable Privacy Policy"
+      )
+    )
+    let navVC = UINavigationController(rootViewController: vc)
+    vc.navigationItem.leftBarButtonItem = .makeCloseButton(onSelect: { [weak vc] in
+      vc?.dismiss(animated: true, completion: nil)
+    })
+    self.present(navVC, animated: true, completion: nil)
+
+  }
+  
+  public func presentEulaAgreement() {
+    let initialString: String = {
+      if let filepath = Bundle.main.path(forResource: "terms_of_service", ofType: "md") {
+        do {
+          return try String(contentsOfFile: filepath)
+        } catch let error {
+          print(error)
+        }
+      }
+      return ""
+    }()
+    // TODO: log this
+    if initialString.isEmpty { return }
+    let actionButton = Button(FableButtonViewModel.primaryButton())
+    actionButton.setTitle("Agree", for: .normal)
+    actionButton.addTarget(self, action: #selector(didTapEulaButton), for: .touchUpInside)
+    let userDidAgree = self.userManager.currentUser?.eulaAgreedAt != nil
+    let vc = MarkdownViewController(
+      viewModel: .init(
+        initialString: initialString,
+        navigationTitle: "Terms of Service",
+        actionButton: userDidAgree ? nil : actionButton
+      )
+    )
+    let navVC = UINavigationController(rootViewController: vc)
+    vc.navigationItem.leftBarButtonItem = .makeCloseButton(onSelect: { [weak vc] in
+      vc?.dismiss(animated: true, completion: nil)
+    })
+    self.present(navVC, animated: true, completion: nil)
+  }
+  
+  @objc private func didTapEulaButton() {
+    self.userManager.agreeToEULA().sinkDisposed(receiveCompletion: nil) { [weak self] _ in
+      self?.dismiss(animated: true, completion: nil)
+    }
+  }
 
   private func update() {
     let state = stateManager.state()
@@ -106,9 +172,9 @@ public class UserSettingsViewController: UITableViewController {
     } : nil
 
     if authManager.isLoggedIn {
-      menuOptions = [.editProfile, .logout, .onboarding]
+      menuOptions = [.editProfile, .logout, .onboarding, .privacyPolicy, .termsOfService]
     } else {
-      menuOptions = [.login, .onboarding]
+      menuOptions = [.login, .onboarding, .privacyPolicy, .termsOfService]
     }
     
     if canShowAdminMenu {
@@ -154,8 +220,10 @@ extension UserSettingsViewController {
       case .editProfile: return UIImage(named: "editProfile")
       case .logout: return UIImage(named: "logout")
       case .login: return UIImage(named: "loginIcon")
+      case .privacyPolicy: return nil
       case .onboarding: return nil
       case .adminPanel: return nil
+      case .termsOfService: return nil
       }
     }()
     cell.imageView?.image = image?.resized(to: CGSize(width: 16.0, height: 16.0))
@@ -179,6 +247,10 @@ extension UserSettingsViewController {
       delegate?.presentLogin(viewController: self)
     case .onboarding:
       presentOnboarding()
+    case .privacyPolicy:
+      presentPrivacyPolicy()
+    case .termsOfService:
+      self.presentEulaAgreement()
     case .adminPanel:
       showAdminMenu()
     }
