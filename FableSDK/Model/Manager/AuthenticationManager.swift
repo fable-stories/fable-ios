@@ -44,6 +44,7 @@ public protocol AuthManager {
 }
 
 public class AuthManagerImpl: NSObject, AuthManager {
+  internal let remoteLogger = RemoteLogger.shared
 
   public var isLoggedIn: Bool {
     environmentManager.authState != nil
@@ -203,7 +204,6 @@ public class AuthManagerImpl: NSObject, AuthManager {
   }
   
   private func setAuthState(_ authState: AuthState?) {
-    RemoteLogger.shared.setMachineName(authState.flatMap { $0.userId.toString() })
     self.delegate?.authManager(authStateDidChange: authState, authManager: self)
   }
 }

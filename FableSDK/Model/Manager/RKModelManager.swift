@@ -38,15 +38,6 @@ public class RemoteLogger {
   
   public var isEnabled: Bool = false
   
-  public func setMachineName(_ name: String?) {
-    let args: [String] = [
-      ApplicationMetadata.source().rawValue,
-      ApplicationMetadata.versionBuild(),
-      name
-    ].compactMap { $0 }.filter { $0.isNotEmpty }
-    self.paperTrailLogger?.machineName = args.joined(separator: "-")
-  }
-  
   private var paperTrailLogger: RMPaperTrailLogger?
 
   private init() {
@@ -54,12 +45,16 @@ public class RemoteLogger {
       paperTrailLogger.host = "logs5.papertrailapp.com"
       paperTrailLogger.port = 53487
       self.paperTrailLogger = paperTrailLogger
-      self.setMachineName("")
+      let args: [String] = [
+        ApplicationMetadata.source().rawValue,
+        ApplicationMetadata.versionBuild(),
+      ].compactMap { $0 }.filter { $0.isNotEmpty }
+      self.paperTrailLogger?.machineName = args.joined(separator: "-")
       DDLog.add(paperTrailLogger)
     }
   }
   
-  public func log(_ value: Any?) {
+  public func log( _ value: Any?) {
     guard let value = value else { return }
     DDLogVerbose(value)
   }

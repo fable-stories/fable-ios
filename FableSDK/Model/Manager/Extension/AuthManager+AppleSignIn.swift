@@ -61,6 +61,7 @@ extension AuthManagerImpl: ASAuthorizationControllerDelegate, ASAuthorizationCon
 
   
   public func authenticateWithApple() {
+    remoteLogger.log("attempting to sign in with Apple")
     self.isAuthenticatingObserver.send(value: true)
     let nonce = randomNonceString()
     currentNonce = nonce
@@ -83,26 +84,31 @@ extension AuthManagerImpl: ASAuthorizationControllerDelegate, ASAuthorizationCon
         keychain[key] = email
       }
       guard let email = appleIDCredential.email ?? keychain[key], email.isNotEmpty else {
+        remoteLogger.log("could not retrieve email")
         return self.isAuthenticatingObserver
           .send(error: Exception(AppleSignInError.couldNotRetrieveEmail))
       }
+      remoteLogger.log("retreived email")
       self.receiveAppleAuth(
         appleSub: appleIDCredential.user,
         email: email
       ).sinkDisposed(receiveCompletion: { [weak self] (completion) in
         switch completion {
         case .failure(let error):
+          self?.remoteLogger.log(error.localizedDescription)
           self?.isAuthenticatingObserver.send(error: error)
         case .finished:
           break
         }
       }, receiveValue: { [weak self] (userId) in
+        self?.remoteLogger.log("\(userId) signed in with Apple successfully")
         self?.isAuthenticatingObserver.send(value: false)
       })
     }
   }
 
   public func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
+    self.remoteLogger.log(error.localizedDescription)
     self.isAuthenticatingObserver.send(error: Exception(error))
     self.analyticsManager.trackEvent(AnalyticsEvent.appleSignInFailed, properties: ["error": error.localizedDescription])
   }

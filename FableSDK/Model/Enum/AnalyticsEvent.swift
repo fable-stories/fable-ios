@@ -39,32 +39,55 @@ public protocol AnalyticsEventIdentifiable {
   var rawValue: String { get }
 }
 
-public enum AnalyticsEvent: String, RawRepresentable, AnalyticsEventIdentifiable {
-
+public enum AnalyticsEvent: RawRepresentable, AnalyticsEventIdentifiable {
   /// Sign In Screen
   
-  case didSelectGoogleSignIn = "selected_google_sign_in"
-  case didSelectAppleSignIn = "selected_apple_sign_in"
-  case didSelectEmailsignIn = "selected_email_sign_in"
+  case didSelectGoogleSignIn
+  case didSelectAppleSignIn
+  case didSelectEmailsignIn
   
-  case appleSignInSucceeded = "apple_sign_in_succeeded"
-  case appleSignInFailed = "apple_sign_in_failed"
-  case googleignInSucceeded = "google_sign_in_succeeded"
-  case googleSignInFailed = "google_sign_in_failed"
-  case emailignInSucceeded = "email_sign_in_succeeded"
-  case emailSignInFailed = "email_sign_in_failed"
+  case appleSignInSucceeded
+  case appleSignInFailed
+  case googleignInSucceeded
+  case googleSignInFailed
+  case emailignInSucceeded
+  case emailSignInFailed
   
-  case didSelectFeedTab = "selected_feed_tab"
-  case didSelectWriterTab = "selected_writer_tab"
-  case didSelectUserProfileTab = "selected_user_profile_tab"
+  case didSelectFeedTab
+  case didSelectWriterTab
+  case didSelectUserProfileTab
   
-  // Feed Screen
+  /// Feed Screen
   
-  case didSelectStoryInFeed = "selected_story_in_feed"
+  case didSelectStoryInFeed
   
-  /// Reader Screen
+  /// Story Screen
   
-  case didTapNextMessageInReader = "tapped_next_message_in_reader"
-  case didCompleteStoryInReader = "completed_story_in_reader"
-  case didDismissReader = "dismissed_reader"
+  case didTapNextMessageInReader
+  case didCompleteStoryInReader
+  case didDismissReader
+  
+  public var rawValue: String {
+    switch self {
+    case .didSelectGoogleSignIn: return "selected_google_sign_in"
+    case .didSelectAppleSignIn: return "selected_apple_sign_in"
+    case .didSelectEmailsignIn: return "selected_email_sign_in"
+    case .appleSignInSucceeded: return "apple_sign_in_succeeded"
+    case .appleSignInFailed: return "apple_sign_in_failed"
+    case .googleignInSucceeded: return "google_sign_in_succeeded"
+    case .googleSignInFailed: return "google_sign_in_failed"
+    case .emailignInSucceeded: return "email_sign_in_succeeded"
+    case .emailSignInFailed: return "email_sign_in_failed"
+    case .didSelectFeedTab: return "selected_feed_tab"
+    case .didSelectWriterTab: return "selected_writer_tab"
+    case .didSelectUserProfileTab: return "selected_user_profile_tab"
+    case .didSelectStoryInFeed: return "selected_story_in_feed"
+    case .didTapNextMessageInReader: return "tapped_next_message_in_reader"
+    case .didCompleteStoryInReader: return "completed_story_in_reader"
+    case .didDismissReader: return "dismissed_reader"
+    }
+  }
+  
+  /// You cannot map an Analytic event ad-hoc
+  public init?(rawValue: String) { nil }
 }
