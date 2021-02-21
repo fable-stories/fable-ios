@@ -202,14 +202,14 @@ platform :ios do
       value: new_build_number
     )
     # http://docs.fastlane.tools/actions/update_code_signing_settings/#update_code_signing_settings
-    update_code_signing_settings(
-      path: "./Fable.xcodeproj",
-      targets: "Fable",
-      build_configurations: "Release",
-      profile_name: "match AppStore com.fable.stories",
-      code_sign_identity: "Apple Distribution: Andrew Aquino (2NC533SE3E)",
-      use_automatic_signing: false,
-    )
+    # update_code_signing_settings(
+    #   path: "./Fable.xcodeproj",
+    #   targets: "Fable",
+    #   build_configurations: "Release",
+    #   profile_name: "match AppStore com.fable.stories",
+    #   code_sign_identity: "Apple Distribution: Andrew Aquino (2NC533SE3E)",
+    #   use_automatic_signing: true,
+    # )
     # https://docs.fastlane.tools/actions/build_app/
     gym(
       workspace: "Fable.xcworkspace",
@@ -222,7 +222,7 @@ platform :ios do
       output_name: "Fable.ipa",
       clean: false,
       skip_archive: false,
-      skip_codesigning: true,
+      skip_codesigning: false,
       skip_package_ipa: false,
       include_symbols: true,
       include_bitcode: true,

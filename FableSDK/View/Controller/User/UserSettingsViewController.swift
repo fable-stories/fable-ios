@@ -131,12 +131,17 @@ public class UserSettingsViewController: UITableViewController {
     let actionButton = Button(FableButtonViewModel.primaryButton())
     actionButton.setTitle("Agree", for: .normal)
     actionButton.addTarget(self, action: #selector(didTapEulaButton), for: .touchUpInside)
-    let userDidAgree = self.userManager.currentUser?.eulaAgreedAt != nil
+    let showActionButton: Bool = {
+      if let myUser = self.userManager.currentUser {
+        return myUser.eulaAgreedAt == nil
+      }
+      return false
+    }()
     let vc = MarkdownViewController(
       viewModel: .init(
         initialString: initialString,
         navigationTitle: "Terms of Service",
-        actionButton: userDidAgree ? nil : actionButton
+        actionButton: showActionButton ? actionButton : nil
       )
     )
     let navVC = UINavigationController(rootViewController: vc)
