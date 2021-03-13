@@ -283,7 +283,11 @@ public class EditableStoryDetailViewController: UIViewController {
       ),
       borderViewModel: FableBorderViewModel.regular
     ))
-    vc.navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(named: "backButton")) { [weak vc] in
+    vc.navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(named: "backButton")) { [weak self, weak vc] in
+      /// Save on screen dismissal
+      if let string = vc?.textView.text {
+        self?.modelPresenter.updateStory(parameters: UpdateStoryParameters(title: string))
+      }
       vc?.navigationController?.popViewController(animated: true)
     }
     vc.onKeyReturn = { [weak self, weak vc] string in
@@ -333,7 +337,11 @@ public class EditableStoryDetailViewController: UIViewController {
       ),
       borderViewModel: FableBorderViewModel.regular
     ))
-    vc.navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(named: "backButton")) { [weak vc] in
+    vc.navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(named: "backButton")) { [weak self, weak vc] in
+      /// Save on screen dismissal
+      if let string = vc?.textView.text {
+        self?.modelPresenter.updateStory(parameters: UpdateStoryParameters(synopsis: string))
+      }
       vc?.navigationController?.popViewController(animated: true)
     }
     vc.onKeyReturn = { [weak self, weak vc] string in

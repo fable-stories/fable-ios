@@ -193,7 +193,7 @@ public class MainTabBarViewController: UITabBarController {
           } else if let storyId = storyId {
             self.presentStoryEditor(storyId: storyId, presenter: viewController)
           } else {
-            self.presentNewStoryEditor(presenter: viewController)
+            self.presentDraftStoryEditor(presenter: viewController)
           }
         case .storyEditorDetails, .userSettings:
           break
@@ -320,7 +320,7 @@ public class MainTabBarViewController: UITabBarController {
     presenter.present(navVC, animated: true, completion: nil)
   }
   
-  private func presentNewStoryEditor(presenter viewController: UIViewController) {
+  private func presentDraftStoryEditor(presenter viewController: UIViewController) {
     let vc = StoryEditorViewController(resolver: self.resolver)
     let navVC = UINavigationController(rootViewController: vc)
     navVC.modalTransitionStyle = .coverVertical
@@ -383,7 +383,10 @@ public class MainTabBarViewController: UITabBarController {
       viewModel: .init(
         initialString: initialString,
         navigationTitle: "Terms of Service",
-        actionButton: userDidAgree ? nil : actionButton
+        actionButton: userDidAgree ? nil : actionButton,
+        configureTextView: { textView in
+          textView.isEditable = false
+        }
       )
     )
     let navVC = UINavigationController(rootViewController: vc)

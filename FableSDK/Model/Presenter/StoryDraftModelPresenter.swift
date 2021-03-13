@@ -20,7 +20,7 @@ public struct StoryDraftModelPresenterBuilder {
 }
 
 public protocol StoryDraftModelPresenter {
-  func loadInitialDataAsNewStory()
+  func loadInitialDataAsDraftStory()
   func loadInitialData(storyId: Int)
   
   func fetchModel() -> StoryDraftModel?
@@ -83,10 +83,9 @@ private class StoryDraftModelPresenterImpl: StoryDraftModelPresenter {
   private func loadCachedData() {
   }
   
-  public func loadInitialDataAsNewStory() {
-    storyDraftManager.createStoryDraft()
+  public func loadInitialDataAsDraftStory() {
+    storyDraftManager.fetchLatestOrCreateStoryDraft()
       .sinkDisposed(receiveCompletion: nil) { [weak self] storyDraft in
-        guard let storyDraft = storyDraft else { return }
         self?.loadInitialData(storyDraft: storyDraft)
       }
   }
@@ -110,7 +109,6 @@ private class StoryDraftModelPresenterImpl: StoryDraftModelPresenter {
     }
     storyDraftManager.refreshStoryDraft(storyId: storyId)
       .sinkDisposed(receiveCompletion: nil) { [weak self] storyDraft in
-        guard let storyDraft = storyDraft else { return }
         self?.loadInitialData(storyDraft: storyDraft)
       }
   }

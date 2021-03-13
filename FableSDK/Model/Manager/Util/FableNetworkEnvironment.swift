@@ -43,7 +43,7 @@ public struct FableNetworkEnvironment: NetworkEnvironment {
       host: {
         switch environment {
         case .local: return "localhost"
-        case .dev: return "fable-api-456669b5-qojz76tfha-uw.a.run.app"
+        case .dev: return "dev.fablestories.app"
         case .stage: return "fable-api-456669b5-qojz76tfha-uw.a.run.app"
         case .prod: return "fable-api-4feb2d9a-sitjxhw7ya-uw.a.run.app"
         case .proxy(let url): return url.toURL()?.host ?? ""

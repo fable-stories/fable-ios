@@ -67,8 +67,13 @@ public class UserManagerImpl: UserManager {
     refreshMyUser()
 
     // refresh the user each time the environment changes
-    environmentManager.onUpdate.take(duringLifetimeOf: self).observeValues { [weak self] in
-      self?.refreshMyUser()
+    eventManager.onEvent.eraseToAnyPublisher().sinkDisposed(receiveCompletion: nil) { [weak self] (event) in
+      switch event {
+      case AuthManagerEvent.userDidSignIn:
+        self?.refreshMyUser()
+      default:
+        break
+      }
     }
   }
   

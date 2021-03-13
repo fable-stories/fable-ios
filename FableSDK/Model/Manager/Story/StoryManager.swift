@@ -14,6 +14,7 @@ import FableSDKResourceTargets
 import FableSDKWireObjects
 
 public protocol StoryManager {
+  var deletedStoryIds: Set<Int> { get }
   func findById(storyId: Int) -> AnyPublisher<Story?, Exception>
   func fetchById(storyId: Int) -> Story?
   func updateCacheById(storyId: Int, closure: (inout MutableStory) -> Void) 
@@ -31,6 +32,7 @@ public class StoryManagerImpl: StoryManager {
   private let authManager: AuthManager
   
   private var storyById: [Int: CachedItem<Story>] = [:]
+  public private(set) var deletedStoryIds: Set<Int> = []
   
   public init(
     networkManager: NetworkManagerV2,

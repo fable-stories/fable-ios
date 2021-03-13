@@ -171,6 +171,10 @@ public class FBSDKTextViewNode: ASButtonNode {
   
   public var attributedPlaceholderText: NSAttributedString?
   
+  deinit {
+    NotificationCenter.default.removeObserver(self)
+  }
+  
   public init(
     insets: UIEdgeInsets = .zero,
     attributedText: NSAttributedString? = nil,
@@ -193,8 +197,25 @@ public class FBSDKTextViewNode: ASButtonNode {
     
     self.automaticallyManagesSubnodes = true
     self.addTarget(self, action: #selector(didTapSelf), forControlEvents: .touchUpInside)
+    
+    NotificationCenter.default.addObserver(
+      self,
+      selector: #selector(didReceiveNotification(_:)),
+      name: UITextView.textDidChangeNotification,
+      object: nil
+    )
   }
   
+  @objc private func didReceiveNotification(_ notification: Notification) {
+    print(notification.name)
+    switch notification.name {
+    case UITextView.textDidChangeNotification:
+      self.validatePlaceholderState()
+    default:
+      break
+    }
+  }
+
   public override func layoutSpecThatFits(_ constrainedSize: ASSizeRange) -> ASLayoutSpec {
     return ASInsetLayoutSpec(
       insets: insets,

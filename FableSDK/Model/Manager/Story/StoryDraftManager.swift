@@ -16,8 +16,9 @@ import FableSDKWireObjects
 
 public protocol StoryDraftManager {
   func fetchByStoryId(storyId: Int) -> StoryDraft?
-  func refreshStoryDraft(storyId: Int) -> AnyPublisher<StoryDraft?, Exception>
+  func refreshStoryDraft(storyId: Int) -> AnyPublisher<StoryDraft, Exception>
   func createStoryDraft() -> AnyPublisher<StoryDraft?, Exception>
+  func fetchLatestOrCreateStoryDraft() -> AnyPublisher<StoryDraft, Exception>
 }
 
 
@@ -44,22 +45,16 @@ public class StoryDraftManagerImpl: StoryDraftManager {
   
   public func refreshStoryDraft(
     storyId: Int
-  ) -> AnyPublisher<StoryDraft?, Exception> {
-    let publisher: AnyPublisher<StoryDraft?, Exception> = networkManager.request(
+  ) -> AnyPublisher<StoryDraft, Exception> {
+    let publisher: AnyPublisher<StoryDraft, Exception> = networkManager.request(
       path: "/story/\(storyId)/draft",
       method: .get
-    ).map { [weak self] (wire: WireStoryDraft?) in
-      if let wire = wire, let storyDraft = StoryDraft(wire: wire) {
-        self?.storyDraftByStoryId[storyId] = storyDraft
-        return storyDraft
-      }
-      return nil
+    ).map { [weak self] (wire: WireStoryDraft) in
+      let storyDraft = StoryDraft(wire: wire)
+      self?.storyDraftByStoryId[storyId] = storyDraft
+      return storyDraft
     }
     .eraseToAnyPublisher()
-    if let storyDraft = storyDraftByStoryId[storyId] {
-      publisher.sinkDisposed()
-      return .singleValue(storyDraft)
-    }
     return publisher
   }
   
@@ -69,11 +64,21 @@ public class StoryDraftManagerImpl: StoryDraftManager {
       path: "/user/\(userId)/draft/story",
       method: .post
     ).map { [weak self] (wire: WireStoryDraft) in
-      if let storyDraft = StoryDraft(wire: wire) {
-        self?.storyDraftByStoryId[storyDraft.storyId] = storyDraft
-        return storyDraft
-      }
-      return nil
+      let storyDraft = StoryDraft(wire: wire)
+      self?.storyDraftByStoryId[storyDraft.storyId] = storyDraft
+      return storyDraft
+    }
+    .eraseToAnyPublisher()
+  }
+  
+  public func fetchLatestOrCreateStoryDraft() -> AnyPublisher<StoryDraft, Exception> {
+    return networkManager.request(
+      path: "/story/draft/latest",
+      method: .get
+    ).map { [weak self] (wire: WireStoryDraft) in
+      let storyDraft = StoryDraft(wire: wire)
+      self?.storyDraftByStoryId[storyDraft.storyId] = storyDraft
+      return storyDraft
     }
     .eraseToAnyPublisher()
   }

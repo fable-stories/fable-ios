@@ -585,19 +585,9 @@ extension ResourceConfig {
 // MARK: - WireStoryDraft
 
 public struct WireStoryDraft: Codable {
-  public let storyId: Int?
-  public let userId: Int?
-  public let currentChapterId: Int?
-
-  public init(
-    storyId: Int? = nil,
-    userId: Int? = nil,
-    currentChapterId: Int? = nil
-  ) {
-    self.storyId = storyId
-    self.userId = userId
-    self.currentChapterId = currentChapterId
-  }
+  public let storyId: Int
+  public let userId: Int
+  public let currentChapterId: Int
 }
 
 extension WireStoryDraft: CustomStringConvertible {
@@ -605,14 +595,11 @@ extension WireStoryDraft: CustomStringConvertible {
 }
 
 extension StoryDraft {
-  public init?(wire: WireStoryDraft) {
-    guard let storyId = wire.storyId else { return nil }
-    guard let userId = wire.userId else { return nil }
-    guard let currentChapterId = wire.currentChapterId else { return nil }
+  public init(wire: WireStoryDraft) {
     self.init(
-      storyId: storyId,
-      userId: userId,
-      currentChapterId: currentChapterId
+      storyId: wire.storyId,
+      userId: wire.userId,
+      currentChapterId: wire.currentChapterId
     )
   }
 

@@ -16,10 +16,16 @@ import UIKit
 import Down
 
 public struct MarkdownViewModel {
-  public init(initialString: String, navigationTitle: String, actionButton: UIButton? = nil) {
+  public init(
+    initialString: String,
+    navigationTitle: String,
+    actionButton: UIButton? = nil,
+    configureTextView: ((UITextView) -> ())? = nil
+  ) {
     self.initialString = initialString
     self.navigationTitle = navigationTitle
     self.actionButton = actionButton
+    self.configureTextView = configureTextView
   }
   
   /// The Terms of Service text that will be turned into Markdown text
@@ -27,6 +33,7 @@ public struct MarkdownViewModel {
   /// The title for the View Controller
   public let navigationTitle: String
   public let actionButton: UIButton?
+  public let configureTextView: ((UITextView) -> ())?
 }
 
 class MarkdownViewController: UIViewController, UITextViewDelegate {
@@ -42,6 +49,9 @@ class MarkdownViewController: UIViewController, UITextViewDelegate {
   ) {
     self.viewModel = viewModel
     super.init(nibName: nil, bundle: nil)
+    if let configureTextView = viewModel.configureTextView {
+      configureTextView(markdownText)
+    }
   }
   
   required init?(coder: NSCoder) {

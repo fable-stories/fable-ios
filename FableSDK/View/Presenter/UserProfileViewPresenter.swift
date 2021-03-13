@@ -36,23 +36,20 @@ public class UserProfileViewPresenter {
       method: .get,
       expect: WireUserProfile.self
     ).map { [weak self] wire in
+      guard let self = self else { return nil }
       if let model = UserProfile(wire: wire) {
-        self?.userToUserManager.cacheUserToUser(
+        self.userToUserManager.cacheUserToUser(
           userId: model.user.userId,
           userToUser: model.user.userToUser
         )
         for story in model.stories {
-          self?.storyManager.cacheStory(story: story)
+          self.storyManager.cacheStory(story: story)
         }
-        self?.userProfileByUserId[userId] = model
+        self.userProfileByUserId[userId] = model
         return model
       }
       return nil
     }.eraseToAnyPublisher()
-    if let userProfile = self.userProfileByUserId[userId] {
-      publisher.sinkDisposed()
-      return .singleValue(userProfile)
-    }
     return publisher
   }
 }

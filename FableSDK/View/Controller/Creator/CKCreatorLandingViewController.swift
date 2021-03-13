@@ -148,7 +148,8 @@ public class CKLandingViewController: UIViewController {
       case let .failure(error):
         self.presentAlert(error: error, onComplete: onComplete)
       case let .success(wire):
-        if let wire = wire, let storyDraft = StoryDraft(wire: wire) {
+        if let wire = wire {
+          let storyDraft = StoryDraft(wire: wire)
           self.presentCreatorKit(storyDraft: storyDraft, onComplete: onComplete)
         } else {
           self.presentNewCreatorKit(userId: user.userId, onComplete: onComplete)
@@ -166,7 +167,8 @@ public class CKLandingViewController: UIViewController {
       case let .failure(error):
         self.presentAlert(error: error, onComplete: onComplete)
       case let .success(wire):
-        guard let wire = wire, let storyDraft = StoryDraft(wire: wire) else { return }
+        guard let wire = wire else { return }
+        let storyDraft = StoryDraft(wire: wire)
         self.presentCreatorKit(storyDraft: storyDraft, onComplete: onComplete)
       }
     }

@@ -64,14 +64,14 @@ public class StoryEditorViewController: ASDKViewController<StoryEditorNode> {
     if let storyId = initializedWithStoryId {
       self.loadInitialData(storyId: storyId)
     } else {
-      self.loadInitialDataAsNewStory()
+      self.loadInitialDataAsDraftStory()
     }
   }
   
-  public func loadInitialDataAsNewStory() {
+  public func loadInitialDataAsDraftStory() {
     self.navigationItem.rightBarButtonItem?.isEnabled = false
     self.node.setLoadingScreenHidden(false)
-    self.modelPresenter.loadInitialDataAsNewStory()
+    self.modelPresenter.loadInitialDataAsDraftStory()
   }
 
   public func loadInitialData(storyId: Int) {
