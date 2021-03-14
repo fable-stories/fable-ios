@@ -59,6 +59,17 @@ public class CKLandingViewController: UIViewController {
 
   private let actionButton = Button(FableButtonViewModel.action())
   private let actionButton2 = Button(FableButtonViewModel.plain())
+  
+  private let container = UIView()
+  private let containerStackView: UIStackView = {
+    let view = UIStackView()
+    view.alignment = .center
+    view.axis = .vertical
+    view.distribution = .fillProportionally
+    return view
+  }()
+  private let telegramButton = Button(FableButtonViewModel.plain())
+  private let shareButton = Button(FableButtonViewModel.plain())
 
   // MARK: View Life Cycle
 
@@ -88,6 +99,11 @@ public class CKLandingViewController: UIViewController {
     view.addSubview(titleLabel)
     view.addSubview(actionButton)
     view.addSubview(actionButton2)
+    
+    view.addSubview(container)
+    container.addSubview(containerStackView)
+    containerStackView.addArrangedSubview(telegramButton)
+    containerStackView.addArrangedSubview(shareButton)
 
     titleLabel.snp.makeConstraints { make in
       make.leading.equalToSuperview().inset(view.layoutMargins)
@@ -108,6 +124,31 @@ public class CKLandingViewController: UIViewController {
       make.trailing.equalToSuperview().inset(view.layoutMargins)
       make.height.equalTo(40.0)
     }
+    
+    container.snp.makeConstraints { make in
+      make.top.equalTo(actionButton2.snp.bottom)
+      make.leading.equalToSuperview().inset(view.layoutMargins)
+      make.trailing.equalToSuperview().inset(view.layoutMargins)
+      make.bottom.equalToSuperview().inset(view.layoutMargins)
+    }
+    
+    containerStackView.snp.makeConstraints { make in
+      make.center.equalToSuperview()
+      make.leading.equalToSuperview()
+      make.trailing.equalToSuperview()
+    }
+    
+    telegramButton.snp.makeConstraints { make in
+      make.leading.equalToSuperview()
+      make.trailing.equalToSuperview()
+      make.height.equalTo(40.0)
+    }
+    
+    shareButton.snp.makeConstraints { make in
+      make.leading.equalToSuperview()
+      make.trailing.equalToSuperview()
+      make.height.equalTo(40.0)
+    }
   }
 
   private func configureSubviews() {
@@ -119,8 +160,13 @@ public class CKLandingViewController: UIViewController {
     actionButton.addTarget(self, action: #selector(createStoryButtonTapped(button:)), for: .touchUpInside)
     
     actionButton2.title = "CONTINUE MOST RECENT STORY"
-    actionButton2.addShadow(FableShadowViewModel.regular)
     actionButton2.addTarget(self, action: #selector(continueRecentStoryDraft(button:)), for: .touchUpInside)
+    
+    let telegramIcon = UIImage(named: "telegram_icon")?.resized(to: .sizeWithConstantDimensions(24.0))
+    telegramButton.setImage(telegramIcon, for: .normal)
+    telegramButton.imageEdgeInsets = UIEdgeInsets(top: 0.0, left: 0.0, bottom: 0.0, right: 8.0)
+    telegramButton.addTarget(self, action: #selector(didTapOnTelegramCTA), for: .touchUpInside)
+    telegramButton.title = "Join our Telegram group!"
   }
 
   private func configureGestures() {}
@@ -148,6 +194,11 @@ public class CKLandingViewController: UIViewController {
     } else {
       self.presentLogin()
     }
+  }
+  
+  @objc private func didTapOnTelegramCTA() {
+    guard let url = URL(string: "https://t.me/fablestories") else { return }
+    UIApplication.shared.open(url)
   }
 
   private func presentLogin() {

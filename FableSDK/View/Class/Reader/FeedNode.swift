@@ -50,7 +50,7 @@ public class FeedNode: ASDisplayNode {
     didSet {
       ASPerformBlockOnMainThread {
         self.tableNode.isHidden = self.sections.isEmpty
-        self.tableNode.reloadData()
+        self.reloadData()
       }
     }
   }
