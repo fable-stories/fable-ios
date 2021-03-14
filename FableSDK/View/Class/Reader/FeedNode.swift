@@ -11,6 +11,7 @@ import FableSDKModelObjects
 
 public protocol FeedNodeDelegate: class {
   func feedNode(didSelectStory storyId: Int)
+  func feedNode(didPullToRefresh node: FeedNode)
   func feedNode(didTapBackgroundImage node: FeedNode)
 }
 
@@ -60,6 +61,8 @@ public class FeedNode: ASDisplayNode {
   
   public weak var delegate: FeedNodeDelegate?
   
+  private let refreshControl = UIRefreshControl()
+  
   private lazy var tableNode: ASTableNode = .new {
     let node = ASTableNode(style: .plain)
     node.delegate = self
@@ -68,6 +71,7 @@ public class FeedNode: ASDisplayNode {
     ASPerformBlockOnMainThread {
       node.view.showsVerticalScrollIndicator = false
       node.view.separatorStyle = .none
+      node.view.refreshControl = self.refreshControl
     }
     return node
   }
@@ -82,6 +86,7 @@ public class FeedNode: ASDisplayNode {
     super.init()
     self.automaticallyManagesSubnodes = true
     self.tableNode.isHidden = true
+    self.refreshControl.addTarget(self, action: #selector(didPullToRefresh), for: .valueChanged)
   }
   
   public override func didEnterDisplayState() {
@@ -89,7 +94,12 @@ public class FeedNode: ASDisplayNode {
     self.animationNode.play()
   }
   
+  @objc private func didPullToRefresh() {
+    self.delegate?.feedNode(didPullToRefresh: self)
+  }
+  
   public func reloadData() {
+    self.refreshControl.endRefreshing()
     self.tableNode.reloadData()
   }
   

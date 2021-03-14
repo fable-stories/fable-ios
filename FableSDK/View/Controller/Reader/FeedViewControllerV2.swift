@@ -117,6 +117,10 @@ extension FeedViewControllerV2: FeedNodeDelegate {
     }
   }
   
+  public func feedNode(didPullToRefresh node: FeedNode) {
+    self.refreshData()
+  }
+
   public func feedNode(didTapBackgroundImage node: FeedNode) {
   }
 }

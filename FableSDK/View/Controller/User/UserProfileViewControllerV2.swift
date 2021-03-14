@@ -108,6 +108,7 @@ public class UserProfileViewControllerV2: ASDKViewController<UserProfileNode> {
       switch event {
       case AuthManagerEvent.userDidSignIn, AuthManagerEvent.userDidSignOut,
            StoryDraftModelPresenterEvent.didDeleteStory,
+           StoryDraftModelPresenterEvent.didUpdateStory,
            UserManagerEvent.didSetFollowStatus,
            WriterDashboardEvent.didStartNewStory:
         self?.refreshData()
