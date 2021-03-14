@@ -286,6 +286,7 @@ public struct WireConfig: Codable {
   public let resourceConfig: WireResourceConfig?
   public let eulaAgreement: String
   public let privacyPolicy: String
+  public let shareLink: String?
 
   public init(
     configId: Int? = nil,
@@ -305,6 +306,7 @@ public struct WireConfig: Codable {
     self.resourceConfig = resourceConfig
     self.eulaAgreement = eulaAgreement
     self.privacyPolicy = privacyPolicy
+    self.shareLink = ""
   }
 }
 
@@ -320,7 +322,8 @@ extension Config {
       colorHexStrings: wire.colorHexStrings,
       enableInteractiveStories: wire.enableInteractiveStories,
       admins: wire.admins,
-      resourceConfig: wire.resourceConfig.flatMap { ResourceConfig(wire: $0) }
+      resourceConfig: wire.resourceConfig.flatMap { ResourceConfig(wire: $0) },
+      shareLink: wire.shareLink
     )
   }
 

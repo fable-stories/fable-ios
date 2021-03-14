@@ -407,6 +407,7 @@ public struct Config: Codable {
   public let resourceConfig: ResourceConfig?
   public let eulaAgreement: String
   public let privacyPolicy: String
+  public let shareLink: String
 
   public init(
     configId: Int,
@@ -415,7 +416,8 @@ public struct Config: Codable {
     admins: [String]? = nil,
     resourceConfig: ResourceConfig? = nil,
     eulaAgreement: String = "",
-    privacyPolicy: String = ""
+    privacyPolicy: String = "",
+    shareLink: String? = nil
   ) {
     self.configId = configId
     self.colorHexStrings = colorHexStrings ?? []
@@ -424,22 +426,7 @@ public struct Config: Codable {
     self.resourceConfig = resourceConfig
     self.eulaAgreement = eulaAgreement
     self.privacyPolicy = privacyPolicy
-  }
-
-  public func copy(
-    configId: Int? = nil,
-    colorHexStrings: [String]? = nil,
-    enableInteractiveStories: Bool? = nil,
-    admins: [String]? = nil,
-    resourceConfig: ResourceConfig? = nil
-  ) -> Config {
-    Config(
-      configId: configId ?? self.configId,
-      colorHexStrings: colorHexStrings ?? self.colorHexStrings,
-      enableInteractiveStories: enableInteractiveStories ?? self.enableInteractiveStories,
-      admins: admins ?? self.admins,
-      resourceConfig: resourceConfig ?? self.resourceConfig
-    )
+    self.shareLink = shareLink ?? ""
   }
 }
 

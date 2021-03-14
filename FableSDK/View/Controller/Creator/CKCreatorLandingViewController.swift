@@ -33,6 +33,7 @@ public class CKLandingViewController: UIViewController {
   private let authManager: AuthManager
   private let resourceManager: ResourceManager
   private let storyDraftManager: StoryDraftManager
+  private let configManager: ConfigManager
 
   public init(
     resolver: FBSDKResolver
@@ -44,6 +45,7 @@ public class CKLandingViewController: UIViewController {
     self.authManager = resolver.get()
     self.resourceManager = resolver.get()
     self.storyDraftManager = resolver.get()
+    self.configManager = resolver.get()
     super.init(nibName: nil, bundle: nil)
   }
 
@@ -66,6 +68,7 @@ public class CKLandingViewController: UIViewController {
     view.alignment = .center
     view.axis = .vertical
     view.distribution = .fillProportionally
+    view.spacing = 8.0
     return view
   }()
   private let telegramButton = Button(FableButtonViewModel.plain())
@@ -167,6 +170,9 @@ public class CKLandingViewController: UIViewController {
     telegramButton.imageEdgeInsets = UIEdgeInsets(top: 0.0, left: 0.0, bottom: 0.0, right: 8.0)
     telegramButton.addTarget(self, action: #selector(didTapOnTelegramCTA), for: .touchUpInside)
     telegramButton.title = "Join our Telegram group!"
+    
+    shareButton.title = "Share this App"
+    shareButton.addTarget(self, action: #selector(didTapOnShareCTA), for: .touchUpInside)
   }
 
   private func configureGestures() {}
@@ -199,6 +205,14 @@ public class CKLandingViewController: UIViewController {
   @objc private func didTapOnTelegramCTA() {
     guard let url = URL(string: "https://t.me/fablestories") else { return }
     UIApplication.shared.open(url)
+  }
+  
+  @objc private func didTapOnShareCTA() {
+    let shareLink = "https://testflight.apple.com/join/zwgj88F3"
+    UIPasteboard.general.string = shareLink
+    let alert = UIAlertController(title: "Copied!", message: shareLink, preferredStyle: .alert)
+    alert.addAction(.init(title: "Okay", style: .default, handler: nil))
+    self.present(alert, animated: true, completion: nil)
   }
 
   private func presentLogin() {
