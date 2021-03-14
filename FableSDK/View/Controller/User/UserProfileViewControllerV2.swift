@@ -180,7 +180,7 @@ public class UserProfileViewControllerV2: ASDKViewController<UserProfileNode> {
   }
   
   private func presentStoryEditor(storyId: Int) {
-    self.eventManager.sendEvent(RouterRequestEvent.present(.storyEditor(storyId: storyId), viewController: self))
+    self.eventManager.sendEvent(RouterRequestEvent.present(.storyEditor(.existingStory(storyId)), viewController: self))
   }
   
   private func presentStoryReader(storyId: Int) {

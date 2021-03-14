@@ -16,6 +16,11 @@ import FableSDKModelPresenters
 import FableSDKViews
 
 public class StoryEditorViewController: ASDKViewController<StoryEditorNode> {
+  public enum ViewContext {
+    case newStory
+    case recentStory
+    case existingStory(_ storyId: Int)
+  }
   
   private let resolver: FBSDKResolver
   private let eventManager: EventManager
@@ -23,32 +28,27 @@ public class StoryEditorViewController: ASDKViewController<StoryEditorNode> {
   private let characterManager: CharacterManager
 
   private let modelPresenter: StoryDraftModelPresenter
-  private let initializedWithStoryId: Int?
+  private let viewContext: ViewContext
   
-  public init(resolver: FBSDKResolver, storyId: Int) {
+  public init(resolver: FBSDKResolver, viewContext: ViewContext) {
     self.resolver = resolver
     self.eventManager = resolver.get()
     self.messageManager = resolver.get()
     self.characterManager = resolver.get()
     self.modelPresenter = StoryDraftModelPresenterBuilder.make(
-      resolver: resolver
+      resolver: resolver,
+      context: {
+        switch viewContext {
+        case let .existingStory(storyId): return .existingStory(storyId: storyId)
+        case .newStory: return .newStory
+        case .recentStory: return .recentStory
+        }
+      }()
     )
-    self.initializedWithStoryId = storyId
+    self.viewContext = viewContext
     super.init(node: .init())
   }
-  
-  public init(resolver: FBSDKResolver) {
-    self.resolver = resolver
-    self.eventManager = resolver.get()
-    self.messageManager = resolver.get()
-    self.characterManager = resolver.get()
-    self.modelPresenter = StoryDraftModelPresenterBuilder.make(
-      resolver: resolver
-    )
-    self.initializedWithStoryId = nil
-    super.init(node: .init())
-  }
-  
+
   public required init?(coder: NSCoder) {
     fatalError()
   }
@@ -61,23 +61,13 @@ public class StoryEditorViewController: ASDKViewController<StoryEditorNode> {
     self.node.setDelegate(self)
     self.configureReceivables()
     
-    if let storyId = initializedWithStoryId {
-      self.loadInitialData(storyId: storyId)
-    } else {
-      self.loadInitialDataAsDraftStory()
-    }
+    self.loadInitialData()
   }
   
-  public func loadInitialDataAsDraftStory() {
+  public func loadInitialData() {
     self.navigationItem.rightBarButtonItem?.isEnabled = false
     self.node.setLoadingScreenHidden(false)
-    self.modelPresenter.loadInitialDataAsDraftStory()
-  }
-
-  public func loadInitialData(storyId: Int) {
-    self.navigationItem.rightBarButtonItem?.isEnabled = false
-    self.node.setLoadingScreenHidden(false)
-    self.modelPresenter.loadInitialData(storyId: storyId)
+    self.modelPresenter.loadInitialData()
   }
   
   private func configureReceivables() {

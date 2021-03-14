@@ -55,13 +55,14 @@ public class StoryDetailsViewControllerV2: ASDKViewController<StoryDetailNodeV2>
 
   public init(
     resolver: FBSDKResolver,
-    workspaceManager: WorkspaceManager
+    workspaceManager: WorkspaceManager,
+    modelPresenter: StoryDraftModelPresenter
   ) {
     self.resolver = resolver
     self.categoryManager = resolver.get()
     self.eventManager = resolver.get()
     self.assetManager = resolver.get()
-    self.modelPresenter = StoryDraftModelPresenterBuilder.make(resolver: resolver)
+    self.modelPresenter = modelPresenter
     super.init(node: .init())
   }
   

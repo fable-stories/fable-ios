@@ -32,7 +32,7 @@ public enum RouterRequestEvent: EventContext {
   public enum Screen {
     case story(storyId: Int)
     case userProfile(userId: Int)
-    case storyEditor(storyId: Int?)
+    case storyEditor(StoryEditorContext)
     case storyEditorDetails(modelPresenter: StoryDraftModelPresenter)
     case storyDetail(storyId: Int)
     case storyReader(datastore: DataStore)
@@ -40,6 +40,12 @@ public enum RouterRequestEvent: EventContext {
     case userSettings
     case login
     case onboarding
+    
+    public enum StoryEditorContext {
+      case newStory
+      case recentStory
+      case existingStory(_ storyId: Int)
+    }
   }
 }
 
@@ -184,16 +190,20 @@ public class MainTabBarViewController: UITabBarController {
         switch screen {
         case .storyDetail(let storyId):
           self.presentStoryDetail(storyId: storyId, presenter: viewController)
-        case .storyEditor(let storyId):
+        case .storyEditor(let context):
           guard let user = self.userManager.currentUser else {
             return self.presentLogin(viewController: viewController)
           }
           if user.eulaAgreedAt == nil {
-            self.presentEulaAgreement(presenter: viewController, userDidAgree: false)
-          } else if let storyId = storyId {
-            self.presentStoryEditor(storyId: storyId, presenter: viewController)
-          } else {
-            self.presentDraftStoryEditor(presenter: viewController)
+            return self.presentEulaAgreement(presenter: viewController, userDidAgree: false)
+          }
+          switch context {
+          case let .existingStory(storyId):
+            self.presentStoryEditor(presenter: viewController, viewContext: .existingStory(storyId))
+          case .newStory:
+            self.presentStoryEditor(presenter: viewController, viewContext: .newStory)
+          case .recentStory:
+            self.presentStoryEditor(presenter: viewController, viewContext: .recentStory)
           }
         case .storyEditorDetails, .userSettings:
           break
@@ -319,22 +329,15 @@ public class MainTabBarViewController: UITabBarController {
     }
     presenter.present(navVC, animated: true, completion: nil)
   }
-  
-  private func presentDraftStoryEditor(presenter viewController: UIViewController) {
-    let vc = StoryEditorViewController(resolver: self.resolver)
-    let navVC = UINavigationController(rootViewController: vc)
-    navVC.modalTransitionStyle = .coverVertical
-    navVC.modalPresentationStyle = .fullScreen
-    vc.navigationItem.leftBarButtonItem = .makeCloseButton(onSelect: { [weak vc] in
-      vc?.dismiss(animated: true, completion: nil)
-    })
-    viewController.present(navVC, animated: true) { [weak self] in
-      self?.eventManager.sendEvent(WriterDashboardEvent.didStartNewStory)
-    }
-  }
-  
-  private func presentStoryEditor(storyId: Int, presenter: UIViewController) {
-    let vc = StoryEditorViewController(resolver: resolver, storyId: storyId)
+
+  private func presentStoryEditor(
+    presenter: UIViewController,
+    viewContext: StoryEditorViewController.ViewContext
+  ) {
+    let vc = StoryEditorViewController(
+      resolver: resolver,
+      viewContext: viewContext
+    )
     let navVC = UINavigationController(rootViewController: vc)
     navVC.modalTransitionStyle = .coverVertical
     navVC.modalPresentationStyle = .fullScreen

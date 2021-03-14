@@ -14,15 +14,14 @@ import FableSDKModelManagers
 import Combine
 
 public struct StoryDraftModelPresenterBuilder {
-  public static func make(resolver: FBSDKResolver) -> StoryDraftModelPresenter {
-    StoryDraftModelPresenterImpl(resolver: resolver)
+  public static func make(resolver: FBSDKResolver, context: StoryDraftModelPresenterContext) -> StoryDraftModelPresenter {
+    StoryDraftModelPresenterImpl(resolver: resolver, context: context)
   }
 }
 
 public protocol StoryDraftModelPresenter {
-  func loadInitialDataAsDraftStory()
-  func loadInitialData(storyId: Int)
-  
+  func loadInitialData()
+
   func fetchModel() -> StoryDraftModel?
   
   /// Story
@@ -52,8 +51,13 @@ public protocol StoryDraftModelPresenter {
   func setEditMode(_ editMode: StoryDraftEditMode)
 }
 
+public enum StoryDraftModelPresenterContext {
+  case newStory
+  case recentStory
+  case existingStory(storyId: Int)
+}
+
 private class StoryDraftModelPresenterImpl: StoryDraftModelPresenter {
-  
   private let storyDraftManager: StoryDraftManager
   private let storyManager: StoryManager
   private let chapterManager: ChapterManager
@@ -67,8 +71,9 @@ private class StoryDraftModelPresenterImpl: StoryDraftModelPresenter {
   private var model: MutableStoryDraftModel?
   
   public var editMode: StoryDraftEditMode = .normal
+  private let context: StoryDraftModelPresenterContext
 
-  public init(resolver: FBSDKResolver) {
+  public init(resolver: FBSDKResolver, context: StoryDraftModelPresenterContext) {
     self.storyDraftManager = resolver.get()
     self.storyManager = resolver.get()
     self.chapterManager = resolver.get()
@@ -78,19 +83,28 @@ private class StoryDraftModelPresenterImpl: StoryDraftModelPresenter {
     self.configManager = resolver.get()
     self.categoryManager = resolver.get()
     self.assetManager = resolver.get()
+    self.context = context
   }
   
-  private func loadCachedData() {
+  public func loadInitialData() {
+    switch context {
+    case let .existingStory(storyId):
+      self.loadInitialData(storyId: storyId)
+    case .newStory:
+      storyDraftManager.createStoryDraft()
+        .sinkDisposed(receiveCompletion: nil) { [weak self] storyDraft in
+          guard let storyDraft = storyDraft else { return }
+          self?.loadInitialData(storyDraft: storyDraft)
+        }
+    case .recentStory:
+      storyDraftManager.fetchLatestOrCreateStoryDraft()
+        .sinkDisposed(receiveCompletion: nil) { [weak self] storyDraft in
+          self?.loadInitialData(storyDraft: storyDraft)
+        }
+    }
   }
   
-  public func loadInitialDataAsDraftStory() {
-    storyDraftManager.fetchLatestOrCreateStoryDraft()
-      .sinkDisposed(receiveCompletion: nil) { [weak self] storyDraft in
-        self?.loadInitialData(storyDraft: storyDraft)
-      }
-  }
-  
-  public func loadInitialData(storyId: Int) {
+  private func loadInitialData(storyId: Int) {
     if
       let storyDraft = storyDraftManager.fetchByStoryId(storyId: storyId),
       let story = storyManager.fetchById(storyId: storyDraft.storyId),

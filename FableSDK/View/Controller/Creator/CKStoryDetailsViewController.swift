@@ -43,14 +43,15 @@ public class EditableStoryDetailViewController: UIViewController {
 
   public init(
     resolver: FBSDKResolver,
-    workspaceManager: WorkspaceManager
+    workspaceManager: WorkspaceManager,
+    modelPresenter: StoryDraftModelPresenter
   ) {
     self.resolver = resolver
     self.resourceManager = resolver.get()
     self.categoryManager = resolver.get()
     self.eventManager = resolver.get()
     self.assetManager = resolver.get()
-    self.modelPresenter = StoryDraftModelPresenterBuilder.make(resolver: resolver)
+    self.modelPresenter = modelPresenter
     super.init(nibName: nil, bundle: nil)
   }
   
