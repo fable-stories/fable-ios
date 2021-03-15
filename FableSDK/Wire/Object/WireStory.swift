@@ -99,23 +99,17 @@ public extension MutableUserToStory {
 }
 
 public struct WireStoryStats: Codable {
-  internal init(views: Int, reportCount: Int, likes: Int) {
-    self.views = views
-    self.reportCount = reportCount
-    self.likes = likes
-  }
-  
-  public let views: Int
-  public let reportCount: Int
-  public let likes: Int
+  public let views: Int?
+  public let reportCount: Int?
+  public let likes: Int?
 }
 
 public extension StoryStats {
   init(wire: WireStoryStats) {
     self.init(
-      likes: wire.likes,
-      reportCount: wire.reportCount,
-      views: wire.views
+      likes: wire.likes ?? 0,
+      reportCount: wire.reportCount ?? 0,
+      views: wire.views ?? 0
     )
   }
 }

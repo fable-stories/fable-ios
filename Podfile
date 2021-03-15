@@ -2,7 +2,7 @@ ENV["COCOAPODS_DISABLE_STATS"] = "true"
 $useStaticFrameworks = ENV['COCOAPODS_USE_STATIC_FRAMEWORKS'] == 'true'
 
 platform :ios, '13.0'
-
+install! 'cocoapods', :deterministic_uuids => false
 inhibit_all_warnings!
 
 if !$useStaticFrameworks
@@ -68,6 +68,7 @@ def firebase
   googleutilities
   pod 'Firebase/Crashlytics'
   pod 'Firebase/Analytics'
+  pod 'Firebase/Performance'
   pod 'Firebase/Core'
   pod 'Firebase/Auth'
 end

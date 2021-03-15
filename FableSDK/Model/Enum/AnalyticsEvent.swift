@@ -42,6 +42,10 @@ public protocol AnalyticsEventIdentifiable {
 public enum AnalyticsEvent: RawRepresentable, AnalyticsEventIdentifiable {
   /// Sign In Screen
   
+  case didSignUp
+  case didLogin
+  case didLogout
+  
   case didSelectGoogleSignIn
   case didSelectAppleSignIn
   case didSelectEmailsignIn
@@ -69,6 +73,9 @@ public enum AnalyticsEvent: RawRepresentable, AnalyticsEventIdentifiable {
   
   public var rawValue: String {
     switch self {
+    case .didSignUp: return "user_did_signup"
+    case .didLogin: return "user_did_login"
+    case .didLogout: return "user_did_logout"
     case .didSelectGoogleSignIn: return "selected_google_sign_in"
     case .didSelectAppleSignIn: return "selected_apple_sign_in"
     case .didSelectEmailsignIn: return "selected_email_sign_in"

@@ -31,6 +31,7 @@ public struct SignInResponse: Codable, InitializableWireObject {
 }
 
 public struct WireAuthenticationResponse: Codable {
+  public let isNewUser: Bool?
   public let accessToken: String?
   public let user: WireUser?
 }

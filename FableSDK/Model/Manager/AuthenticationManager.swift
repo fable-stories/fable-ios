@@ -24,7 +24,6 @@ public enum AuthManagerEvent: EventContext {
 
 private let kAuthCheckInterval: TimeInterval = 30.0
 
-
 public protocol AuthManagerDelegate: class {
   func authManager(authStateDidChange authState: AuthState?, authManager: AuthManager)
 }
@@ -156,6 +155,7 @@ public class AuthManagerImpl: NSObject, AuthManager {
 
   public func signOut() {
     self.delegate?.authManager(authStateDidChange: nil, authManager: self)
+    self.analyticsManager.trackEvent(AnalyticsEvent.didLogout)
     self.eventManager.sendEvent(AuthManagerEvent.userDidSignOut)
   }
   
@@ -176,7 +176,9 @@ public class AuthManagerImpl: NSObject, AuthManager {
       self.setAuthState(AuthState(userId: user.userId, accessToken: accessToken))
       self.eventManager.sendEvent(AuthManagerEvent.userDidSignIn)
       self.isAuthenticatingObserver.send(value: false)
-
+      
+      self.analyticsManager.trackEvent(AnalyticsEvent.didLogin)
+      
       return user.userId
     }
   }
@@ -198,6 +200,8 @@ public class AuthManagerImpl: NSObject, AuthManager {
       
       self.setAuthState(AuthState(userId: user.userId, accessToken: accessToken))
       self.eventManager.sendEvent(AuthManagerEvent.userDidSignIn)
+      
+      self.analyticsManager.trackEvent(AnalyticsEvent.didLogin)
       
       return SignalProducer<Int, SignInError>(value: user.userId)
     }

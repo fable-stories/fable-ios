@@ -7,10 +7,10 @@
 
 import Foundation
 import Firebolt
+import FableSDKEnums
 import FableSDKModelObjects
 import FableSDKModelManagers
 import FirebaseAnalytics
-
 
 private let firebaseAnalyticsDelegate = FirebaseAnalyticsDelegate()
 
@@ -20,85 +20,111 @@ public class FBSDKResolver: Resolver {
   public init() {
     super.init("FBSDKResolver")
 
-    // Core Managers
-    
     register { GlobalContextManager() }
-    register { EnvironmentManager(delegate: $0.get(expect: GlobalContextManager.self)) }
-    register(expect: AnalyticsManager.self) { AnalyticsManagerImpl(networkManager: $0.get(), delegate: firebaseAnalyticsDelegate) }
-    register { StateManager(environmentManager: $0.get()) }
-    register(expect: UserManager.self) {
+    register { (resolver: FBSDKResolver) in
+      EnvironmentManager(delegate: resolver.get(expect: GlobalContextManager.self))
+    }
+    register(expect: AnalyticsManager.self) { (resolver: FBSDKResolver) in
+      AnalyticsManagerImpl(networkManager: resolver.get(), delegate: firebaseAnalyticsDelegate)
+    }
+    register { (resolver: FBSDKResolver) in
+      StateManager(environmentManager: resolver.get())
+    }
+    register(expect: UserManager.self) { (resolver: FBSDKResolver) in
       UserManagerImpl(
-        stateManager: $0.get(),
-        networkManager: $0.get(),
-        environmentManager: $0.get(),
-        authManager: $0.get(),
-        eventManager: $0.get(),
-        userToUserManager: $0.get()
+        stateManager: resolver.get(),
+        networkManager: resolver.get(),
+        environmentManager: resolver.get(),
+        authManager: resolver.get(),
+        eventManager: resolver.get(),
+        userToUserManager: resolver.get()
       )
     }
-    register(expect: AuthManager.self) {
+    register(expect: AuthManager.self) { (resolver: FBSDKResolver) in
       AuthManagerImpl(
-        stateManager: $0.get(),
-        environmentManager: $0.get(),
-        networkManager: $0.get(),
-        networkManagerV2: $0.get(),
-        eventManager: $0.get(),
-        analyticsManager: $0.get(),
-        delegate: $0.get(expect: GlobalContextManager.self)
+        stateManager: resolver.get(),
+        environmentManager: resolver.get(),
+        networkManager: resolver.get(),
+        networkManagerV2: resolver.get(),
+        eventManager: resolver.get(),
+        analyticsManager: resolver.get(),
+        delegate: resolver.get(expect: GlobalContextManager.self)
       )
     }
-    
-    register(expect: NetworkManager.self) { NetworkManagerImpl(environmentManager: $0.get()) }
-    register(expect: NetworkManagerV2.self) { NetworkManagerV2Impl(environmentManager: $0.get()) }
-    
-    register(expect: ConfigManager.self) {
+    register(expect: NetworkManager.self) { (resolver: FBSDKResolver) in
+      NetworkManagerImpl(environmentManager: resolver.get())
+    }
+    register(expect: NetworkManagerV2.self) { (resolver: FBSDKResolver) in
+      NetworkManagerV2Impl(environmentManager: resolver.get())
+    }
+    register(expect: ConfigManager.self) { (resolver: FBSDKResolver) in
       ConfigManagerImpl(
-        networkManager: $0.get(),
-        networkManagerV2: $0.get(),
-        environmentManager: $0.get(),
-        stateManager: $0.get()
+        networkManager: resolver.get(),
+        networkManagerV2: resolver.get(),
+        environmentManager: resolver.get(),
+        stateManager: resolver.get()
       )
     }
     register { EventManager() }
-    register { ResourceManager(networkManager: $0.get(), stateManager: $0.get(), authManager: $0.get()) }
-    register(expect: StoryDraftManager.self) { StoryDraftManagerImpl(resourceManager: $0.get(), networkManager: $0.get(), authManager: $0.get()) }
-    register(expect: DataStoreManager.self) {
+    register { (resolver: FBSDKResolver) in
+      ResourceManager(networkManager: resolver.get(), stateManager: resolver.get(), authManager: resolver.get())
+    }
+    register(expect: StoryDraftManager.self) { (resolver: FBSDKResolver) in
+      StoryDraftManagerImpl(resourceManager: resolver.get(), networkManager: resolver.get(), authManager: resolver.get())
+    }
+    register(expect: DataStoreManager.self) { (resolver: FBSDKResolver) in
       DataStoreManagerImpl(
-        networkManager: $0.get(),
-        storyManager: $0.get(),
-        chapterManager: $0.get(),
-        messageManager: $0.get(),
-        characterManager: $0.get()
+        networkManager: resolver.get(),
+        storyManager: resolver.get(),
+        chapterManager: resolver.get(),
+        messageManager: resolver.get(),
+        characterManager: resolver.get()
       )
     }
-    register(expect: ImageManager.self) { ImageManagerImpl() }
-    register(expect: StoryManager.self) {
+    register(expect: ImageManager.self) { (resolver: FBSDKResolver) in
+      ImageManagerImpl()
+    }
+    register(expect: StoryManager.self) { (resolver: FBSDKResolver) in
       StoryManagerImpl(
-        networkManager: $0.get(),
-        userManager: $0.get(),
-        userToStoryManager: $0.get(),
-        authManager: $0.get()
+        networkManager: resolver.get(),
+        userManager: resolver.get(),
+        userToStoryManager: resolver.get(),
+        authManager: resolver.get()
       )
     }
-    register(expect: ChapterManager.self) { ChapterManagerImpl(networkManager: $0.get()) }
-    register(expect: MessageManager.self) { MessageManagerImpl(networkManager: $0.get(), authManager: $0.get()) }
-    register(expect: CharacterManager.self) { CharacterManagerImpl(networkManager: $0.get(), authManager: $0.get()) }
-    register(expect: FirebaseManager.self) { FirebaseManagerImpl(eventManager: $0.get(), authManager: $0.get()) }
-    register(expect: CategoryManager.self) { CategoryManagerImpl(networkManager: $0.get()) }
-    register(expect: AssetManager.self) { AssetManagerImpl(networkManager: $0.get(), authManager: $0.get()) }
-    register(expect: StoryStatsManager.self) { StoryStatsManagerImpl(networkManager: $0.get()) }
-    register(expect: UserToStoryManager.self) {
+    register(expect: ChapterManager.self) { (resolver: FBSDKResolver) in
+      ChapterManagerImpl(networkManager: resolver.get())
+    }
+    register(expect: MessageManager.self) { (resolver: FBSDKResolver) in
+      MessageManagerImpl(networkManager: resolver.get(), authManager: resolver.get())
+    }
+    register(expect: CharacterManager.self) { (resolver: FBSDKResolver) in
+      CharacterManagerImpl(networkManager: resolver.get(), authManager: resolver.get())
+    }
+    register(expect: FirebaseManager.self) { (resolver: FBSDKResolver) in
+      FirebaseManagerImpl(eventManager: resolver.get(), authManager: resolver.get())
+    }
+    register(expect: CategoryManager.self) { (resolver: FBSDKResolver) in
+      CategoryManagerImpl(networkManager: resolver.get())
+    }
+    register(expect: AssetManager.self) { (resolver: FBSDKResolver) in
+      AssetManagerImpl(networkManager: resolver.get(), authManager: resolver.get())
+    }
+    register(expect: StoryStatsManager.self) { (resolver: FBSDKResolver) in
+      StoryStatsManagerImpl(networkManager: resolver.get())
+    }
+    register(expect: UserToStoryManager.self) { (resolver: FBSDKResolver) in
       UserToStoryManagerImpl(
-        networkManager: $0.get(),
-        eventManager: $0.get(),
-        authManager: $0.get()
+        networkManager: resolver.get(),
+        eventManager: resolver.get(),
+        authManager: resolver.get()
       )
     }
-    register(expect: UserToUserManager.self) {
+    register(expect: UserToUserManager.self) { (resolver: FBSDKResolver) in
       UserToUserManagerImpl(
-        networkManager: $0.get(),
-        eventManager: $0.get(),
-        authManager: $0.get()
+        networkManager: resolver.get(),
+        eventManager: resolver.get(),
+        authManager: resolver.get()
       )
     }
   }
@@ -106,6 +132,13 @@ public class FBSDKResolver: Resolver {
 
 public class FirebaseAnalyticsDelegate: AnalyticsManagerDelegate {
   public func analyticsManager(firebaseTrackEvent event: String, parameters: [String : Any]?) {
-    Analytics.logEvent(event, parameters: parameters)
+    switch event {
+    case AnalyticsEvent.didLogin.rawValue:
+      Analytics.logEvent(AnalyticsEventLogin, parameters: parameters)
+    case AnalyticsEvent.didSignUp.rawValue:
+      Analytics.logEvent(AnalyticsEventSignUp, parameters: parameters)
+    default:
+      Analytics.logEvent(event, parameters: parameters)
+    }
   }
 }
