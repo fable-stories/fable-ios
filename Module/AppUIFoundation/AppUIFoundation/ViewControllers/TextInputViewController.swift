@@ -44,7 +44,7 @@ public class TextInputViewController: UIViewController {
     public var configuration: TextInputViewController.Configuration { return self }
   }
 
-  public private(set) lazy var textView = PlaceholderTextView.create {
+  public private(set) lazy var textView = PlaceholderTextView.new {
     $0.autocapitalizationType = .none
     $0.autocorrectionType = .no
     $0.returnKeyType = .done

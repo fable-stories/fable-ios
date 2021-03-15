@@ -19,14 +19,14 @@ public protocol StoryContainerViewDelegate: class {
 }
 
 public class StoryContainerView: UIView {
-  public static let size = CGSize(width: 150.0, height: 180.0)
+  public static let size = CGSize(width: 113.0, height: 217.0)
 
   public var story: Story? {
     didSet {
       updateView()
     }
   }
-  
+
   public weak var delegate: StoryContainerViewDelegate?
 
   public init(delegate: StoryContainerViewDelegate? = nil) {
@@ -40,12 +40,19 @@ public class StoryContainerView: UIView {
   public required init?(coder aDecoder: NSCoder) {
     fatalError()
   }
+  
+  private let storyImageContainer: UIView = .new { view in
+    view.layer.cornerRadius = 12.0
+    view.layer.masksToBounds = true
+    view.layer.borderWidth = 1.0
+    view.layer.borderColor = UIColor.clear.cgColor
+  }
 
-  private let storyImageView = UIButton.create {
+  private let storyImageView = UIButton.new {
     $0.contentMode = .scaleAspectFill
   }
 
-  private let titleLabel = UILabel.create {
+  private let titleLabel = UILabel.new {
     $0.numberOfLines = 0
     $0.setTextAttributes(.titleBold14(.white))
   }
@@ -54,7 +61,7 @@ public class StoryContainerView: UIView {
     let view = GradientView(
       start: GradientView.ViewModel(color: .clear, point: CGPoint(x: 0.5, y: 1.0)),
       end: GradientView.ViewModel(color: .fableBlack, point: CGPoint(x: 0.5, y: 0.0)),
-      alpha: 0.8
+      alpha: 0.6
     )
     view.isHidden = true
     return view
@@ -62,22 +69,25 @@ public class StoryContainerView: UIView {
   public let selectionContainer = UIButton()
 
   private func configureSelf() {
-    layer.cornerRadius = 12.0
-    layer.masksToBounds = true
-    layer.borderWidth = 1.0
-    layer.borderColor = UIColor.clear.cgColor
-
-    backgroundColor = .clear
+    backgroundColor = .random()
   }
 
   private func configureLayout() {
-    addSubview(storyImageView)
-    addSubview(gradentView)
+    self.addSubview(storyImageContainer)
+    storyImageContainer.addSubview(storyImageView)
+    storyImageContainer.addSubview(gradentView)
     addSubview(titleLabel)
     addSubview(selectionContainer)
 
+    storyImageContainer.snp.makeConstraints { make in
+      make.top.equalToSuperview()
+      make.leading.equalToSuperview()
+      make.trailing.equalToSuperview()
+      make.size.equalTo(CGSize(width: 113.0, height: 155.0))
+    }
+    
     storyImageView.snp.makeConstraints { make in
-      make.edges.equalTo(snp.edges)
+      make.edges.equalToSuperview()
     }
 
     gradentView.snp.makeConstraints { make in
@@ -85,6 +95,7 @@ public class StoryContainerView: UIView {
     }
 
     titleLabel.snp.makeConstraints { make in
+      make.top.equalTo(storyImageView.snp.bottom).offset(6.0)
       make.leading.equalTo(snp.leadingMargin)
       make.trailing.equalTo(snp.trailingMargin)
       make.bottom.equalTo(snp.bottomMargin)

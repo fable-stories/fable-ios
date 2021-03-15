@@ -39,17 +39,17 @@ public class MessageBlockTableViewCell: UITableViewCell {
   }
 
   private let blockContainerView = UIView()
-  private let blockContentStackView = UIStackView.create {
+  private let blockContentStackView = UIStackView.new {
     $0.distribution = .fillProportionally
     $0.alignment = .fill
     $0.axis = .vertical
   }
 
-  private let button = UIButton.create {
+  private let button = UIButton.new {
     $0.setImage(UIImage(named: "moreButtonGray"), for: .normal)
   }
 
-  public let titleLabel = UITextView.create {
+  public let titleLabel = UITextView.new {
     $0.isScrollEnabled = false
     $0.font = .fableFont(13.0, weight: .semibold)
     $0.autocorrectionType = .no
@@ -59,7 +59,7 @@ public class MessageBlockTableViewCell: UITableViewCell {
     $0.isUserInteractionEnabled = false
   }
 
-  public let textView = PlaceholderTextView.create {
+  public let textView = PlaceholderTextView.new {
     $0.isScrollEnabled = false
     $0.isUserInteractionEnabled = false
     $0.font = .fableFont(16.0, weight: .regular)

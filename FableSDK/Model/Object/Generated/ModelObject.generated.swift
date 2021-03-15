@@ -849,11 +849,13 @@ public protocol Story: Codable {
   var landscapeImageAssetId: Int? { get }
   var portraitImageAssetId: Int? { get }
   var squareImageAssetId: Int? { get}
-  
+
   /// Transients
   var landscapeImageAsset: Asset? { get }
   var squareImageAsset: Asset? { get }
   var portraitImageAsset: Asset? { get }
+  
+  var stats: StoryStats { get }
 
   init(
     storyId: Int,
@@ -868,7 +870,8 @@ public protocol Story: Codable {
     landscapeImageAssetId: Int?,
     landscapeImageAsset: Asset?,
     squareImageAssetId: Int?,
-    squareImageAsset: Asset?
+    squareImageAsset: Asset?,
+    stats: StoryStats?
   )
 }
 
@@ -921,6 +924,8 @@ public class MutableStory: Story {
   public var landscapeImageAsset: Asset?
   public var squareImageAssetId: Int?
   public var squareImageAsset: Asset?
+  
+  public var stats: StoryStats
 
   required public init(
     storyId: Int,
@@ -935,7 +940,8 @@ public class MutableStory: Story {
     landscapeImageAssetId: Int? = nil,
     landscapeImageAsset: Asset? = nil,
     squareImageAssetId: Int? = nil,
-    squareImageAsset: Asset? = nil
+    squareImageAsset: Asset? = nil,
+    stats: StoryStats? = nil
   ) {
     self.storyId = storyId
     self.userId = userId
@@ -950,6 +956,7 @@ public class MutableStory: Story {
     self.landscapeImageAsset = landscapeImageAsset
     self.squareImageAssetId = squareImageAssetId
     self.squareImageAsset = squareImageAsset
+    self.stats = stats ?? StoryStats(likes: 0, reportCount: 0, views: 0)
   }
   
   public init(story: Story) {
@@ -966,6 +973,7 @@ public class MutableStory: Story {
     self.squareImageAssetId = story.squareImageAssetId
     self.squareImageAsset = story.squareImageAsset
     self.portraitImageAsset = story.portraitImageAsset
+    self.stats = story.stats
   }
 }
 
@@ -1171,4 +1179,16 @@ extension User: Hashable {
     biography.hash(into: &hasher)
     avatarAsset.hash(into: &hasher)
   }
+}
+
+public struct StoryStats: Codable {
+  public init(likes: Int, reportCount: Int, views: Int) {
+    self.likes = likes
+    self.reportCount = reportCount
+    self.views = views
+  }
+  
+  public let likes: Int
+  public let reportCount: Int
+  public let views: Int
 }

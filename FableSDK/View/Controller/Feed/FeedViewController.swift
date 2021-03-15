@@ -91,6 +91,12 @@ public class FeedViewController: UIViewController {
 
   private let searchController = UISearchController(searchResultsController: nil)
   private lazy var searchBar = searchController.searchBar
+  
+  private lazy var refreshControl: UIRefreshControl = {
+    let view = UIRefreshControl()
+    view.addTarget(self, action: #selector(didPullToRefresh), for: .valueChanged)
+    return view
+  }()
 
   private let carouselView = CarouselView(
     itemSize: CGSize(width: ScreenSize.width - 32.0, height: 190.0),
@@ -102,6 +108,7 @@ public class FeedViewController: UIViewController {
     $0.delegate = self
     $0.dataSource = self
     $0.register(StoryCollectionTableViewCell.self, forCellReuseIdentifier: StoryCollectionTableViewCell.reuseIdentifier)
+    $0.refreshControl = refreshControl
   }
 
   override public func viewDidLoad() {
@@ -109,11 +116,12 @@ public class FeedViewController: UIViewController {
     configureSelf()
     configureSubviews()
     configureLayout()
+    
+    refresh()
   }
 
   override public func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
-    refresh()
   }
 
   private func configureSelf() {
@@ -177,6 +185,7 @@ public class FeedViewController: UIViewController {
           acc.merging(i.stories.indexed(by: \.storyId), uniquingKeysWith: { $1 })
         }
       )
+      self.refreshControl.endRefreshing()
       self.update()
     }
   }
@@ -191,6 +200,10 @@ public class FeedViewController: UIViewController {
       }
     }
     tableView.reloadData()
+  }
+  
+  @objc private func didPullToRefresh() {
+    self.refresh()
   }
   
   private func presentStory(storyId: Int) {

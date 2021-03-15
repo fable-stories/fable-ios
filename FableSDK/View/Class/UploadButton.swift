@@ -91,12 +91,12 @@ open class UploadButton: UIButton {
     }
   }
 
-  private let uploadImage = UIImageView.create {
+  private let uploadImage = UIImageView.new {
     $0.image = #imageLiteral(resourceName: "uploadIcon")
     $0.isUserInteractionEnabled = false
   }
 
-  private let uploadText = UILabel.create {
+  private let uploadText = UILabel.new {
     $0.text = "Upload image"
     $0.textColor = .blue
     $0.font = .fableFont(12, weight: .semibold)

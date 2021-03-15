@@ -13,7 +13,7 @@ public protocol Creatable {
 }
 
 extension Creatable {
-  public static func create(_ creationBlock: (Self) -> Void) -> Self {
+  public static func new(_ creationBlock: (Self) -> Void) -> Self {
     let object = self.init()
     creationBlock(object)
     return object

@@ -23,6 +23,7 @@ import GoogleSignIn
 import AuthenticationServices
 import FirebaseCrashlytics
 import os
+import SnapKit
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -113,17 +114,24 @@ func application(_ app: UIApplication, open url: URL, options: [UIApplication.Op
   return handled
 }
 
-
 private extension AppDelegate {
   var isLaunchedFromUnitTest: Bool {
     ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
   }
 }
 
-
 private class LandingViewController: UIViewController {
+  
+  private let iconImageView = UIImageView(image: UIImage(named: "fableLogo"))
+
   override func viewDidLoad() {
     super.viewDidLoad()
     self.view.backgroundColor = .white
+    self.view.addSubview(iconImageView)
+    
+    iconImageView.snp.makeConstraints { make in
+      make.center.equalToSuperview()
+      make.size.equalTo(CGSize(width: 80.0, height: 102.0))
+    }
   }
 }

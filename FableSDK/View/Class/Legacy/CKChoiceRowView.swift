@@ -45,14 +45,14 @@ public class ChoiceRowView: UIView {
 
   private let contentView = UIView()
 
-  private lazy var titleTextField = UITextField.create {
+  private lazy var titleTextField = UITextField.new {
     $0.font = .fableFont(13.0, weight: .light)
     $0.isUserInteractionEnabled = false
     $0.returnKeyType = .done
     $0.delegate = self
   }
 
-  private lazy var editButton = UIButton.create {
+  private lazy var editButton = UIButton.new {
     $0.setImage(UIImage(named: "editIconBlack")?.withRenderingMode(.alwaysTemplate), for: .normal)
     $0.isHidden = true
     $0.reactive.pressed = .invoke { [weak self] in
@@ -61,7 +61,7 @@ public class ChoiceRowView: UIView {
     }
   }
 
-  private lazy var goToButton = UIButton.create {
+  private lazy var goToButton = UIButton.new {
     $0.setImage(UIImage(named: "storyMapFlag")?.withRenderingMode(.alwaysTemplate), for: .normal)
 //    $0.reactive.pressed = .invoke { [weak self] in
 //      guard let mcId = self?.choice?.mutableTargetMessageGroupId.value else { return }

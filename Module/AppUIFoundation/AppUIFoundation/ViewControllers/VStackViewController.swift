@@ -10,7 +10,7 @@ import SnapKit
 
 public class VStackViewController: UIViewController {
   
-  private let stackView = UIStackView.create {
+  private let stackView = UIStackView.new {
     $0.axis = .vertical
     $0.alignment = .top
     $0.distribution = .fillProportionally

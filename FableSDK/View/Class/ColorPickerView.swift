@@ -74,7 +74,7 @@ public class ColorPickerView: UIView {
     fatalError()
   }
 
-  private let titleLabel = UILabel.create {
+  private let titleLabel = UILabel.new {
     $0.textColor = .fableBackgroundTextGray
     $0.font = .fableFont(13.0, weight: .medium)
     $0.text = "Colors"
@@ -163,7 +163,7 @@ extension ColorPickerView: UICollectionViewDelegate, UICollectionViewDataSource,
   }
 
   private class ColorCollectionViewCell: UICollectionViewCell {
-    private let selectionContainer = UIView.create {
+    private let selectionContainer = UIView.new {
       $0.layer.cornerRadius = 10.0
       $0.layer.borderWidth = 1.0
       $0.layer.borderColor = UIColor.clear.cgColor

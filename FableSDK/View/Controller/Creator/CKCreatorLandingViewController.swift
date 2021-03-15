@@ -55,7 +55,7 @@ public class CKLandingViewController: UIViewController {
 
   // MARK: Subviews
 
-  private let titleLabel = UILabel.create {
+  private let titleLabel = UILabel.new {
     $0.numberOfLines = 0
   }
 

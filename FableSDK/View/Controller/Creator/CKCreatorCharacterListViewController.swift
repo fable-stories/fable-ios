@@ -300,7 +300,7 @@ public class CharacterTableViewCell: UITableViewCell {
   public var onBeginEdit: ((UITextField) -> Void)?
   public var onKeyReturn: ((UITextField) -> Void)?
   
-  public let textField = UITextField.create {
+  public let textField = UITextField.new {
     $0.font = .fableFont(16.0, weight: .light)
     $0.autocorrectionType = .no
     $0.autocapitalizationType = .words
@@ -308,18 +308,18 @@ public class CharacterTableViewCell: UITableViewCell {
     $0.placeholder = "Character Name"
   }
 
-  private let rightControlStackView = UIStackView.create {
+  private let rightControlStackView = UIStackView.new {
     $0.axis = .horizontal
     $0.distribution = .fillProportionally
     $0.alignment = .trailing
     $0.spacing = 16.0
   }
 
-  public let alignmentButton = UIButton.create {
+  public let alignmentButton = UIButton.new {
     $0.setImage(UIImage(named: "alignmentIcon"), for: .normal)
   }
 
-  public let colorButton = UIButton.create {
+  public let colorButton = UIButton.new {
     $0.layer.cornerRadius = 4.0
     $0.layer.borderWidth = 1.0
   }

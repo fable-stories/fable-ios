@@ -31,18 +31,18 @@ public class ChoiceGroupTableViewCell: UITableViewCell, ChoiceGroupTableViewCell
   }
 
   private let blockContainerView = UIView()
-  private let horizontalContentStackView = UIStackView.create {
+  private let horizontalContentStackView = UIStackView.new {
     $0.axis = .horizontal
     $0.spacing = 10.0
   }
 
-  private let contentStackView = UIStackView.create {
+  private let contentStackView = UIStackView.new {
     $0.axis = .vertical
     $0.spacing = 10.0
     $0.distribution = .equalSpacing
   }
 
-  private let button = UIButton.create {
+  private let button = UIButton.new {
     $0.setImage(UIImage(named: "moreButtonGray"), for: .normal)
   }
 
@@ -138,7 +138,7 @@ public class ChoiceRowContainer: UIView, ChoiceRowViewProtocol {
     fatalError()
   }
 
-  public let textView = PlaceholderTextView.create {
+  public let textView = PlaceholderTextView.new {
     $0.font = .fableFont(13.0, weight: .regular)
     $0.textAlignment = .left
     $0.returnKeyType = .done

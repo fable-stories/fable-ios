@@ -13,12 +13,12 @@ import UIKit
 public class StorySectionViewHeader: UIView {
   public static let estimatedHeight: CGFloat = 36.0
 
-  private let titleLabel = UILabel.create {
+  private let titleLabel = UILabel.new {
     $0.font = .fableFont(24.0, weight: .bold)
     $0.textColor = .fableBlack
   }
 
-  private let subtitleLabel = UILabel.create {
+  private let subtitleLabel = UILabel.new {
     $0.font = .fableFont(12.0, weight: .semibold)
     $0.textColor = .fableDarkGray
   }

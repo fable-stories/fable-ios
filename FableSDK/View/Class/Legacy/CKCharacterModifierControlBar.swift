@@ -35,14 +35,14 @@ public class CharacterModifierControlBar: UIView {
 
   deinit {}
 
-  private lazy var infoLabel = UILabel.create {
+  private lazy var infoLabel = UILabel.new {
     $0.font = .fableFont(11.0, weight: .regular)
     $0.textColor = .fableMediumGray
     $0.text = "Characters"
     $0.tintColor = .fableBlack
   }
 
-  private lazy var addCharacterButton = UIButton.create {
+  private lazy var addCharacterButton = UIButton.new {
     $0.setImage(UIImage(named: "addCharacterButtonBlack")?.withRenderingMode(.alwaysTemplate), for: .normal)
     $0.tintColor = .fableBlack
     $0.imageView?.contentMode = .scaleAspectFit
@@ -71,7 +71,7 @@ public class CharacterModifierControlBar: UIView {
     return view
   }()
 
-  private let rightControlStackView = UIStackView.create {
+  private let rightControlStackView = UIStackView.new {
     $0.axis = .horizontal
     $0.distribution = .fillProportionally
     $0.spacing = 20.0

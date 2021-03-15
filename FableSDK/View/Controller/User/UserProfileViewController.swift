@@ -60,13 +60,13 @@ public class UserProfileViewController: UIViewController {
   private let profileContentContainer = UIView()
   private let profileImageView = UIButton()
 
-  private let userNameLabel = UILabel.create {
+  private let userNameLabel = UILabel.new {
     $0.font = .fableFont(14.0, weight: .medium)
     $0.textAlignment = .center
     $0.textColor = .fableBlack
   }
 
-  private let biographyTextView = UITextView.create {
+  private let biographyTextView = UITextView.new {
     $0.font = .fableFont(14.0, weight: .medium)
     $0.textAlignment = .center
     $0.textColor = .fableBlack
@@ -411,7 +411,7 @@ public class HorizontalSelector: UIView {
     fatalError()
   }
 
-  private let stackView = UIStackView.create {
+  private let stackView = UIStackView.new {
     $0.axis = .horizontal
   }
 

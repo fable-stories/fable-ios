@@ -58,7 +58,7 @@ public class OptionPickerViewController: UIViewController {
     fatalError()
   }
   
-  private lazy var tableView = UITableView.create {
+  private lazy var tableView = UITableView.new {
     $0.separatorColor = .clear
     $0.delegate = self
     $0.dataSource = self

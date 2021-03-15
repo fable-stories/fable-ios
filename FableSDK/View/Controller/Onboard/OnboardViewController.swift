@@ -47,42 +47,42 @@ public class OnboardViewController: UIViewController {
   ]
 
   // Inits the display image
-  private let displayImage = UIImageView.create {
+  private let displayImage = UIImageView.new {
     let imageName = "onboarding_image1.png"
     let image = UIImage(named: imageName)
     $0.image = image
   }
 
   // Inits text view
-  private let displayTextView = UITextView.create {
+  private let displayTextView = UITextView.new {
     $0.isEditable = false
     $0.isScrollEnabled = false
     $0.isSelectable = false
   }
 
   // Inits next button
-  private let nextButton = UIButton.create {
+  private let nextButton = UIButton.new {
     $0.tintColor = .black
     $0.setImage(#imageLiteral(resourceName: "onboardingNextButton"), for: .normal)
     $0.addTarget(self, action: #selector(nextButtonTapped), for: .touchUpInside)
   }
 
   // Inits counter dots
-  private let firstDot = UIImageView.create {
+  private let firstDot = UIImageView.new {
     let imageName = "pageActive.png"
     let image = UIImage(imageLiteralResourceName: imageName)
     let imageView = UIImageView(image: image)
     $0.image = image
   }
 
-  private let secondDot = UIImageView.create {
+  private let secondDot = UIImageView.new {
     let imageName = "pageInactive.png"
     let image = UIImage(imageLiteralResourceName: imageName)
     let imageView = UIImageView(image: image)
     $0.image = image
   }
 
-  private let thirdDot = UIImageView.create {
+  private let thirdDot = UIImageView.new {
     let imageName = "pageInactive.png"
     let image = UIImage(imageLiteralResourceName: imageName)
     let imageView = UIImageView(image: image)

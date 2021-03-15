@@ -75,7 +75,7 @@ public class WorkspaceViewController: UIViewController {
   }
 
   private lazy var controlBar = CKControlBar()
-  private var keyboardWhitespace = UIView.create {
+  private var keyboardWhitespace = UIView.new {
     $0.backgroundColor = .fableWhite
   }
 
@@ -126,7 +126,7 @@ public class WorkspaceViewController: UIViewController {
     }
   }
 
-  let button = UIButton.create {
+  let button = UIButton.new {
     $0.setTitle("", for: .normal)
   }
 

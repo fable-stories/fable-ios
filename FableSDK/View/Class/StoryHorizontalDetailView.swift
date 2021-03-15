@@ -33,33 +33,33 @@ public class StoryHorizontalDetailView: UIView {
     fatalError()
   }
 
-  private let storyImageView = UIImageView.create {
+  private let storyImageView = UIImageView.new {
     $0.layer.cornerRadius = 12.0
     $0.clipsToBounds = true
   }
 
-  private let titleLabel = UILabel.create {
+  private let titleLabel = UILabel.new {
     $0.numberOfLines = 2
     $0.font = .fableFont(13.0, weight: .medium)
     $0.textColor = .fableBlack
     $0.textAlignment = .left
   }
 
-  private let authorLabel = UILabel.create {
+  private let authorLabel = UILabel.new {
     $0.numberOfLines = 1
     $0.font = .fableFont(13.0, weight: .regular)
     $0.textColor = .fableTextGray
     $0.textAlignment = .left
   }
 
-  private let viewsLabel = UILabel.create {
+  private let viewsLabel = UILabel.new {
     $0.numberOfLines = 1
     $0.font = .fableFont(11.0, weight: .regular)
     $0.textColor = .fableRed
     $0.textAlignment = .left
   }
 
-  private let summaryTextView = UITextView.create {
+  private let summaryTextView = UITextView.new {
     $0.isScrollEnabled = false
     $0.isUserInteractionEnabled = false
     $0.font = .fableFont(13.0, weight: .regular)

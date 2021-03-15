@@ -69,13 +69,13 @@ public class CKControlBar: UIView {
     fatalError()
   }
 
-  private let verticalControlStackView = UIStackView.create {
+  private let verticalControlStackView = UIStackView.new {
     $0.axis = .vertical
     $0.distribution = .fillProportionally
     $0.spacing = 4.0
   }
   
-  private let topHorizontalStackView = UIStackView.create {
+  private let topHorizontalStackView = UIStackView.new {
     $0.axis = .horizontal
     $0.distribution = .fillProportionally
     $0.spacing = 16.0
@@ -83,7 +83,7 @@ public class CKControlBar: UIView {
   
   private lazy var characterControlBar = CharacterModifierControlBar()
   
-  private lazy var moreButton: UIButton = .create {
+  private lazy var moreButton: UIButton = .new {
     $0.setImage(UIImage(named: "sortIconGray")?.withRenderingMode(.alwaysTemplate), for: .normal)
     $0.tintColor = .fableBlack
     $0.imageView?.contentMode = .scaleAspectFit
@@ -94,13 +94,13 @@ public class CKControlBar: UIView {
 
   private let bottomControlView = UIView()
 
-  private let rightControlStackView = UIStackView.create {
+  private let rightControlStackView = UIStackView.new {
     $0.axis = .horizontal
     $0.distribution = .fillProportionally
     $0.spacing = 16.0
   }
 
-  private lazy var choiceModifierButton = UIButton.create {
+  private lazy var choiceModifierButton = UIButton.new {
     $0.setImage(UIImage(named: "choiceGroupModifier"), for: .normal)
     $0.reactive.pressed = .invoke { [weak self] in
       self?.onChoiceBlockSelect?()
@@ -108,7 +108,7 @@ public class CKControlBar: UIView {
     $0.isHidden = true
   }
   
-  private lazy var textView = PlaceholderTextView.create {
+  private lazy var textView = PlaceholderTextView.new {
     $0.isScrollEnabled = false
     $0.font = .fableFont(16.0, weight: .regular)
     $0.autocorrectionType = .yes
@@ -127,7 +127,7 @@ public class CKControlBar: UIView {
     $0.delegate = self
   }
 
-  private lazy var sendButton = UIButton.create {
+  private lazy var sendButton = UIButton.new {
     $0.setImage(UIImage(named: "sendButtonRed"), for: .normal)
     $0.accessibilityLabel = "Send"
     $0.reactive.pressed = .invoke { [weak self] in

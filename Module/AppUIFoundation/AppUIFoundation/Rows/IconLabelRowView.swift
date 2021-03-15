@@ -32,26 +32,26 @@ public class IconLabelRowView: UIView {
   
   private let containerButton = UIButton()
 
-  private let iconImageView = UIImageView.create {
+  private let iconImageView = UIImageView.new {
     $0.contentMode = .scaleAspectFit
   }
-  private let verticalStackView = UIStackView.create {
+  private let verticalStackView = UIStackView.new {
     $0.alignment = .top
     $0.axis = .vertical
     $0.distribution = .fillProportionally
   }
-  private let inLineStackView = UIStackView.create {
+  private let inLineStackView = UIStackView.new {
     $0.alignment = .trailing
     $0.axis = .horizontal
     $0.distribution = .fillProportionally
   }
-  private let titleLabel = UILabel.create {
+  private let titleLabel = UILabel.new {
     $0.numberOfLines = 0
   }
-  private let inLineSubtitleLabel = UILabel.create {
+  private let inLineSubtitleLabel = UILabel.new {
     $0.numberOfLines = 0
   }
-  private let subtitleTextView = UITextView.create {
+  private let subtitleTextView = UITextView.new {
     $0.textContainerInset = .zero
     $0.isScrollEnabled = false
   }

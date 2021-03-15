@@ -46,7 +46,7 @@ public class EditUserProfileViewController: UIViewController {
   private let scrollableStackView = ScrollableStackView()
 
   private let uploadContainer = UIView()
-  private let userProfileUploadView = ImageUploadView.create {
+  private let userProfileUploadView = ImageUploadView.new {
     $0.layer.cornerRadius = 45.0
   }
 

@@ -10,7 +10,7 @@ import SnapKit
 
 public class ScrollableStackView: UIView {
   private let scrollView = UIScrollView()
-  private let stackView = UIStackView.create {
+  private let stackView = UIStackView.new {
     $0.axis = .vertical
     $0.distribution = .fillProportionally
     $0.alignment = .top

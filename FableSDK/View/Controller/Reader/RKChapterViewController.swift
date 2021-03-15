@@ -379,7 +379,7 @@ extension RKChapterViewController {
       case narrative
     }
     
-    private let titleLabel = UITextView.create {
+    private let titleLabel = UITextView.new {
       $0.textContainerInset = .zero
       $0.contentInset = .zero
       $0.isScrollEnabled = false
@@ -450,7 +450,7 @@ extension RKChapterViewController {
 
   public class MessageTableViewCell: UITableViewCell, AnimatingTableViewCell {
     public static let estimatedHeight: CGFloat = 40.0
-    private let textView = UITextView.create {
+    private let textView = UITextView.new {
       $0.isScrollEnabled = false
       $0.layer.cornerRadius = 16.0
       $0.textContainerInset = UIEdgeInsets(top: 5.0, left: 10.0, bottom: 4.0, right: 10.0)
@@ -549,10 +549,10 @@ extension RKChapterViewController {
 
   public class TailTableViewCell: UITableViewCell, AnimatingTableViewCell {
     private let padding = UIView()
-    private let tailLabel = UILabel.create {
+    private let tailLabel = UILabel.new {
       $0.numberOfLines = 0
     }
-    private let tailSubLabel = UILabel.create {
+    private let tailSubLabel = UILabel.new {
       $0.numberOfLines = 0
     }
     private let dismissButton = Button(FableButtonViewModel.primaryButton())
