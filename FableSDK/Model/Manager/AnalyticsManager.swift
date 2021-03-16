@@ -32,6 +32,8 @@ public class AnalyticsManagerImpl: AnalyticsManager {
   private let networkManager: NetworkManager
   private weak var delegate: AnalyticsManagerDelegate?
   
+  private var trackCount: Int = 0
+  
   public init(networkManager: NetworkManager, delegate: AnalyticsManagerDelegate) {
     self.networkManager = networkManager
     self.delegate = delegate
@@ -45,6 +47,8 @@ public class AnalyticsManagerImpl: AnalyticsManager {
   
   public func trackEvent(_ event: AnalyticsEventIdentifiable, properties: [String : Any]?) {
     self.delegate?.analyticsManager(firebaseTrackEvent: event.rawValue, parameters: properties)
+    self.trackCount += 1
+    print("AnalyticEvent \(self.trackCount): \(event.rawValue)")
   }
 }
 

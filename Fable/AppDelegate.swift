@@ -58,7 +58,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
        print(exception)
        print(exception.callStackSymbols)
     }
-    
+
     return true
   }
   

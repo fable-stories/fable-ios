@@ -91,6 +91,8 @@ public class AuthManagerImpl: NSObject, AuthManager {
     
     if let authState = self.environmentManager.authState {
       print(authState.prettyJSONString)
+      self.eventManager.sendEvent(AuthManagerEvent.userDidSignIn)
+      self.analyticsManager.trackEvent(AnalyticsEvent.didLogin)
     }
   }
 
