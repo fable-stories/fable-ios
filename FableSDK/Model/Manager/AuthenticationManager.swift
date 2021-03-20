@@ -95,6 +95,7 @@ public class AuthManagerImpl: NSObject, AuthManager {
       print(authState.prettyJSONString)
       self.eventManager.sendEvent(AuthManagerEvent.userDidSignIn)
       self.analyticsManager.trackEvent(AnalyticsEvent.didLogin)
+      self.setAuthState(authState)
     }
     
     self.eventManager.onEvent.sinkDisposed(receiveCompletion: nil) { [weak self] (event) in

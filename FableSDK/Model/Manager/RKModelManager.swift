@@ -36,8 +36,8 @@ public class RKModelManager {
 public class RemoteLogger {
   public static let shared = RemoteLogger()
   
-  public var isEnabled: Bool = false
-  
+  private var userInfo: [String: String] = [:]
+
   private var paperTrailLogger: RMPaperTrailLogger?
 
   private init() {
@@ -53,5 +53,20 @@ public class RemoteLogger {
   public func log( _ value: Any?) {
     guard let value = value else { return }
     DDLogVerbose(value)
+  }
+  
+  public func addUserInfo(_ key: String, value: String) {
+    self.userInfo[key] = value
+    self.updateProgramName()
+  }
+  
+  public func removeUserInfo(_ key: String) {
+    self.userInfo[key] = nil
+    self.updateProgramName()
+  }
+  
+  private func updateProgramName() {
+    let progrmaName = userInfo.values.sorted(by: >).joined(separator: ":")
+    self.paperTrailLogger?.programName = progrmaName
   }
 }

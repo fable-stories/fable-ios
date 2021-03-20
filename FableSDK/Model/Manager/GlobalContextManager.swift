@@ -53,15 +53,23 @@ public class GlobalContextManager {
     if let envString = envString("env") {
       setEnvironment(Environment(rawValue: envString))
     }
+    
+    RemoteLogger.shared.addUserInfo("ApplicationMetadata", value: ApplicationMetadata.source().rawValue)
   }
 
   public func setEnvironment(_ environment: Environment) {
     GlobalContextManager.mutableCurrentEnvironment.value = environment
+    RemoteLogger.shared.addUserInfo("ENVIRONMENT", value: environment.description)
     setGlobalContextDidChange()
   }
 
   private func setAuthState(_ authState: AuthState?) {
     GlobalContextManager.mutableCurrentAuthState.value = authState
+    if let authState = authState {
+      RemoteLogger.shared.addUserInfo("AUTH_STATE", value: authState.userId.toString())
+    } else {
+      RemoteLogger.shared.removeUserInfo("AUTH_STATE")
+    }
     setGlobalContextDidChange()
   }
 

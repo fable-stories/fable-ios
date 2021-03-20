@@ -45,7 +45,7 @@ public class ConfigManagerImpl: ConfigManager {
   private let stateManager: StateManager
   private let environmentManager: EnvironmentManager
   private let eventManager: EventManager
-  
+
   public let initialLaunchConfig: CurrentValueSubject<LaunchConfigState, Exception>
 
   public init(

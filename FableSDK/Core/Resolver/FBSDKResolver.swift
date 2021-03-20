@@ -66,7 +66,9 @@ public class FBSDKResolver: Resolver {
         eventManager: resolver.get()
       )
     }
-    register { EventManager() }
+    register { (resolver: FBSDKResolver) in
+      EventManager(environmentManager: resolver.get())
+    }
     register { (resolver: FBSDKResolver) in
       ResourceManager(networkManager: resolver.get(), stateManager: resolver.get(), authManager: resolver.get())
     }

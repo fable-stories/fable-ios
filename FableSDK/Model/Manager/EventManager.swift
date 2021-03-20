@@ -50,8 +50,12 @@ public class EventManager {
   public private(set) lazy var onEvent = _onEvent.eraseToAnyPublisher()
   
   private var eventCount: Int = 0
+  
+  private let environmentManager: EnvironmentManager
 
-  public init() {}
+  public init(environmentManager: EnvironmentManager) {
+    self.environmentManager = environmentManager
+  }
 
   public func sendEvent(_ event: EventContext) {
     self.remoteLogger.log(event)
