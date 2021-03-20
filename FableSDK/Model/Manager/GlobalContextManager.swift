@@ -20,51 +20,46 @@ public struct GlobalContext {
   public let environment: Environment
 }
 
+private var mutableCurrentEnvironment = PersistedProperty<Environment>(
+  currentEnvironmentKey,
+  delegate: GlobalContextPropertyDelegate()
+)
+
+private let mutableCurrentAuthState = PersistedProperty<AuthState?>(
+  authStateKey,
+  nil
+)
+
+private let currentEnvironmentKey = "GlobalContext.currentEnvironment"
+private let authStateKey = "GlobalContext.currentAuthState"
 
 public class GlobalContextManager {
-  fileprivate static var mutableCurrentEnvironment = PersistedProperty<Environment>(
-    "GlobalContext.currentEnvironment",
-    {
-      switch ApplicationMetadata.source() {
-      case .appStore: return .prod
-      case .adHoc, .testFlight: return .dev
-      case .simulator: return .local
-      }
-    }()
-  )
-
-  fileprivate static let mutableCurrentAuthState = PersistedProperty<AuthState?>(
-    "GlobalContext.currentAuthState",
-    nil
-  )
-
+  public static let shared = GlobalContextManager()
   private var currentGlobalContext: GlobalContext {
     GlobalContext(
-      userId: GlobalContextManager.mutableCurrentAuthState.value?.userId,
-      environment: GlobalContextManager.mutableCurrentEnvironment.value
+      userId: mutableCurrentAuthState.value?.userId,
+      environment: mutableCurrentEnvironment.value
     )
   }
 
   public let onUpdate: Signal<Void, Never>
   private let onUpdateObserver: Signal<Void, Never>.Observer
 
-  public init() {
+  private init() {
     (self.onUpdate, self.onUpdateObserver) = Signal<Void, Never>.pipe()
-    if let envString = envString("env") {
-      setEnvironment(Environment(rawValue: envString))
-    }
-    
-    RemoteLogger.shared.addUserInfo("ApplicationMetadata", value: ApplicationMetadata.source().rawValue)
+
+    RemoteLogger.shared.addUserInfo("ENVIRONMENT", value: self.currentGlobalContext.environment.rawValue)
+    RemoteLogger.shared.addUserInfo("APPLICATION_METADATA", value: ApplicationMetadata.source().rawValue)
   }
 
   public func setEnvironment(_ environment: Environment) {
-    GlobalContextManager.mutableCurrentEnvironment.value = environment
-    RemoteLogger.shared.addUserInfo("ENVIRONMENT", value: environment.description)
+    mutableCurrentEnvironment.value = environment
+    RemoteLogger.shared.addUserInfo("ENVIRONMENT", value: environment.rawValue)
     setGlobalContextDidChange()
   }
 
   private func setAuthState(_ authState: AuthState?) {
-    GlobalContextManager.mutableCurrentAuthState.value = authState
+    mutableCurrentAuthState.value = authState
     if let authState = authState {
       RemoteLogger.shared.addUserInfo("AUTH_STATE", value: authState.userId.toString())
     } else {
@@ -78,13 +73,12 @@ public class GlobalContextManager {
   }
 }
 
-
 extension GlobalContextManager: EnvironmentManagerDelegate {
   public var environment: Environment {
-    get { GlobalContextManager.mutableCurrentEnvironment.value }
-    set { GlobalContextManager.mutableCurrentEnvironment.value = newValue }
+    get { mutableCurrentEnvironment.value }
+    set { mutableCurrentEnvironment.value = newValue }
   }
-  public var authState: AuthState? { GlobalContextManager.mutableCurrentAuthState.value }
+  public var authState: AuthState? { mutableCurrentAuthState.value }
 
   public func environmentManager(setEnvironment environment: Environment) {
     self.setEnvironment(environment)
@@ -95,5 +89,33 @@ extension GlobalContextManager: EnvironmentManagerDelegate {
 extension GlobalContextManager: AuthManagerDelegate {
   public func authManager(authStateDidChange authState: AuthState?, authManager: AuthManager) {
     self.setAuthState(authState)
+  }
+}
+
+private class GlobalContextPropertyDelegate: PersistedPropertyDelegate {
+  public func initialValue<T>(for key: String) throws -> T where T : Decodable, T : Encodable {
+    switch key {
+    case currentEnvironmentKey:
+      if let environment = Environment.sourceEnvironment() as? T {
+        return environment
+      }
+    default:
+      break
+    }
+    throw Exception("Exhausted possible keys for property delegate")
+  }
+  
+  func initialPersistedValue<T>(for key: String) throws -> T? where T : Decodable, T : Encodable {
+    switch key {
+    case currentEnvironmentKey:
+      /// Override the persisted value if there is an active Env Var
+      if let envString = envString("env"), let environment = Environment(rawValue: envString) as? T {
+        return environment
+      }
+      return nil
+    default:
+      break
+    }
+    throw Exception("Exhausted possible keys for property delegate")
   }
 }

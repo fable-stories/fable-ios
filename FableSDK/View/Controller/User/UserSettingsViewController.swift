@@ -168,7 +168,7 @@ public class UserSettingsViewController: UITableViewController {
     }()
 
     navigationItem.rightBarButtonItem = canShowAdminMenu ? UIBarButtonItem(
-      title: envManager.environment.description,
+      title: envManager.environment.rawValue,
       style: .done,
       target: self, action: #selector(showAdminMenu)
     ).also {
@@ -192,7 +192,7 @@ public class UserSettingsViewController: UITableViewController {
   @objc private func showAdminMenu() {
     let message = "\(ApplicationMetadata.source().rawValue.capitalized) \(ApplicationMetadata.versionBuild())"
     let alert = UIAlertController(title: "Admin Menu", message: message, preferredStyle: .actionSheet)
-    let currentEnvironment = envManager.environment.description
+    let currentEnvironment = envManager.environment.rawValue
     alert.addAction(UIAlertAction(title: "Prod\("prod" == currentEnvironment ? " (ACTIVE)" : "")", style: .default, handler: { [weak self] _ in
       self?.envManager.setEnvironment(.prod)
     }))

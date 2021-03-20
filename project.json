@@ -176,14 +176,9 @@
           "path" : "Fable"
         },
         {
-          "buildPhase" : {
-            "copyFiles" : {
-              "destination" : "resources"
-            }
-          },
           "createIntermediateGroups" : false,
           "group" : "Fable",
-          "path" : "Secrets\/${FABLE_IOS_ENV}\/GoogleService-Info.plist"
+          "path" : "Secrets\/Firebase"
         }
       ],
       "templates" : [

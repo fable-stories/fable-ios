@@ -78,6 +78,7 @@ extension NetworkManagerV2 {
   }
   
   public func request<T>(
+    
     path: String,
     method: ResourceTargetHTTPMethod,
     expect: T.Type = T.self

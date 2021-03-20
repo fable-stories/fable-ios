@@ -20,7 +20,7 @@ public class FBSDKResolver: Resolver {
   public init() {
     super.init("FBSDKResolver")
 
-    register { GlobalContextManager() }
+    register { GlobalContextManager.shared }
     register { (resolver: FBSDKResolver) in
       EnvironmentManager(delegate: resolver.get(expect: GlobalContextManager.self))
     }

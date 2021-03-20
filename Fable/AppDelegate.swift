@@ -44,7 +44,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     configureNavigationBar()
     configureLaunchViewController()
 
-    configManager.initialLaunchConfig.eraseToAnyPublisher().sinkDisposed(receiveCompletion: nil) { [weak self] (state) in
+    configManager.initialLaunchConfig.eraseToAnyPublisher().sinkDisposed(receiveCompletion: { completion in
+      switch completion {
+      case let .failure(error):
+        print(error)
+      case .finished:
+        break
+      }
+    }) { [weak self] (state) in
       switch state {
       case .received, .receivedNone:
         self?.configureInitialRootViewController()

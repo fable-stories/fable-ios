@@ -7,7 +7,18 @@
 
 import Foundation
 
-public enum Environment: Codable, CustomStringConvertible {
+public enum Environment: Codable, RawRepresentable, Equatable {
+  public static func sourceEnvironment() -> Environment {
+    if let envString = envString("env") {
+      return Environment(rawValue: envString)
+    }
+    switch ApplicationMetadata.source() {
+    case .appStore: return .prod
+    case .adHoc, .testFlight: return .dev
+    case .simulator: return .local
+    }
+  }
+  
   private enum CodingKeys: String, CodingKey  {
     case value
   }
@@ -18,7 +29,7 @@ public enum Environment: Codable, CustomStringConvertible {
   case stage
   case prod
   
-  public var description: String {
+  public var rawValue: String {
     switch self {
     case .local: return "local"
     case .dev: return "dev"
@@ -46,6 +57,6 @@ public enum Environment: Codable, CustomStringConvertible {
   
   public func encode(to encoder: Encoder) throws {
     var container = encoder.container(keyedBy: CodingKeys.self)
-    try container.encode(description, forKey: .value)
+    try container.encode(self.rawValue, forKey: .value)
   }
 }

@@ -16,7 +16,6 @@ public protocol EnvironmentManagerDelegate: AnyObject {
   func environmentManager(setEnvironment environment: Environment)
 }
 
-
 public struct EnvironmentManager {
   private let initialEnvironment: Environment
   private let initialUserId: Int?
@@ -45,6 +44,8 @@ public struct EnvironmentManager {
     self.delegate = delegate
     self.initialEnvironment = delegate.environment
     self.initialUserId = delegate.authState?.userId
+    
+    print("Initial Environment: \(self.initialEnvironment)")
   }
   
   public func setEnvironment(_ environment: Environment) {

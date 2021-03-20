@@ -65,7 +65,7 @@ public struct FableNetworkEnvironment: NetworkEnvironment {
       }(),
       headers: [
         "Application-Platform": "ios",
-        "Application-Environment": environment.description,
+        "Application-Environment": environment.rawValue,
         "Application-Version": ApplicationMetadata.appVersion(),
         "Application-Build": ApplicationMetadata.appBuild(),
         "Application-API-Key": "9c97bf0e-c3d2-4ad5-a5f7-8a2a5c819469",
