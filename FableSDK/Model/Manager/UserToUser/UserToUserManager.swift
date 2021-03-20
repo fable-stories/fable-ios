@@ -51,7 +51,7 @@ public class UserToUserManagerImpl: UserToUserManager {
       expect: EmptyResponseBody.self
     )
     .mapVoid()
-    .also { [weak self] in
+    .alsoOnValue { [weak self] in
       if var userToUser = self?.userIdToUserToUser[userId] as? MutableUserToUser {
         userToUser.isBlocked = isBlocked
         self?.userIdToUserToUser[userId] = userToUser

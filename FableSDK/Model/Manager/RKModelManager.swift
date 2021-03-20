@@ -45,11 +45,7 @@ public class RemoteLogger {
       paperTrailLogger.host = "logs5.papertrailapp.com"
       paperTrailLogger.port = 53487
       self.paperTrailLogger = paperTrailLogger
-      let args: [String] = [
-        ApplicationMetadata.source().rawValue,
-        ApplicationMetadata.versionBuild(),
-      ].compactMap { $0 }.filter { $0.isNotEmpty }
-      self.paperTrailLogger?.machineName = args.joined(separator: "-")
+      self.paperTrailLogger?.machineName = "com.fable.stories"
       DDLog.add(paperTrailLogger)
     }
   }

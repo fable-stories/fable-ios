@@ -246,7 +246,7 @@ public final class NetworkCoreV2 {
         if let response = EmptyResponseBody() as? T {
           callback(.success(response))
         } else {
-          callback(.failure(Exception(NetworkError.noData)))
+          callback(.failure(Exception(error)))
         }
       }
     } else {

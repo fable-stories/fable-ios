@@ -95,6 +95,7 @@ extension AuthManagerImpl: ASAuthorizationControllerDelegate, ASAuthorizationCon
       ).sinkDisposed(receiveCompletion: { [weak self] (completion) in
         switch completion {
         case .failure(let error):
+          self?.eventManager.sendEvent(AuthManagerEvent.didFailWithError(error))
           self?.remoteLogger.log(error.localizedDescription)
           self?.isAuthenticatingObserver.send(error: error)
         case .finished:
@@ -109,6 +110,7 @@ extension AuthManagerImpl: ASAuthorizationControllerDelegate, ASAuthorizationCon
 
   public func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
     self.remoteLogger.log(error.localizedDescription)
+    self.eventManager.sendEvent(AuthManagerEvent.didFailWithError(error))
     self.isAuthenticatingObserver.send(error: Exception(error))
     self.analyticsManager.trackEvent(AnalyticsEvent.appleSignInFailed, properties: ["error": error.localizedDescription])
   }

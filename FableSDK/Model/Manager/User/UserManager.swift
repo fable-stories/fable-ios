@@ -180,7 +180,7 @@ public class UserManagerImpl: UserManager {
       method: .post,
       parameters: UpsertUserToUserResource.Request(isFollowing: isFollowing),
       expect: EmptyResponseBody.self
-    ).mapException().mapVoid().also { [weak self] in
+    ).mapException().mapVoid().alsoOnValue { [weak self] in
       if var user = self?.fetchUser(userId: userId) {
         user.userToUser = user.userToUser.copy({ $0["isFollowing"] = isFollowing })
         self?.cacheUser(user: user)
@@ -201,7 +201,7 @@ public class UserManagerImpl: UserManager {
     )
     .mapException()
     .mapVoid()
-    .also { [weak self] in
+    .alsoOnValue { [weak self] in
       if var user = self?.fetchUser(userId: myUserId) {
         user.eulaAgreedAt = .now
         self?.cacheUser(user: user)

@@ -5,6 +5,7 @@
 //  Created by Andrew Aquino on 12/13/19.
 //
 
+import Foundation
 import FableSDKFoundation
 import FableSDKErrorObjects
 import FableSDKModelObjects
@@ -20,6 +21,7 @@ import Combine
 public enum AuthManagerEvent: EventContext {
   case userDidSignIn
   case userDidSignOut
+  case didFailWithError(Error)
 }
 
 private let kAuthCheckInterval: TimeInterval = 30.0
@@ -57,8 +59,8 @@ public class AuthManagerImpl: NSObject, AuthManager {
   private let environmentManager: EnvironmentManager
   private let networkManager: NetworkManager
   private let networkManagerV2: NetworkManagerV2
-  private let eventManager: EventManager
-  public let analyticsManager: AnalyticsManager
+  internal let eventManager: EventManager
+  internal let analyticsManager: AnalyticsManager
   
   public let isAuthenticating: Signal<Bool, Exception>
   internal let isAuthenticatingObserver: Signal<Bool, Exception>.Observer
@@ -94,6 +96,16 @@ public class AuthManagerImpl: NSObject, AuthManager {
       self.eventManager.sendEvent(AuthManagerEvent.userDidSignIn)
       self.analyticsManager.trackEvent(AnalyticsEvent.didLogin)
     }
+    
+    self.eventManager.onEvent.sinkDisposed(receiveCompletion: nil) { [weak self] (event) in
+      /// Sign out on an Auth error event
+      switch event {
+      case AuthManagerEvent.didFailWithError:
+        self?.signOut()
+      default:
+        break
+      }
+    }
   }
 
   public func authenticate(email: String, password: String) -> SignalProducer<Int, SignInError> {
@@ -111,6 +123,7 @@ public class AuthManagerImpl: NSObject, AuthManager {
       self?.processResult($0) ?? .empty
     }
     .on(failed: { [weak self] error in
+      self?.eventManager.sendEvent(AuthManagerEvent.didFailWithError(error))
       self?.analyticsManager.trackEvent(AnalyticsEvent.emailSignInFailed, properties: ["error": error.localizedDescription])
     }, value: { [weak self] _ in
       self?.analyticsManager.trackEvent(AnalyticsEvent.emailignInSucceeded)
@@ -128,6 +141,7 @@ public class AuthManagerImpl: NSObject, AuthManager {
       self?.processResult($0) ?? .empty
     }
     .on(failed: { [weak self] error in
+      self?.eventManager.sendEvent(AuthManagerEvent.didFailWithError(error))
       self?.analyticsManager.trackEvent(AnalyticsEvent.googleSignInFailed, properties: ["error": error.localizedDescription])
     }, value: { [weak self] _ in
       self?.analyticsManager.trackEvent(AnalyticsEvent.googleignInSucceeded)
@@ -151,8 +165,11 @@ public class AuthManagerImpl: NSObject, AuthManager {
       guard let self = self else { throw SignInError.invalidResponseError }
       return try self.processResultV2(.success(value))
     }
-    .mapError { Exception($0) }
     .eraseToAnyPublisher()
+    .mapException()
+    .alsoOnError { [weak self] error in
+      self?.eventManager.sendEvent(AuthManagerEvent.didFailWithError(error))
+    }
   }
 
   public func signOut() {

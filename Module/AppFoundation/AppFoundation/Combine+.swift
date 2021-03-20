@@ -65,7 +65,13 @@ public extension AnyPublisher {
 }
 
 public extension AnyPublisher where Failure == Exception {
-  func also(_ closure: @escaping () -> Void) -> AnyPublisher<Output, Failure> {
+  func alsoOnError(_ closure: @escaping (Error) -> Void) -> AnyPublisher<Output, Failure> {
+    mapError { error in
+      closure(error)
+      return error
+    }.eraseToAnyPublisher()
+  }
+  func alsoOnValue(_ closure: @escaping () -> Void) -> AnyPublisher<Output, Failure> {
     map { i in
       closure()
       return i

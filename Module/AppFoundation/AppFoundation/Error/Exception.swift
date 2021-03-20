@@ -8,12 +8,13 @@
 import Foundation
 
 public struct Exception: LocalizedError, Equatable {
-  public var errorDescription: String?
+  public let errorDescription: String
   public init(_ errorDescription: String = "", file: String = #file, function: String = #function, line: Int = #line) {
-    let trace = "\(file)_\(function)_\(line)"
-    self.errorDescription = "\(trace) \(errorDescription)"
+    // let trace = "\(file)_\(function)_\(line)"
+    self.errorDescription = "\(errorDescription)"
   }
   public init(_ error: Error, file: String = #file, function: String = #function, line: Int = #line) {
-    self.init(error.localizedDescription, file: file, function: function, line: line)
+    let errorMessage = (error as NSError).debugDescription
+    self.init(errorMessage, file: file, function: function, line: line)
   }
 }

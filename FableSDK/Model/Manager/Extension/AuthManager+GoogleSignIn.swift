@@ -21,12 +21,13 @@ extension AuthManagerImpl: GIDSignInDelegate {
   }
 
   public func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error!) {
-    guard error == nil, let auth = user.authentication else {
+    if let error = error {
       self.analyticsManager.trackEvent(AnalyticsEvent.googleSignInFailed, properties: ["error": error.localizedDescription])
+      self.eventManager.sendEvent(AuthManagerEvent.didFailWithError(error))
       // Authentication screen closing
       self.isAuthenticatingObserver.send(value: false)
-      return
+    } else if let auth = user.authentication {
+      authenticateWithGoogle(idToken: auth.idToken).start()
     }
-    authenticateWithGoogle(idToken: auth.idToken).start()
   }
 }

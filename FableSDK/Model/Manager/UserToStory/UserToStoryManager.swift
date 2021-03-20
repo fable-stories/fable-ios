@@ -69,7 +69,7 @@ public class UserToStoryManagerImpl: UserToStoryManager {
       expect: EmptyResponseBody.self
     )
     .mapVoid()
-    .also { [weak self] in
+    .alsoOnValue { [weak self] in
       self?.updateByKey(userId: myUserId, storyId: storyId, closure: { userToStory in
         userToStory.isReported = true
       })
@@ -88,7 +88,7 @@ public class UserToStoryManagerImpl: UserToStoryManager {
       expect: EmptyResponseBody.self
     )
     .mapVoid()
-    .also { [weak self] in
+    .alsoOnValue { [weak self] in
       self?.updateByKey(userId: myUserId, storyId: storyId, closure: { userToStory in
         userToStory.isHidden = isHidden
       })

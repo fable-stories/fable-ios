@@ -44,6 +44,8 @@ public struct EventSource: Equatable {
 
 
 public class EventManager {
+  private let remoteLogger = RemoteLogger.shared
+  
   private let _onEvent = PassthroughSubject<EventContext, Exception>()
   public private(set) lazy var onEvent = _onEvent.eraseToAnyPublisher()
   
@@ -52,6 +54,7 @@ public class EventManager {
   public init() {}
 
   public func sendEvent(_ event: EventContext) {
+    self.remoteLogger.log(event)
     self.eventCount += 1
     print("Event \(self.eventCount): \(event)")
     _onEvent.send(event)

@@ -14,6 +14,11 @@ import NetworkFoundation
 import ReactiveSwift
 import Combine
 import FableSDKWireObjects
+import FableSDKFoundation
+
+public enum ConfigManagerEvent: EventContext {
+  case didFailWithError(Error)
+}
 
 public protocol ConfigManager {
   func refreshConfig()
@@ -39,6 +44,7 @@ public class ConfigManagerImpl: ConfigManager {
   private let networkManagerV2: NetworkManagerV2
   private let stateManager: StateManager
   private let environmentManager: EnvironmentManager
+  private let eventManager: EventManager
   
   public let initialLaunchConfig: CurrentValueSubject<LaunchConfigState, Exception>
 
@@ -46,12 +52,14 @@ public class ConfigManagerImpl: ConfigManager {
     networkManager: NetworkManager,
     networkManagerV2: NetworkManagerV2,
     environmentManager: EnvironmentManager,
-    stateManager: StateManager
+    stateManager: StateManager,
+    eventManager: EventManager
   ) {
     self.networkManager = networkManager
     self.networkManagerV2 = networkManagerV2
     self.environmentManager = environmentManager
     self.stateManager = stateManager
+    self.eventManager = eventManager
     self.initialLaunchConfig = CurrentValueSubject<LaunchConfigState, Exception>(.unknown)
   }
 
@@ -59,7 +67,7 @@ public class ConfigManagerImpl: ConfigManager {
     self.networkManagerV2.request(
       path: "/config",
       method: .get
-    ).mapException().map { [weak self] (wire: WireConfig) in
+    ).map { [weak self] (wire: WireConfig) in
       guard let self = self else { return nil }
       if let config = Config(wire: wire) {
         if self.initialLaunchConfig.value == .unknown {
@@ -71,7 +79,9 @@ public class ConfigManagerImpl: ConfigManager {
         self.initialLaunchConfig.value = .receivedNone
       }
       return nil
-    }.eraseToAnyPublisher()
+    }.eraseToAnyPublisher().mapException().alsoOnError { [weak self] error in
+      self?.eventManager.sendEvent(ConfigManagerEvent.didFailWithError(error))
+    }
   }
 
   public func refreshConfig() {
