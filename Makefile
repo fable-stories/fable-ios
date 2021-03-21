@@ -27,8 +27,7 @@ test:
           test | xcpretty
 
 release:
-	bundle exec fastlane release --env fastlane
-
+	#bundle exec fastlane release --env fastlane
 
 clean:
 	@make _clean -i

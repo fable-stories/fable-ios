@@ -201,11 +201,10 @@ public final class NetworkCore {
     logger: Logger,
     startTime: Date
   ) {
-    let requestDuration = Date.now.timeIntervalSince(startTime).rounded(toPlaces: 2)
-    let statusCode = response.response.flatMap {
-      "\($0.statusCode)"
-    } ?? ""
-    logger.enqueue("\n-- RESPONSE \(requestDuration)s \(statusCode) --\n")
+//    let requestDuration = Date.now.timeIntervalSince(startTime).rounded(toPlaces: 2)
+//    let statusCode = response.response.flatMap {
+//      "\($0.statusCode)"
+//    } ?? ""
     let targetType = type(of: target)
     if let error = response.error, response.response?.hasSuccessfulStatusCode != true {
       logger.enqueue(error, logLevel: .error)

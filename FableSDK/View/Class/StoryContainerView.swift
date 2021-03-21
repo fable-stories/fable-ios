@@ -20,6 +20,32 @@ public protocol StoryContainerViewDelegate: class {
 
 public class StoryContainerView: UIView {
   public static let size = CGSize(width: 113.0, height: 217.0)
+  
+  public enum Stat {
+    case views(Int)
+    case likes(Int)
+    
+    public var imageName: String {
+      switch self {
+      case .likes: return "heart"
+      case .views: return "eye"
+      }
+    }
+    
+    public var value: Int {
+      switch self {
+      case let .likes(value): return value
+      case let .views(value): return value
+      }
+    }
+    
+    public var displayString: String {
+      let k = value / 1000
+      let h = value % 1000
+      if k == 0 { return "\(value)" }
+      return "\(k).\(h)k"
+    }
+  }
 
   public var story: Story? {
     didSet {
@@ -51,10 +77,36 @@ public class StoryContainerView: UIView {
   private let storyImageView = UIButton.new {
     $0.contentMode = .scaleAspectFill
   }
-
+  
+  private let statsContainer: UIStackView = .new { view in
+    view.axis = .horizontal
+    view.alignment = .center
+    view.distribution = .fillEqually
+  }
+  
+  private lazy var viewsButton: UIButton = .new { button in
+    button.setImage(
+      UIImage(named: Stat.views(0).imageName)?
+        .resized(to: .init(width: 13.0, height: 11.0)),
+      for: .normal
+    )
+    button.imageView?.contentMode = .scaleAspectFit
+    button.imageEdgeInsets = UIEdgeInsets(top: 0.0, left: 0.0, bottom: 0.0, right: 6.0)
+  }
+  
+  private lazy var likesButton: UIButton = .new { button in
+    button.setImage(
+      UIImage(named: Stat.likes(0).imageName)?
+        .resized(to: .init(width: 12.0, height: 11.0)),
+      for: .normal
+    )
+    button.imageView?.contentMode = .scaleAspectFit
+    button.imageEdgeInsets = UIEdgeInsets(top: 0.0, left: 0.0, bottom: 0.0, right: 6.0)
+  }
+  
   private let titleLabel = UILabel.new {
-    $0.numberOfLines = 0
-    $0.setTextAttributes(.titleBold14(.white))
+    $0.numberOfLines = 2
+    $0.setTextAttributes(.titleBold14(UIColor("#173966")))
   }
 
   private lazy var gradentView: GradientView = {
@@ -66,16 +118,20 @@ public class StoryContainerView: UIView {
     view.isHidden = true
     return view
   }()
+  
   public let selectionContainer = UIButton()
 
   private func configureSelf() {
-    backgroundColor = .random()
+    backgroundColor = .clear
   }
 
   private func configureLayout() {
     self.addSubview(storyImageContainer)
     storyImageContainer.addSubview(storyImageView)
     storyImageContainer.addSubview(gradentView)
+    addSubview(statsContainer)
+    statsContainer.addArrangedSubview(viewsButton)
+    statsContainer.addArrangedSubview(likesButton)
     addSubview(titleLabel)
     addSubview(selectionContainer)
 
@@ -93,9 +149,15 @@ public class StoryContainerView: UIView {
     gradentView.snp.makeConstraints { make in
       make.edges.equalTo(snp.edges)
     }
+    
+    statsContainer.snp.makeConstraints { make in
+      make.top.equalTo(storyImageView.snp.bottom).offset(6.0)
+      make.leading.equalTo(snp.leadingMargin)
+      make.trailing.equalTo(snp.trailingMargin)
+    }
 
     titleLabel.snp.makeConstraints { make in
-      make.top.equalTo(storyImageView.snp.bottom).offset(6.0)
+      make.top.equalTo(statsContainer.snp.bottom)
       make.leading.equalTo(snp.leadingMargin)
       make.trailing.equalTo(snp.trailingMargin)
       make.bottom.equalTo(snp.bottomMargin)
@@ -142,6 +204,16 @@ public class StoryContainerView: UIView {
         }
       }
     }
+    
+    let likes: Stat = .likes(story.stats.likes)
+    self.likesButton.setAttributedTitle(likes.displayString.toAttributedString([
+      .foregroundColor: UIColor.black
+    ]), for: .normal)
+
+    let views: Stat = .likes(story.stats.views)
+    self.viewsButton.setAttributedTitle(views.displayString.toAttributedString([
+      .foregroundColor: UIColor.black
+    ]), for: .normal)
   }
   
   public func prepareForReuse() {

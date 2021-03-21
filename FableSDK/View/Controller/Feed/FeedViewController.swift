@@ -117,7 +117,7 @@ public class FeedViewController: UIViewController {
     configureSubviews()
     configureLayout()
     
-    refresh()
+    refreshData()
   }
 
   override public func viewWillAppear(_ animated: Bool) {
@@ -169,9 +169,20 @@ public class FeedViewController: UIViewController {
     }
   }
 
-  private func configureReactive() {}
+  private func configureReactive() {
+    self.eventManager.onEvent.sinkDisposed(receiveCompletion: nil) { [weak self] (event) in
+      switch event {
+      case UserToStoryManagerEvent.didReportStory,
+           UserToStoryManagerEvent.didSetStoryHidden,
+           UserToStoryManagerEvent.didSetStoryLike:
+        self?.refreshData()
+      default:
+        break
+      }
+    }
+  }
 
-  private func refresh() {
+  private func refreshData() {
     networkManager.request(
       path: "/mobile/feed",
       method: .get,
@@ -203,7 +214,7 @@ public class FeedViewController: UIViewController {
   }
   
   @objc private func didPullToRefresh() {
-    self.refresh()
+    self.refreshData()
   }
   
   private func presentStory(storyId: Int) {

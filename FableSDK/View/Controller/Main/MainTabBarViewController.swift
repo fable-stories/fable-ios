@@ -128,7 +128,7 @@ public class MainTabBarViewController: UITabBarController {
 
   private func configureViewControllers() {
     let inset: CGFloat = 5.0
-    let feedVC: FeedViewControllerV2 = FeedViewControllerV2(resolver: resolver)
+    let feedVC: FeedViewController = FeedViewController(resolver: resolver)
     feedVC.tabBarItem = UITabBarItem(
       title: nil,
       image: UIImage(named: "homeTabIcon")?.withRenderingMode(.alwaysOriginal),

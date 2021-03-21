@@ -96,9 +96,17 @@ public final class StoryDetailViewController: ASDKViewController<StoryDetailNode
     let storyId = self.storyId
     guard let myUserId = authManager.authenticatedUserId else { return }
     guard let userToStory = userToStoryManager.fetchUserToStory(userId: myUserId, storyId: storyId) else { return }
+    let isLiked = userToStory.isLiked
     let isHidden = userToStory.isHidden
     let isReported = userToStory.isReported
     let alert = UIAlertController(title: "More", message: nil, preferredStyle: .actionSheet)
+    alert.addAction(.init(title: isLiked ? "Unlike" : "Like", style: .default, handler: { [weak self] _ in
+      let newValue = !isLiked
+      self?.userToStoryManager.setStoryLiked(
+        storyId: storyId,
+        isLiked: newValue
+      ).sinkDisposed()
+    }))
     alert.addAction(.init(title: isHidden ? "Unhide" : "Hide", style: .default, handler: { [weak self] _ in
       let newValue = !isHidden
       self?.userToStoryManager.setStoryHidden(

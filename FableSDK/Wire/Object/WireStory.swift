@@ -94,7 +94,7 @@ public struct WireUserToStory: Codable {
 
 public extension MutableUserToStory {
   init(wire: WireUserToStory) {
-    self.init(liked: wire.liked, isHidden: wire.hide, isReported: wire.reported)
+    self.init(isLiked: wire.liked, isHidden: wire.hide, isReported: wire.reported)
   }
 }
 

@@ -69,6 +69,7 @@ def firebase
   pod 'Firebase/Crashlytics'
   pod 'Firebase/Analytics'
   pod 'Firebase/Performance'
+  pod 'Firebase/Messaging'
   pod 'Firebase/Core'
   pod 'Firebase/Auth'
 end
@@ -185,6 +186,7 @@ target 'FableSDKModelPresenters' do
 end
 
 target 'FableSDKModelManagers' do 
+  firebase
   reactiveswift
   kingfisher
   keychainaccess

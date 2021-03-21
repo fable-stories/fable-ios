@@ -160,7 +160,9 @@ platform :ios do
     deploy_beta(
       release_notes: options[:release_notes]
     )
-    upload_dsyms
+    upload_dsyms(
+      environment: ENV["ENV"]
+    )
   end
 
   lane :deploy_beta do |options|
@@ -245,10 +247,11 @@ platform :ios do
     )
   end
 
-  lane :upload_dsyms do
+  lane :upload_dsyms do |options|
+    environment = options[:environment] || "dev"
     upload_symbols_to_crashlytics(
       dsym_path: "./Artifacts/Fable.app.dSYM.zip",
-      gsp_path: "./Secrets/Dev/GoogleService-Info.plist",
+      gsp_path: "./Secrets/Firebase/GoogleService-Info-#{environment.capitalize}.plist",
       dsym_worker_threads: 4,
       debug: true
     )

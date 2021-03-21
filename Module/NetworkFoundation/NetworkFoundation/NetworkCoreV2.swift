@@ -92,7 +92,7 @@ public final class NetworkCoreV2 {
       )
       let startTime = Date.now
       
-      logger.enqueue("\n\(method) \(absoluteUrl)", logLevel: .info)
+      logger.enqueue("\(method) \(absoluteUrl)", logLevel: .info)
       
       AF.upload(
         multipartFormData: multipartFormData,
@@ -153,9 +153,8 @@ public final class NetworkCoreV2 {
         )
         let startTime = Date.now
 
-        logger.enqueue("\n\(method) \(absoluteUrl)", logLevel: .info)
+        logger.enqueue("\(method) \(absoluteUrl)", logLevel: .info)
         if parameters.isNotEmpty, method != .get {
-          logger.enqueue("\n-- REQUEST --\n")
           let data = try JSONSerialization.data(withJSONObject: parameters, options: .prettyPrinted)
           if let jsonString = String(data: data, encoding: .utf8) {
             logger.enqueue(jsonString, logLevel: .verbose)
@@ -202,11 +201,10 @@ public final class NetworkCoreV2 {
     startTime: Date,
     callback: (Result<T, Exception>) -> Void
   ) {
-    let requestDuration = Date.now.timeIntervalSince(startTime).rounded(toPlaces: 2)
-    let statusCode = response.response.flatMap {
-      "\($0.statusCode)"
-    } ?? ""
-    logger.enqueue("\n-- RESPONSE \(requestDuration)s \(statusCode) --\n")
+//    let requestDuration = Date.now.timeIntervalSince(startTime).rounded(toPlaces: 2)
+//    let statusCode = response.response.flatMap {
+//      "\($0.statusCode)"
+//    } ?? ""
     if let error = response.error, response.response?.hasSuccessfulStatusCode != true {
       logger.enqueue(error, logLevel: .error)
       callback(.failure(Exception(NetworkError.network(error, nil))))

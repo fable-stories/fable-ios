@@ -207,7 +207,6 @@ public class FBSDKTextViewNode: ASButtonNode {
   }
   
   @objc private func didReceiveNotification(_ notification: Notification) {
-    print(notification.name)
     switch notification.name {
     case UITextView.textDidChangeNotification:
       self.validatePlaceholderState()

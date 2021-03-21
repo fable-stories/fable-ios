@@ -72,6 +72,15 @@ public class CKLandingViewController: UIViewController {
     return view
   }()
   private let telegramButton = Button(FableButtonViewModel.plain())
+  private let telegramTextView: UITextView = .new { view in
+    view.isUserInteractionEnabled = false
+    view.isScrollEnabled = false
+    view.text = "Here are Fable Stories, we are constantly striving to make the best in-app"
+    + "Story creation tools while delivering the best possible experience for our readers."
+    + "\n\nPlease join our Telegram group and give us feedback & feature requests."
+    + "We would love to engage with you!"
+    view.setContentHuggingPriority(.required, for: .vertical)
+  }
   private let shareButton = Button(FableButtonViewModel.plain())
 
   // MARK: View Life Cycle
@@ -106,6 +115,7 @@ public class CKLandingViewController: UIViewController {
     view.addSubview(container)
     container.addSubview(containerStackView)
     containerStackView.addArrangedSubview(telegramButton)
+    containerStackView.addArrangedSubview(telegramTextView)
     containerStackView.addArrangedSubview(shareButton)
 
     titleLabel.snp.makeConstraints { make in
@@ -145,6 +155,11 @@ public class CKLandingViewController: UIViewController {
       make.leading.equalToSuperview()
       make.trailing.equalToSuperview()
       make.height.equalTo(40.0)
+    }
+    
+    telegramTextView.snp.makeConstraints { make in
+      make.leading.equalToSuperview()
+      make.trailing.equalToSuperview()
     }
     
     shareButton.snp.makeConstraints { make in

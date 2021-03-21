@@ -25,6 +25,9 @@ PODS:
   - Firebase/Crashlytics (7.8.1):
     - Firebase/CoreOnly
     - FirebaseCrashlytics (~> 7.8.0)
+  - Firebase/Messaging (7.8.1):
+    - Firebase/CoreOnly
+    - FirebaseMessaging (~> 7.8.0)
   - Firebase/Performance (7.8.1):
     - Firebase/CoreOnly
     - FirebasePerformance (~> 7.8.0)
@@ -64,6 +67,18 @@ PODS:
     - GoogleUtilities/Environment (~> 7.0)
     - GoogleUtilities/UserDefaults (~> 7.0)
     - PromisesObjC (~> 1.2)
+  - FirebaseInstanceID (7.8.0):
+    - FirebaseCore (~> 7.0)
+    - FirebaseInstallations (~> 7.0)
+    - GoogleUtilities/Environment (~> 7.0)
+    - GoogleUtilities/UserDefaults (~> 7.0)
+  - FirebaseMessaging (7.8.0):
+    - FirebaseCore (~> 7.0)
+    - FirebaseInstanceID (~> 7.0)
+    - GoogleUtilities/AppDelegateSwizzler (~> 7.0)
+    - GoogleUtilities/Environment (~> 7.0)
+    - GoogleUtilities/Reachability (~> 7.0)
+    - GoogleUtilities/UserDefaults (~> 7.0)
   - FirebasePerformance (7.8.0):
     - FirebaseCore (~> 7.0)
     - FirebaseInstallations (~> 7.0)
@@ -186,6 +201,7 @@ DEPENDENCIES:
   - Firebase/Auth
   - Firebase/Core
   - Firebase/Crashlytics
+  - Firebase/Messaging
   - Firebase/Performance
   - Firebolt (~> 0.4.6)
   - GoogleSignIn
@@ -213,6 +229,8 @@ SPEC REPOS:
     - FirebaseCoreDiagnostics
     - FirebaseCrashlytics
     - FirebaseInstallations
+    - FirebaseInstanceID
+    - FirebaseMessaging
     - FirebasePerformance
     - FirebaseRemoteConfig
     - Firebolt
@@ -250,6 +268,8 @@ SPEC CHECKSUMS:
   FirebaseCoreDiagnostics: 066f996579cf097bdad3d7dc9a918d6b9e129c50
   FirebaseCrashlytics: d07e61d85aabc7d38a68f94ff99995f8557ea8d0
   FirebaseInstallations: 7f7ed0e7e27fb51f57291e1876e2ddb1524126c1
+  FirebaseInstanceID: aaecc93b4528bbcafea12c477e26827719ca1183
+  FirebaseMessaging: 1d5cac3728c042d3d4700ecb56bbac893660a963
   FirebasePerformance: 4f9de7b38207bbe91396453e2ab669f8a2b864a7
   FirebaseRemoteConfig: 0d7a7e45c23bfaa1f299c768b3c357ae3a5bc9d5
   Firebolt: 542587bb431c4a9b86fa2d47b8c442fdf81fa9ac
@@ -273,6 +293,6 @@ SPEC CHECKSUMS:
   ReactiveSwift: 7937f26ec18d555e2a99352bd0a8b2817d1f042d
   Texture: 2f109e937850d94d1d07232041c9c7313ccddb81
 
-PODFILE CHECKSUM: c4a5f5b82e81ec6e3c0c35235f8ce4ae037633d6
+PODFILE CHECKSUM: 5d1be3aff1fea982bd92c28107b4d1f3d2cb9eb1
 
 COCOAPODS: 1.10.0

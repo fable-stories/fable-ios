@@ -15,9 +15,11 @@ import FableSDKFoundation
 public enum UserToStoryManagerEvent: EventContext {
   case didReportStory(storyId: Int)
   case didSetStoryHidden(storyId: Int, isHidden: Bool)
+  case didSetStoryLike(storyId: Int, isLiked: Bool)
 }
 
 public protocol UserToStoryManager {
+  func setStoryLiked(storyId: Int, isLiked: Bool) -> AnyPublisher<Void, Exception> 
   func setStoryReported(storyId: Int, isReported: Bool) -> AnyPublisher<Void, Exception>
   func setStoryHidden(storyId: Int, isHidden: Bool) -> AnyPublisher<Void, Exception>
   func cacheUserToStory(userId: Int, storyId: Int, userToStory: UserToStory)
@@ -93,6 +95,25 @@ public class UserToStoryManagerImpl: UserToStoryManager {
         userToStory.isHidden = isHidden
       })
       self?.eventManager.sendEvent(UserToStoryManagerEvent.didSetStoryHidden(storyId: storyId, isHidden: isHidden))
+    }
+  }
+  
+  public func setStoryLiked(storyId: Int, isLiked: Bool) -> AnyPublisher<Void, Exception> {
+    guard let myUserId = authManager.authenticatedUserId else { return .singleValue(()) }
+    return self.networkManager.request(
+      path: "/user/to/story/\(storyId)",
+      method: .post,
+      parameters: [
+        "liked": isLiked
+      ],
+      expect: EmptyResponseBody.self
+    )
+    .mapVoid()
+    .alsoOnValue { [weak self] in
+      self?.updateByKey(userId: myUserId, storyId: storyId, closure: { userToStory in
+        userToStory.isLiked = isLiked
+      })
+      self?.eventManager.sendEvent(UserToStoryManagerEvent.didSetStoryLike(storyId: storyId, isLiked: isLiked))
     }
   }
 }

@@ -22,17 +22,17 @@ public struct MutableUserToUser: UserToUser {
 }
 
 public protocol UserToStory: Codable {
-  var liked: Bool { get }
+  var isLiked: Bool { get }
   var isHidden: Bool { get }
   var isReported: Bool { get }
 }
 
 public struct MutableUserToStory: UserToStory {
-  public var liked: Bool
+  public var isLiked: Bool
   public var isHidden: Bool
   public var isReported: Bool
-  public init(liked: Bool, isHidden: Bool, isReported: Bool) {
-    self.liked = liked
+  public init(isLiked: Bool, isHidden: Bool, isReported: Bool) {
+    self.isLiked = isLiked
     self.isHidden = isHidden
     self.isReported = isReported
   }

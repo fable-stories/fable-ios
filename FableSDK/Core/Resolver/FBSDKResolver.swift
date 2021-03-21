@@ -130,6 +130,9 @@ public class FBSDKResolver: Resolver {
         authManager: resolver.get()
       )
     }
+    register(expect: NotificationManager.self) { (resolver: FBSDKResolver) in
+      NotificationManagerImpl(firebaseManager: resolver.get())
+    }
   }
 }
 

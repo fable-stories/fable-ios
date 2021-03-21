@@ -29,6 +29,7 @@ import SnapKit
 class AppDelegate: UIResponder, UIApplicationDelegate {
   private let consoleOutputListener = ConsoleOutputListener.shared
   private let resolver = FBSDKResolver()
+  private lazy var notificationManager: NotificationManager = resolver.get()
   
   var window: UIWindow?
 
