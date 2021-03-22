@@ -11,7 +11,7 @@ import SnapKit
 import UIKit
 
 public class StorySectionViewHeader: UIView {
-  public static let estimatedHeight: CGFloat = 36.0
+  public static let estimatedHeight: CGFloat = 24.0
 
   private let titleLabel = UILabel.new {
     $0.font = .fableFont(24.0, weight: .bold)
@@ -51,7 +51,7 @@ public class StorySectionViewHeader: UIView {
     contentView.addSubview(titleLabel)
     contentView.addSubview(subtitleLabel)
 
-    contentView.layoutMargins = UIEdgeInsets(top: 16.0, left: 16.0, bottom: 8.0, right: 16.0)
+    contentView.layoutMargins = UIEdgeInsets(top: 8.0, left: 16.0, bottom: 8.0, right: 16.0)
 
     contentView.snp.makeConstraints { make in
       make.edges.equalTo(snp.edges)

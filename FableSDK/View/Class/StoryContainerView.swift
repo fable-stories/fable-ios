@@ -18,6 +18,8 @@ public protocol StoryContainerViewDelegate: class {
   func storyContainerView(didRetrieveImage image: UIImage, forKey key: String, view: StoryContainerView)
 }
 
+private let statFont = UIFont.systemFont(ofSize: 12.0, weight: .regular)
+
 public class StoryContainerView: UIView {
   public static let size = CGSize(width: 113.0, height: 217.0)
   
@@ -104,9 +106,8 @@ public class StoryContainerView: UIView {
     button.imageEdgeInsets = UIEdgeInsets(top: 0.0, left: 0.0, bottom: 0.0, right: 6.0)
   }
   
-  private let titleLabel = UILabel.new {
-    $0.numberOfLines = 2
-    $0.setTextAttributes(.titleBold14(UIColor("#173966")))
+  private let titleLabel = UILabel.new { view in
+    view.numberOfLines = 2
   }
 
   private lazy var gradentView: GradientView = {
@@ -151,16 +152,16 @@ public class StoryContainerView: UIView {
     }
     
     statsContainer.snp.makeConstraints { make in
-      make.top.equalTo(storyImageView.snp.bottom).offset(6.0)
+      make.top.equalTo(storyImageView.snp.bottom).offset(8.0)
       make.leading.equalTo(snp.leadingMargin)
       make.trailing.equalTo(snp.trailingMargin)
+      make.height.equalTo(12.0)
     }
 
     titleLabel.snp.makeConstraints { make in
-      make.top.equalTo(statsContainer.snp.bottom)
+      make.top.equalTo(statsContainer.snp.bottom).offset(6.0)
       make.leading.equalTo(snp.leadingMargin)
       make.trailing.equalTo(snp.trailingMargin)
-      make.bottom.equalTo(snp.bottomMargin)
     }
 
     selectionContainer.snp.makeConstraints { make in
@@ -176,8 +177,8 @@ public class StoryContainerView: UIView {
       gradentView.isHidden = true
       return
     }
-    titleLabel.text = story.title
-    
+    titleLabel.attributedText = story.title.toAttributedString(.titleBold14())
+
     let key = "story_id_\(story.storyId)__square_image_url"
     if let image = self.delegate?.storyContainerView(prefetchImageForKey: key, view: self) {
       self.gradentView.isHidden = false
@@ -207,12 +208,14 @@ public class StoryContainerView: UIView {
     
     let likes: Stat = .likes(story.stats.likes)
     self.likesButton.setAttributedTitle(likes.displayString.toAttributedString([
-      .foregroundColor: UIColor.black
+      .foregroundColor: UIColor.black,
+      .font: statFont
     ]), for: .normal)
 
     let views: Stat = .likes(story.stats.views)
     self.viewsButton.setAttributedTitle(views.displayString.toAttributedString([
-      .foregroundColor: UIColor.black
+      .foregroundColor: UIColor.black,
+      .font: statFont
     ]), for: .normal)
   }
   

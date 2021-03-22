@@ -52,9 +52,9 @@ extension UILabel {
   }
 }
 
-extension UITextView {
+public extension UITextView {
   @objc
-  open var attributes: TextAttributes {
+  var attributes: TextAttributes {
     let paragraphStyle = NSMutableParagraphStyle()
     paragraphStyle.lineBreakMode = self.textContainer.lineBreakMode
     paragraphStyle.alignment = textAlignment
@@ -63,6 +63,15 @@ extension UITextView {
       .font: font,
       .paragraphStyle: paragraphStyle
     ].compactMapValues { $0 }
+  }
+  
+  func setTextAttributes(_ textAttributes: TextAttributes) {
+    self.font = textAttributes.font
+    self.textColor = textAttributes.textColor
+    self.textAlignment = textAttributes.textAlignment ?? self.textAlignment
+    let paragraphStyle = textAttributes.paragraphStyle
+    let lineBreakMode = self.textContainer.lineBreakMode
+    self.textContainer.lineBreakMode = paragraphStyle?.lineBreakMode ?? lineBreakMode
   }
 }
 
