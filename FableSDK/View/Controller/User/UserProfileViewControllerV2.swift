@@ -121,10 +121,6 @@ public class UserProfileViewControllerV2: ASDKViewController<UserProfileNode> {
   }
 
   public func refreshData() {
-    if !self.authManager.isLoggedIn {
-      return self.node.sections.removeAll()
-    }
-    
     self.activityView.startAnimating()
     
     self.presenter.refreshData(userId: userId).sinkDisposed(receiveCompletion: { [weak self] completion in

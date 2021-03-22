@@ -31,8 +31,9 @@ public class UserProfileViewPresenter {
   }
   
   public func refreshData(userId: Int) -> AnyPublisher<UserProfile?, Exception> {
+    if userId == -1 { return .singleValue(nil) }
     let publisher: AnyPublisher<UserProfile?, Exception> = self.networkManager.request(
-      path: "/mobile/user/\(userId)/user-profile",
+      path: "/mobile/user/\(userId)/profile",
       method: .get,
       expect: WireUserProfile.self
     ).map { [weak self] wire in

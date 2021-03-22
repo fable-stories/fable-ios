@@ -408,6 +408,7 @@ public struct Config: Codable {
   public let eulaAgreement: String
   public let privacyPolicy: String
   public let shareLink: String
+  public let telegramCallToAction: String?
 
   public init(
     configId: Int,
@@ -417,7 +418,8 @@ public struct Config: Codable {
     resourceConfig: ResourceConfig? = nil,
     eulaAgreement: String = "",
     privacyPolicy: String = "",
-    shareLink: String? = nil
+    shareLink: String? = nil,
+    telegramCallToAction: String? = nil
   ) {
     self.configId = configId
     self.colorHexStrings = colorHexStrings ?? []
@@ -427,6 +429,7 @@ public struct Config: Codable {
     self.eulaAgreement = eulaAgreement
     self.privacyPolicy = privacyPolicy
     self.shareLink = shareLink ?? ""
+    self.telegramCallToAction = telegramCallToAction
   }
 }
 

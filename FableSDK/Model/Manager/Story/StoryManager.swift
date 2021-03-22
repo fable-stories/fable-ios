@@ -22,6 +22,9 @@ public protocol StoryManager {
   func deleteStory(storyId: Int) -> AnyPublisher<Void, Exception>
   func listByUserId(userId: Int) -> AnyPublisher<[Story], Exception>
   func cacheStory(story: Story)
+  
+  /// Mobile Screens -- need to move somewhere else
+  func refreshStoryDetails(storyId: Int) -> AnyPublisher<Story?, Exception>
 }
 
 public class StoryManagerImpl: StoryManager {
@@ -145,4 +148,20 @@ public class StoryManagerImpl: StoryManager {
       }
     }.eraseToAnyPublisher()
   }
+  
+  public func refreshStoryDetails(storyId: Int) -> AnyPublisher<Story?, Exception> {
+    self.networkManager.request(
+      path: "/mobile/story/\(storyId)/profile",
+      method: .get
+    ).map { (wire: WireStoryDetailScreen) in
+      if let story = MutableStory(wire: wire.story) {
+        return story
+      }
+      return nil
+    }.eraseToAnyPublisher()
+  }
+}
+
+private struct WireStoryDetailScreen: Codable {
+  public let story: WireStory
 }

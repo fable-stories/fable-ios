@@ -75,10 +75,6 @@ public class CKLandingViewController: UIViewController {
   private let telegramTextView: UITextView = .new { view in
     view.isUserInteractionEnabled = false
     view.isScrollEnabled = false
-    view.text = "Here are Fable Stories, we are constantly striving to make the best in-app"
-    + "Story creation tools while delivering the best possible experience for our readers."
-    + "\n\nPlease join our Telegram group and give us feedback & feature requests."
-    + "We would love to engage with you!"
     view.setContentHuggingPriority(.required, for: .vertical)
   }
   private let shareButton = Button(FableButtonViewModel.plain())
@@ -199,6 +195,20 @@ public class CKLandingViewController: UIViewController {
         self.dismiss(animated: true, completion: nil)
       }
     }
+    
+    configManager.initialLaunchConfig.eraseToAnyPublisher()
+      .sinkDisposed(receiveCompletion: nil) { [weak self] (configState) in
+        switch configState {
+        case let .received(config):
+          let telegramDefaultText = "We at Fable Stories, we are constantly striving to make the best in-app "
+            + "Story creation tools while delivering the best possible experience for our readers."
+            + "\n\nPlease join our Telegram group and give us feedback & feature requests. "
+            + "We would love to engage with you!"
+          self?.telegramTextView.text = config.telegramCallToAction ?? telegramDefaultText
+        case .receivedNone, .unknown:
+          break
+        }
+      }
   }
   
   @objc private func createStoryButtonTapped(button: UIButton) {

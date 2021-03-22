@@ -71,25 +71,26 @@ public final class StoryDetailViewController: ASDKViewController<StoryDetailNode
   
   public func refreshData() {
     self.activityView.startAnimating()
-    self.storyManager.findById(storyId: storyId).sinkDisposed(receiveCompletion: nil) { [weak self] story in
-      guard let self = self, let story = story else { return }
-      let user = self.userManager.fetchUser(userId: story.userId)
-      let viewModel = StoryDetailNode.ViewModel.init(
-        storyId: story.storyId,
-        miniUserDetail: .init(
-          userId: story.userId,
-          avatarAsset: user?.avatarAsset?.objectUrl,
-          userName: user?.displayName ?? "User",
-          isFollowing: self.userManager.currentUser?.userId == user?.userId ? nil :
-            user?.userToUser.isFollowing == true
-        ),
-        landscapeAsset: story.landscapeImageAsset?.objectUrl,
-        title: story.title,
-        synopsis: story.synopsis
-      )
-      self.activityView.stopAnimating()
-      self.node.setViewModel(viewModel)
-    }
+    self.storyManager.refreshStoryDetails(storyId: storyId)
+      .sinkDisposed(receiveCompletion: nil) { [weak self] story in
+        guard let self = self, let story = story else { return }
+        let user = self.userManager.fetchUser(userId: story.userId)
+        let viewModel = StoryDetailNode.ViewModel.init(
+          storyId: story.storyId,
+          miniUserDetail: .init(
+            userId: story.userId,
+            avatarAsset: user?.avatarAsset?.objectUrl,
+            userName: user?.displayName ?? "User",
+            isFollowing: self.userManager.currentUser?.userId == user?.userId ? nil :
+              user?.userToUser.isFollowing == true
+          ),
+          landscapeAsset: story.landscapeImageAsset?.objectUrl,
+          title: story.title,
+          synopsis: story.synopsis
+        )
+        self.activityView.stopAnimating()
+        self.node.setViewModel(viewModel)
+      }
   }
   
   @objc private func didSelectMore(barButton: UIBarButtonItem) {
