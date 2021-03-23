@@ -220,23 +220,6 @@ public class FeedViewController: UIViewController {
   private func presentStory(storyId: Int) {
     self.eventManager.sendEvent(RouterRequestEvent.present(.storyDetail(storyId: storyId), viewController: self))
   }
-
-  private func presentStory(model: DataStore) {
-    guard let vc = RKChapterViewController(resolver: resolver, model: model) else { return }
-    let navVC = UINavigationController(rootViewController: vc)
-    navVC.modalPresentationStyle = .fullScreen
-    vc.navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(named: "closeButton")) { [weak self, weak vc] in
-      if let vc = vc {
-        self?.analyticsManager.trackEvent(AnalyticsEvent.didDismissReader, properties: [
-          "story_id": model.story.storyId,
-          "chapter_id": model.selectedChapterId,
-          "message_id": vc.currentMessageId
-        ])
-      }
-      self?.dismiss(animated: true, completion: nil)
-    }
-    present(navVC, animated: true, completion: nil)
-  }
 }
 
 extension FeedViewController: UISearchResultsUpdating {

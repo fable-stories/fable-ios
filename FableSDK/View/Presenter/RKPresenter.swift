@@ -46,20 +46,5 @@ public class RKPresenter {
       .sorted(by: { lhs, rhs in lhs.displayIndex < rhs.displayIndex })
       .filter { $0.text.isNotEmpty }
       .map { $0.hydrate(model: model) }
-
-    refreshData()
-  }
-
-  public func refreshData() {
-    refreshDataStore()
-  }
-  
-  private func refreshDataStore() {
-    dataStoreManager.refreshDataStore(storyId: model.story.storyId)
-      .sinkDisposed(receiveCompletion: nil, receiveValue: { [weak self] (datastore) in
-        guard let dataStore = datastore else { return }
-        self?.model = dataStore
-        self?.onUpdateObserver.send(value: ())
-      })
   }
 }

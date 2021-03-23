@@ -63,6 +63,7 @@ public class MainTabBarViewController: UITabBarController {
   private let resourceManager: ResourceManager
   private let userManager: UserManager
   private let authManager: AuthManager
+  private let storyManager: StoryManager
 
   public init(resolver: FBSDKResolver) {
     self.resolver = resolver
@@ -72,6 +73,7 @@ public class MainTabBarViewController: UITabBarController {
     self.resourceManager = resolver.get()
     self.userManager = resolver.get()
     self.authManager = resolver.get()
+    self.storyManager = resolver.get()
     super.init(nibName: nil, bundle: nil)
   }
 
@@ -304,13 +306,29 @@ public class MainTabBarViewController: UITabBarController {
   }
   
   private func presentStory(storyId: Int, presenter: UIViewController) {
-    if let datastore = dataStoreManager.fetchDataStore(storyId: storyId) {
-      return self.presentStory(model: datastore, presenter: presenter)
-    }
-    dataStoreManager.refreshDataStore(storyId: storyId).sinkDisposed(receiveCompletion: nil) { [weak self] datastore in
-      guard let self = self, let datastore = datastore else { return }
-      self.presentStory(model: datastore, presenter: presenter)
-    }
+    self.storyManager.refreshStoryReader(storyId: storyId)
+      .sinkDisposed(receiveCompletion: nil) { [weak self] storyReader in
+        guard let self = self,
+              let storyReader = storyReader,
+              let selectedChapterId = storyReader.chapters.values.first?.chapterId
+        else { return }
+        let model = DataStore(
+          datastoreId: randomInt(),
+          userId: randomInt(),
+          selectedChapterId: selectedChapterId,
+          story: storyReader.story,
+          categories: nil,
+          chapters: storyReader.chapters,
+          messageGroups: nil,
+          messages: storyReader.messages,
+          modifiers: nil,
+          characters: storyReader.characters,
+          choices: nil,
+          choiceGroups: nil,
+          colorHexStrings: nil
+        )
+        self.presentStory(model: model, presenter: presenter)
+      }
   }
   
   private func presentStory(model: DataStore, presenter: UIViewController) {

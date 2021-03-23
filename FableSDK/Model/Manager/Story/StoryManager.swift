@@ -25,6 +25,7 @@ public protocol StoryManager {
   
   /// Mobile Screens -- need to move somewhere else
   func refreshStoryDetails(storyId: Int) -> AnyPublisher<Story?, Exception>
+  func refreshStoryReader(storyId: Int) -> AnyPublisher<StoryReaderScreen?, Exception>
 }
 
 public class StoryManagerImpl: StoryManager {
@@ -160,8 +161,23 @@ public class StoryManagerImpl: StoryManager {
       return nil
     }.eraseToAnyPublisher()
   }
-}
-
-private struct WireStoryDetailScreen: Codable {
-  public let story: WireStory
+  
+  public func refreshStoryReader(storyId: Int) -> AnyPublisher<StoryReaderScreen?, Exception> {
+    self.networkManager.request(
+      path: "/mobile/story/\(storyId)/reader",
+      method: .get
+    ).map { (wire: WireStoryReaderScreen) in
+      guard let story = MutableStory(wire: wire.story) else { return nil }
+      let chapters = wire.chapters.compactMap(Chapter.init(wire:))
+      let messages = wire.messages.compactMap(MutableMessage.init(wire:))
+      let characters = wire.characters.compactMap(MutableCharacter.init(wire:))
+      let model = StoryReaderScreen(
+        story: story,
+        chapters: chapters.indexed(by: \.chapterId),
+        messages: messages.indexed(by: \.messageId),
+        characters: characters.indexed(by: \.characterId)
+      )
+      return model
+    }.eraseToAnyPublisher()
+  }
 }

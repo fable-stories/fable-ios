@@ -4,7 +4,7 @@
 all:
 	@make build
 
-deploy-beta:
+deploy_beta:
 	bundle exec fastlane beta --env fastlane
 
 prod:
@@ -27,7 +27,7 @@ test:
           test | xcpretty
 
 release:
-	#bundle exec fastlane release --env fastlane
+	bundle exec fastlane release --env fastlane.prod
 
 clean:
 	@make _clean -i
