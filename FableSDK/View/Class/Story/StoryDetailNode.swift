@@ -138,7 +138,7 @@ public final class StoryDetailNode: ASScrollNode {
   @objc private func didSelectStartStory() {
     guard let viewModel = viewModel else { return }
     self.startStoryButton.isSelected = true
-    DispatchQueue.main.asyncAfter(deadline: .now() + 0.4, execute: {
+    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0, execute: {
       self.startStoryButton.isSelected = false
     })
     self.delegate?.storyDetailNode(didSelectStartStory: viewModel.storyId)

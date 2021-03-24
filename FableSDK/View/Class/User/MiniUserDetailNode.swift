@@ -47,7 +47,7 @@ public final class MiniUserDetailNode: ASControlNode {
     node.imageModificationBlock = RoundedCornersModificationBlock(cornerRadius: 44.0 / 4.0)
     node.addTarget(self, action: #selector(didSelectUser), forControlEvents: .touchUpInside)
     node.addShadow()
-    node.image = UIImage(.fableLightGray, size: .sizeWithConstantDimensions(44.0))
+    node.image = UIImage(named: "default_user_avatar")
     node.isHidden = true
     return node
   }
@@ -64,13 +64,13 @@ public final class MiniUserDetailNode: ASControlNode {
   }
   
   public func setViewModel(_ viewModel: ViewModel?) {
-    let avatarPlaceholderImage = UIImage(.fableLightGray, size: .sizeWithConstantDimensions(44.0))
+    let avatarPlaceholderImage = UIImage(named: "user_default")
     self.viewModel = viewModel
     guard let viewModel = viewModel else { return }
     if let url = viewModel.avatarAsset?.url() {
       self.avatarImage.setImage(url: url, placeholderImage: avatarPlaceholderImage)
     } else {
-      self.avatarImage.image = UIImage(.fableLightGray, size: .sizeWithConstantDimensions(44.0))
+      self.avatarImage.image = avatarPlaceholderImage
     }
     self.userNameLabel.attributedText = viewModel.userName
       .mapTo({ $0.isEmpty ? "User" : $0 })

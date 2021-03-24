@@ -246,7 +246,7 @@ public class UserProfileHeaderNode: ASDisplayNode {
   }
   
   public func updateWithViewModel(_ viewModel: ViewModel) {
-    let avatarPlaceholderImage = UIImage(.fableLightGray, size: .sizeWithConstantDimensions(44.0))
+    let avatarPlaceholderImage = UIImage(named: "user_default")
     self.viewModel = viewModel
     if let image = viewModel.avatarAsset?.image() {
       self.avatarImage.image = image
