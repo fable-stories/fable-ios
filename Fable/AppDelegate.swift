@@ -11,6 +11,7 @@ import Foundation
 import AppFoundation
 import FableSDKResolver
 import FableSDKViewControllers
+import FableSDKEnums
 import FableSDKModelObjects
 import FableSDKModelManagers
 import FableSDKResourceManagers
@@ -30,6 +31,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   private let consoleOutputListener = ConsoleOutputListener.shared
   private let resolver = FBSDKResolver()
   private lazy var notificationManager: NotificationManager = resolver.get()
+  private lazy var analyticsManager: AnalyticsManager = resolver.get()
   
   var window: UIWindow?
 
@@ -90,10 +92,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   func applicationDidEnterBackground(_ application: UIApplication) {
     // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
     // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
+    self.analyticsManager.trackEvent(AnalyticsEvent.appDidEnterBackground)
   }
   
   func applicationWillEnterForeground(_ application: UIApplication) {
     // Called as part of the transition from the background to the active state; here you can undo many of the changes made on entering the background.
+    self.analyticsManager.trackEvent(AnalyticsEvent.appDidEnterForeground)
   }
   
   func applicationDidBecomeActive(_ application: UIApplication) {

@@ -20,11 +20,13 @@ public class StoryEditorSettingsViewController: ASDKViewController<StoryEditorSe
   
   private let resolver: FBSDKResolver
   private let eventManager: EventManager
+  private let analyticsManager: AnalyticsManager
   private let modelPresenter: StoryDraftModelPresenter
   
   public init(resolver: FBSDKResolver, modelPresenter: StoryDraftModelPresenter) {
     self.resolver = resolver
     self.eventManager = resolver.get()
+    self.analyticsManager = resolver.get()
     self.modelPresenter = modelPresenter
     super.init(node: .init())
     self.node.delegate = self
@@ -88,10 +90,13 @@ extension StoryEditorSettingsViewController: StoryEditorSettingsNodeDelegate {
       guard let navVC = self.navigationController else { return }
       self.eventManager.sendEvent(RouterRequestEvent.push(.storyEditorDetails(modelPresenter: modelPresenter), navigationController: navVC))
     case .previewStory:
+      self.analyticsManager.trackEvent(AnalyticsEvent.didTapDraftStoryPreview)
       self.presentStoryPreview()
     case .publishStory:
+      self.analyticsManager.trackEvent(AnalyticsEvent.didTapPublishStory)
       self.modelPresenter.updateStory(parameters: UpdateStoryParameters(isPublished: true))
     case .unpublishStory:
+      self.analyticsManager.trackEvent(AnalyticsEvent.didTapUnublishStory)
       self.modelPresenter.updateStory(parameters: UpdateStoryParameters(isPublished: false))
     case .deleteStory:
       let alert = UIAlertController(title: "Are you sure you want to delete this Story?", message: nil, preferredStyle: .alert)

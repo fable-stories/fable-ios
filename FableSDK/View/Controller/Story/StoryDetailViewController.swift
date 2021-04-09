@@ -20,6 +20,7 @@ public final class StoryDetailViewController: ASDKViewController<StoryDetailNode
   private let eventManager: EventManager
   private let authManager: AuthManager
   private let userToStoryManager: UserToStoryManager
+  private let analyticsManager: AnalyticsManager
 
   private let storyId: Int
   
@@ -32,6 +33,7 @@ public final class StoryDetailViewController: ASDKViewController<StoryDetailNode
     self.authManager = resolver.get()
     self.eventManager = resolver.get()
     self.userToStoryManager = resolver.get()
+    self.analyticsManager = resolver.get()
     self.storyId = storyId
     super.init(node: .init())
     self.node.delegate = self
@@ -129,6 +131,9 @@ public final class StoryDetailViewController: ASDKViewController<StoryDetailNode
 
 extension StoryDetailViewController: StoryDetailNodeDelegate {
   public func storyDetailNode(didSelectStartStory storyId: Int) {
+    self.analyticsManager.trackEvent(AnalyticsEvent.didStartStory, properties: [
+      "story_id": storyId
+    ])
     self.eventManager.sendEvent(RouterRequestEvent.present(.story(storyId: storyId), viewController: self))
   }
   

@@ -12,10 +12,7 @@ import FableSDKModelObjects
 import FableSDKModelManagers
 import FirebaseAnalytics
 
-private let firebaseAnalyticsDelegate = FirebaseAnalyticsDelegate()
-
 public class FBSDKResolver: Resolver {
-  
 
   public init() {
     super.init("FBSDKResolver")
@@ -25,7 +22,7 @@ public class FBSDKResolver: Resolver {
       EnvironmentManager(delegate: resolver.get(expect: GlobalContextManager.self))
     }
     register(expect: AnalyticsManager.self) { (resolver: FBSDKResolver) in
-      AnalyticsManagerImpl(networkManager: resolver.get(), delegate: firebaseAnalyticsDelegate)
+      AnalyticsManagerImpl(networkManager: resolver.get())
     }
     register { (resolver: FBSDKResolver) in
       StateManager(environmentManager: resolver.get())
@@ -105,7 +102,7 @@ public class FBSDKResolver: Resolver {
       CharacterManagerImpl(networkManager: resolver.get(), authManager: resolver.get())
     }
     register(expect: FirebaseManager.self) { (resolver: FBSDKResolver) in
-      FirebaseManagerImpl(eventManager: resolver.get(), authManager: resolver.get())
+      FirebaseManagerImpl(eventManager: resolver.get(), authManager: resolver.get(), analyticsManager: resolver.get())
     }
     register(expect: CategoryManager.self) { (resolver: FBSDKResolver) in
       CategoryManagerImpl(networkManager: resolver.get())
@@ -132,19 +129,6 @@ public class FBSDKResolver: Resolver {
     }
     register(expect: NotificationManager.self) { (resolver: FBSDKResolver) in
       NotificationManagerImpl(firebaseManager: resolver.get())
-    }
-  }
-}
-
-public class FirebaseAnalyticsDelegate: AnalyticsManagerDelegate {
-  public func analyticsManager(firebaseTrackEvent event: String, parameters: [String : Any]?) {
-    switch event {
-    case AnalyticsEvent.didLogin.rawValue:
-      Analytics.logEvent(AnalyticsEventLogin, parameters: parameters)
-    case AnalyticsEvent.didSignUp.rawValue:
-      Analytics.logEvent(AnalyticsEventSignUp, parameters: parameters)
-    default:
-      Analytics.logEvent(event, parameters: parameters)
     }
   }
 }

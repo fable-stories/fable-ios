@@ -7,6 +7,7 @@
 
 import AppFoundation
 import AppUIFoundation
+import FableSDKEnums
 import FableSDKResolver
 import FableSDKModelManagers
 import FableSDKModelObjects
@@ -34,6 +35,7 @@ public class CKLandingViewController: UIViewController {
   private let resourceManager: ResourceManager
   private let storyDraftManager: StoryDraftManager
   private let configManager: ConfigManager
+  private let analyticsManager: AnalyticsManager
 
   public init(
     resolver: FBSDKResolver
@@ -46,6 +48,7 @@ public class CKLandingViewController: UIViewController {
     self.resourceManager = resolver.get()
     self.storyDraftManager = resolver.get()
     self.configManager = resolver.get()
+    self.analyticsManager = resolver.get()
     super.init(nibName: nil, bundle: nil)
   }
 
@@ -213,6 +216,7 @@ public class CKLandingViewController: UIViewController {
   
   @objc private func createStoryButtonTapped(button: UIButton) {
     if authManager.isLoggedIn {
+      self.analyticsManager.trackEvent(AnalyticsEvent.didTapNewDraftStory)
       self.eventManager.sendEvent(RouterRequestEvent.present(.storyEditor(.newStory), viewController: self))
     } else {
       self.presentLogin()
@@ -221,6 +225,7 @@ public class CKLandingViewController: UIViewController {
   
   @objc private func continueRecentStoryDraft(button: UIButton) {
     if authManager.isLoggedIn {
+      self.analyticsManager.trackEvent(AnalyticsEvent.didTapContinueDraftStory)
       self.eventManager.sendEvent(RouterRequestEvent.present(.storyEditor(.recentStory), viewController: self))
     } else {
       self.presentLogin()
@@ -233,6 +238,7 @@ public class CKLandingViewController: UIViewController {
   }
   
   @objc private func didTapOnShareCTA() {
+    self.analyticsManager.trackEvent(AnalyticsEvent.didCopyShareLink)
     let shareLink = "https://testflight.apple.com/join/zwgj88F3"
     UIPasteboard.general.string = shareLink
     let alert = UIAlertController(title: "Copied!", message: shareLink, preferredStyle: .alert)

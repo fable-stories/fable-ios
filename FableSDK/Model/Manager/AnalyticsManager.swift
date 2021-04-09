@@ -7,14 +7,13 @@
 
 import Foundation
 import FableSDKEnums
-
-public protocol AnalyticsManagerDelegate: class {
-  func analyticsManager(firebaseTrackEvent event: String, parameters: [String: Any]?)
-}
+import Combine
 
 /// The Analytics Manager should be able to flush, identify, and track events through the use of the Firebase SDK
 
 public protocol AnalyticsManager {
+  var onTrackEvent: PassthroughSubject<(AnalyticsEventIdentifiable, [String: Any]?), Never> { get }
+  
   func flushData()
   func identifyUser(userId: Int)
   func trackEvent(_ event: AnalyticsEventIdentifiable, properties: [String: Any]?)
@@ -30,13 +29,14 @@ public extension AnalyticsManager {
 
 public class AnalyticsManagerImpl: AnalyticsManager {
   private let networkManager: NetworkManager
-  private weak var delegate: AnalyticsManagerDelegate?
-  
+
+  public let onTrackEvent: PassthroughSubject<(AnalyticsEventIdentifiable, [String : Any]?), Never>
+
   private var trackCount: Int = 0
   
-  public init(networkManager: NetworkManager, delegate: AnalyticsManagerDelegate) {
+  public init(networkManager: NetworkManager) {
     self.networkManager = networkManager
-    self.delegate = delegate
+    self.onTrackEvent = PassthroughSubject<(AnalyticsEventIdentifiable, [String : Any]?), Never>()
   }
   
   public func flushData() {
@@ -46,8 +46,8 @@ public class AnalyticsManagerImpl: AnalyticsManager {
   }
   
   public func trackEvent(_ event: AnalyticsEventIdentifiable, properties: [String : Any]?) {
-    self.delegate?.analyticsManager(firebaseTrackEvent: event.rawValue, parameters: properties)
     self.trackCount += 1
+    self.onTrackEvent.send((event, properties))
     print("AnalyticEvent \(self.trackCount): \(event.rawValue)")
   }
 }

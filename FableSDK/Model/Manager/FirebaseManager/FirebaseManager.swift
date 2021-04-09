@@ -4,6 +4,8 @@ import ReactiveSwift
 import ReactiveFoundation
 import FirebaseCore
 import FirebaseCrashlytics
+import FirebaseAnalytics
+import FableSDKEnums
 import GoogleSignIn
 
 private let kEmailKey = "UserSessionFirebaseAdapter.email"
@@ -24,10 +26,16 @@ public protocol FirebaseManager {
 public class FirebaseManagerImpl: FirebaseManager {
   private let eventManager: EventManager
   private let authManager: AuthManager
+  private let analyticsManager: AnalyticsManager
 
-  public init(eventManager: EventManager, authManager: AuthManager) {
+  public init(
+    eventManager: EventManager,
+    authManager: AuthManager,
+    analyticsManager: AnalyticsManager
+  ) {
     self.eventManager = eventManager
     self.authManager = authManager
+    self.analyticsManager = analyticsManager
 
     eventManager.onEvent.sinkDisposed(receiveCompletion: nil) { eventContext in
       switch eventContext {
@@ -41,6 +49,21 @@ public class FirebaseManagerImpl: FirebaseManager {
         break
       }
     }
+    
+    self.analyticsManager.onTrackEvent.eraseToAnyPublisher()
+      .sinkDisposed(receiveCompletion: nil) { (event, parameters) in
+        switch event {
+        case AnalyticsEvent.didLogin:
+          Analytics.logEvent(AnalyticsEventLogin, parameters: parameters)
+        case AnalyticsEvent.didSignUp:
+          Analytics.logEvent(AnalyticsEventSignUp, parameters: parameters)
+        case AnalyticsEvent.appDidEnterForeground:
+          Analytics.logEvent(AnalyticsEventAppOpen, parameters: parameters)
+        case AnalyticsEvent.didCopyShareLink:
+          Analytics.logEvent(AnalyticsEventShare, parameters: parameters)
+        default:
+          Analytics.logEvent(event.rawValue, parameters: parameters)
+        }
+      }
   }
 }
-

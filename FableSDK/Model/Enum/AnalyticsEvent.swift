@@ -57,6 +57,15 @@ public enum AnalyticsEvent: RawRepresentable, AnalyticsEventIdentifiable {
   case emailignInSucceeded
   case emailSignInFailed
   
+  /// Share
+  
+  case didCopyShareLink
+  
+  /// App
+  
+  case appDidEnterForeground
+  case appDidEnterBackground
+    
   case didSelectFeedTab
   case didSelectWriterTab
   case didSelectUserProfileTab
@@ -65,14 +74,29 @@ public enum AnalyticsEvent: RawRepresentable, AnalyticsEventIdentifiable {
   
   case didSelectStoryInFeed
   
+  /// Story Detail Screen
+  case didStartStory
+  
   /// Story Screen
   
   case didTapNextMessageInReader
   case didCompleteStoryInReader
   case didDismissReader
   
+  /// Creator Landing Screen
+  
+  case didTapNewDraftStory
+  case didTapContinueDraftStory
+  case didTapDraftStoryPreview
+  case didTapPublishStory
+  case didTapUnublishStory
+  case didTapDeleteStory
+  
   public var rawValue: String {
     switch self {
+    case .didCopyShareLink: return "did_copy_share_link"
+    case .appDidEnterForeground: return "app_did_enter_foreground"
+    case .appDidEnterBackground: return "app_did_enter_background"
     case .didSignUp: return "user_did_signup"
     case .didLogin: return "user_did_login"
     case .didLogout: return "user_did_logout"
@@ -92,6 +116,13 @@ public enum AnalyticsEvent: RawRepresentable, AnalyticsEventIdentifiable {
     case .didTapNextMessageInReader: return "tapped_next_message_in_reader"
     case .didCompleteStoryInReader: return "completed_story_in_reader"
     case .didDismissReader: return "dismissed_reader"
+    case .didStartStory: return "did_start_story"
+    case .didTapNewDraftStory: return "did_tap_new_draft_story"
+    case .didTapContinueDraftStory: return "did_tap_continue_draft_story"
+    case .didTapDraftStoryPreview: return "did_tap_draft_story_preview"
+    case .didTapPublishStory: return "did_tap_publish_story"
+    case .didTapUnublishStory: return "did_tap_unpublish_story"
+    case .didTapDeleteStory: return "did_tap_delete_story"
     }
   }
   
