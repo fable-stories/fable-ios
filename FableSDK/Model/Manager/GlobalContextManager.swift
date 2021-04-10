@@ -50,6 +50,14 @@ public class GlobalContextManager {
 
     RemoteLogger.shared.addUserInfo("ENVIRONMENT", value: self.currentGlobalContext.environment.rawValue)
     RemoteLogger.shared.addUserInfo("APPLICATION_METADATA", value: ApplicationMetadata.source().rawValue)
+    
+    /// Always reset both AppStore and TestFlight builds to `prod` for now
+    switch ApplicationMetadata.source() {
+    case .appStore, .testFlight:
+      self.setEnvironment(.prod)
+    case .adHoc, .simulator:
+      break
+    }
   }
 
   public func setEnvironment(_ environment: Environment) {

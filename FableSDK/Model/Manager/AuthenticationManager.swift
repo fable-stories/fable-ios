@@ -138,8 +138,8 @@ public class AuthManagerImpl: NSObject, AuthManager {
     )
     .mapError { .networkError($0) }
     .materializeResults()
-    .flatMap(.latest) { [weak self] in
-      self?.processResult($0) ?? .empty
+    .flatMap(.latest) { [weak self] result in
+      self?.processResult(result) ?? .empty
     }
     .on(failed: { [weak self] error in
       self?.eventManager.sendEvent(AuthManagerEvent.didFailWithError(error))
@@ -209,6 +209,7 @@ public class AuthManagerImpl: NSObject, AuthManager {
     case let .failure(error):
       // Authentication screen closing with err, allow further login attempt
       self.isAuthenticatingObserver.send(value: false)
+      self.analyticsManager.trackEvent(AnalyticsEvent.loginDidFail, properties: ["error": error.localizedDescription])
       return SignalProducer<Int, SignInError>(error: error)
       
     case let .success(wire):

@@ -234,6 +234,7 @@ public class CKLandingViewController: UIViewController {
   
   @objc private func didTapOnTelegramCTA() {
     guard let url = URL(string: "https://t.me/fablestories") else { return }
+    self.analyticsManager.trackEvent(AnalyticsEvent.didTapTelegramLink)
     UIApplication.shared.open(url)
   }
   

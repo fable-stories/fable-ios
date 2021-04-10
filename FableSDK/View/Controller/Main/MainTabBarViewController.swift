@@ -307,7 +307,14 @@ public class MainTabBarViewController: UITabBarController {
   
   private func presentStory(storyId: Int, presenter: UIViewController) {
     self.storyManager.refreshStoryReader(storyId: storyId)
-      .sinkDisposed(receiveCompletion: nil) { [weak self] storyReader in
+      .sinkDisposed(receiveCompletion: { completion in
+        switch completion {
+        case let .failure(error):
+          presenter.presentAlert(error: error)
+        case .finished:
+          break
+        }
+      }) { [weak self] storyReader in
         guard let self = self,
               let storyReader = storyReader,
               let selectedChapterId = storyReader.chapters.values.first?.chapterId

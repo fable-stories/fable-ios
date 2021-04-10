@@ -21,8 +21,8 @@ extension UIViewController {
   public func presentAlert(error: Error?, onComplete: VoidClosure? = nil) {
     guard let error = error else { return }
     presentAlert(
-      title: (error as? LocalizedError)?.failureReason ?? "Error",
-      body: (error as? LocalizedError)?.errorDescription ?? error.localizedDescription,
+      title: (error as? Exception)?.failureReason ?? "Error",
+      body: (error as? Exception)?.description ?? error.localizedDescription,
       onComplete: onComplete
     )
   }

@@ -45,6 +45,7 @@ public enum AnalyticsEvent: RawRepresentable, AnalyticsEventIdentifiable {
   case didSignUp
   case didLogin
   case didLogout
+  case loginDidFail
   
   case didSelectGoogleSignIn
   case didSelectAppleSignIn
@@ -75,6 +76,7 @@ public enum AnalyticsEvent: RawRepresentable, AnalyticsEventIdentifiable {
   case didSelectStoryInFeed
   
   /// Story Detail Screen
+  
   case didStartStory
   
   /// Story Screen
@@ -92,6 +94,10 @@ public enum AnalyticsEvent: RawRepresentable, AnalyticsEventIdentifiable {
   case didTapUnublishStory
   case didTapDeleteStory
   
+  /// Telegram
+  
+  case didTapTelegramLink
+  
   public var rawValue: String {
     switch self {
     case .didCopyShareLink: return "did_copy_share_link"
@@ -100,6 +106,7 @@ public enum AnalyticsEvent: RawRepresentable, AnalyticsEventIdentifiable {
     case .didSignUp: return "user_did_signup"
     case .didLogin: return "user_did_login"
     case .didLogout: return "user_did_logout"
+    case .loginDidFail: return "login_did_fail"
     case .didSelectGoogleSignIn: return "selected_google_sign_in"
     case .didSelectAppleSignIn: return "selected_apple_sign_in"
     case .didSelectEmailsignIn: return "selected_email_sign_in"
@@ -123,6 +130,7 @@ public enum AnalyticsEvent: RawRepresentable, AnalyticsEventIdentifiable {
     case .didTapPublishStory: return "did_tap_publish_story"
     case .didTapUnublishStory: return "did_tap_unpublish_story"
     case .didTapDeleteStory: return "did_tap_delete_story"
+    case .didTapTelegramLink: return "did_tap_telegram_link"
     }
   }
   

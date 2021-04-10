@@ -234,6 +234,7 @@ public final class NetworkCoreV2 {
             logger.enqueue("could not parse response JSON", logLevel: .error)
           }
           let json = try jsonDecoder.decode(T.self, from: data)
+          logger.enqueue(json.prettyJSONString, logLevel: .info)
           callback(.success(json))
         }
       } catch let error {

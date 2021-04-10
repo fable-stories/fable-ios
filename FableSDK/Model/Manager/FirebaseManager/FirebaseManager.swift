@@ -40,11 +40,13 @@ public class FirebaseManagerImpl: FirebaseManager {
     eventManager.onEvent.sinkDisposed(receiveCompletion: nil) { eventContext in
       switch eventContext {
       case AuthManagerEvent.userDidSignIn:
-        if let userId = authManager.authenticatedUserId {
-          Crashlytics.crashlytics().setUserID("\(userId)")
+        if let userId = authManager.authenticatedUserId?.toString() {
+          Crashlytics.crashlytics().setUserID(userId)
+          Analytics.setUserID(userId)
         }
       case AuthManagerEvent.userDidSignOut:
         Crashlytics.crashlytics().setUserID("")
+          Analytics.setUserID(nil)
       default:
         break
       }

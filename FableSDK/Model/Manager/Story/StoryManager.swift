@@ -154,8 +154,11 @@ public class StoryManagerImpl: StoryManager {
     self.networkManager.request(
       path: "/mobile/story/\(storyId)/profile",
       method: .get
-    ).map { (wire: WireStoryDetailScreen) in
+    ).map { [weak self] (wire: WireStoryDetailScreen) in
       if let story = MutableStory(wire: wire.story) {
+        if let user = wire.story.user.flatMap(User.init(wire:)) {
+          self?.userManager.cacheUser(user: user)
+        }
         return story
       }
       return nil

@@ -13,8 +13,8 @@ public enum Environment: Codable, RawRepresentable, Equatable {
       return Environment(rawValue: envString)
     }
     switch ApplicationMetadata.source() {
-    case .appStore: return .prod
-    case .adHoc, .testFlight: return .dev
+    case .appStore, .testFlight: return .prod
+    case .adHoc: return .dev
     case .simulator: return .local
     }
   }

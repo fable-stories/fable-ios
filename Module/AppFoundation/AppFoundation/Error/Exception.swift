@@ -7,8 +7,11 @@
 
 import Foundation
 
-public struct Exception: LocalizedError, Equatable {
+public struct Exception: LocalizedError, Equatable, CustomStringConvertible {
   public let errorDescription: String
+  public var description: String {
+    errorDescription
+  }
   public init(_ errorDescription: String = "", file: String = #file, function: String = #function, line: Int = #line) {
     // let trace = "\(file)_\(function)_\(line)"
     self.errorDescription = "\(errorDescription)"

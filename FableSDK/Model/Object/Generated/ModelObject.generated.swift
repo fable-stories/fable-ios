@@ -972,9 +972,9 @@ public class MutableStory: Story {
     self.isPublished = story.isPublished
     self.landscapeImageAssetId = story.landscapeImageAssetId
     self.landscapeImageAsset = story.landscapeImageAsset
-    self.portraitImageAssetId = story.portraitImageAssetId
     self.squareImageAssetId = story.squareImageAssetId
     self.squareImageAsset = story.squareImageAsset
+    self.portraitImageAssetId = story.portraitImageAssetId
     self.portraitImageAsset = story.portraitImageAsset
     self.stats = story.stats
   }
