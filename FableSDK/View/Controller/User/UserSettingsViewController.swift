@@ -37,6 +37,7 @@ public class UserSettingsViewController: UITableViewController {
   private let stateManager: StateManager
   private let envManager: EnvironmentManager
   private let userManager: UserManager
+  private let configManager: ConfigManager
 
   public weak var delegate: UserSettingsViewControllerDelegate?
 
@@ -48,6 +49,7 @@ public class UserSettingsViewController: UITableViewController {
     self.envManager = resolver.get()
     self.stateManager = resolver.get()
     self.userManager = resolver.get()
+    self.configManager = resolver.get()
     super.init(nibName: nil, bundle: nil)
   }
 
@@ -158,10 +160,12 @@ public class UserSettingsViewController: UITableViewController {
   }
 
   private func update() {
-    let state = stateManager.state()
+    let config = self.configManager.config.value
 
     let canShowAdminMenu: Bool = {
-      if let email = state.currentUser?.email, let admins = state.config?.admins, admins.contains(email) {
+      if let email = userManager.currentUser?.email,
+         let admins = config?.admins,
+         admins.contains(email) {
         return true
       }
       return false

@@ -24,6 +24,7 @@ public protocol ConfigManager {
   func refreshConfig()
   func refreshConfigV2() -> AnyPublisher<Config?, Exception>
   
+  var config: CurrentValueSubject<Config?, Exception> { get }
   var initialLaunchConfig: CurrentValueSubject<LaunchConfigState, Exception> { get }
 }
 
@@ -46,6 +47,7 @@ public class ConfigManagerImpl: ConfigManager {
   private let environmentManager: EnvironmentManager
   private let eventManager: EventManager
 
+  public let config: CurrentValueSubject<Config?, Exception>
   public let initialLaunchConfig: CurrentValueSubject<LaunchConfigState, Exception>
 
   public init(
@@ -60,6 +62,7 @@ public class ConfigManagerImpl: ConfigManager {
     self.environmentManager = environmentManager
     self.stateManager = stateManager
     self.eventManager = eventManager
+    self.config = CurrentValueSubject<Config?, Exception>(nil)
     self.initialLaunchConfig = CurrentValueSubject<LaunchConfigState, Exception>(.unknown)
   }
 
@@ -73,6 +76,7 @@ public class ConfigManagerImpl: ConfigManager {
         if self.initialLaunchConfig.value == .unknown {
           self.initialLaunchConfig.value = .received(config)
         }
+        self.config.value = config
         return config
       }
       if self.initialLaunchConfig.value == .unknown {
@@ -93,6 +97,7 @@ public class ConfigManagerImpl: ConfigManager {
       guard let self = self, let wire = wire else { return }
       self.stateManager.modifyState { state in
         if let config = Config(wire: wire) {
+          self.config.value = config
           state.config = config
         }
       }
