@@ -93,6 +93,7 @@ public enum AnalyticsEvent: RawRepresentable, AnalyticsEventIdentifiable {
   case didTapPublishStory
   case didTapUnublishStory
   case didTapDeleteStory
+  case didTapDraftStoryDetails
   
   /// Telegram
   
@@ -127,6 +128,7 @@ public enum AnalyticsEvent: RawRepresentable, AnalyticsEventIdentifiable {
     case .didTapNewDraftStory: return "did_tap_new_draft_story"
     case .didTapContinueDraftStory: return "did_tap_continue_draft_story"
     case .didTapDraftStoryPreview: return "did_tap_draft_story_preview"
+    case .didTapDraftStoryDetails: return "did_tap_draft_story_details"
     case .didTapPublishStory: return "did_tap_publish_story"
     case .didTapUnublishStory: return "did_tap_unpublish_story"
     case .didTapDeleteStory: return "did_tap_delete_story"

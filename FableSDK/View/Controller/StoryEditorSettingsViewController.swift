@@ -88,6 +88,7 @@ extension StoryEditorSettingsViewController: StoryEditorSettingsNodeDelegate {
     switch option {
     case .showDetails:
       guard let navVC = self.navigationController else { return }
+      self.analyticsManager.trackEvent(AnalyticsEvent.didTapDraftStoryDetails)
       self.eventManager.sendEvent(RouterRequestEvent.push(.storyEditorDetails(modelPresenter: modelPresenter), navigationController: navVC))
     case .previewStory:
       self.analyticsManager.trackEvent(AnalyticsEvent.didTapDraftStoryPreview)
@@ -99,10 +100,18 @@ extension StoryEditorSettingsViewController: StoryEditorSettingsNodeDelegate {
       self.analyticsManager.trackEvent(AnalyticsEvent.didTapUnublishStory)
       self.modelPresenter.updateStory(parameters: UpdateStoryParameters(isPublished: false))
     case .deleteStory:
+      self.analyticsManager.trackEvent(AnalyticsEvent.didTapDeleteStory)
       let alert = UIAlertController(title: "Are you sure you want to delete this Story?", message: nil, preferredStyle: .alert)
       alert.addAction(UIAlertAction(title: "No", style: .destructive, handler: nil))
       alert.addAction(UIAlertAction(title: "Yes", style: .default, handler: { [weak self] _ in
-        self?.modelPresenter.deleteStory()
+        self?.modelPresenter.deleteStory().sinkDisposed(receiveCompletion: { [weak self] (completion) in
+          switch completion {
+          case let .failure(error):
+            self?.presentAlert(error: error)
+          case .finished:
+            break
+          }
+        }, receiveValue: nil)
       }))
       self.present(alert, animated: true, completion: nil)
     }

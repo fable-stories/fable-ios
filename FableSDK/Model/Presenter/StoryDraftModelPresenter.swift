@@ -29,7 +29,7 @@ public protocol StoryDraftModelPresenter {
   func updateStory(parameters: UpdateStoryParameters)
   func uploadPortraitAssetForStory(data: Data)
   func uploadLandscapeAssetForStory(data: Data)
-  func deleteStory()
+  func deleteStory() -> AnyPublisher<Void, Exception> 
 
   /// Messages
   
@@ -200,9 +200,9 @@ private class StoryDraftModelPresenterImpl: StoryDraftModelPresenter {
     }
   }
   
-  func deleteStory() {
-    guard let storyId = fetchModel()?.fetchStory().storyId else { return }
-    self.storyManager.deleteStory(storyId: storyId).sinkDisposed(receiveCompletion: nil) { [weak self] in
+  func deleteStory() -> AnyPublisher<Void, Exception> {
+    guard let storyId = fetchModel()?.fetchStory().storyId else { return .singleValue(()) }
+    return self.storyManager.deleteStory(storyId: storyId).alsoOnValue { [weak self] in
       self?.eventManager.sendEvent(StoryDraftModelPresenterEvent.didDeleteStory(storyId: storyId))
     }
   }
