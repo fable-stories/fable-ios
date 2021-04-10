@@ -50,5 +50,6 @@ public struct EnvironmentManager {
   
   public func setEnvironment(_ environment: Environment) {
     self.delegate?.environmentManager(setEnvironment: environment)
+    exit(0)
   }
 }
