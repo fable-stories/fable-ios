@@ -35,6 +35,7 @@ public protocol AuthManager {
   var isLoggedIn: Bool { get }
   var authenticatedUserId: Int? { get }
 
+  func configure()
   func authenticate(email: String, password: String) -> SignalProducer<Int, SignInError>
   func authenticateWithGoogle(idToken: String) -> SignalProducer<Int, SignInError>
   func authenticateWithApple()
@@ -86,6 +87,18 @@ public class AuthManagerImpl: NSObject, AuthManager {
     (self.isAuthenticating, self.isAuthenticatingObserver) = Signal<Bool, Exception>.pipe()
     super.init()
 
+    self.eventManager.onEvent.sinkDisposed(receiveCompletion: nil) { [weak self] (event) in
+      /// Sign out on an Auth error event
+      switch event {
+      case AuthManagerEvent.didFailWithError:
+        self?.signOut()
+      default:
+        break
+      }
+    }
+  }
+  
+  public func configure() {
     /// Local development tooling
     if let userId = envInt("user_id"), let accessToken = envString("access_token") {
       self.setAuthState(AuthState(userId: userId, accessToken: accessToken))
@@ -96,16 +109,6 @@ public class AuthManagerImpl: NSObject, AuthManager {
       self.eventManager.sendEvent(AuthManagerEvent.userDidSignIn)
       self.analyticsManager.trackEvent(AnalyticsEvent.didLogin)
       self.setAuthState(authState)
-    }
-    
-    self.eventManager.onEvent.sinkDisposed(receiveCompletion: nil) { [weak self] (event) in
-      /// Sign out on an Auth error event
-      switch event {
-      case AuthManagerEvent.didFailWithError:
-        self?.signOut()
-      default:
-        break
-      }
     }
   }
 

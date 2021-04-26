@@ -52,7 +52,7 @@ public class FirebaseManagerImpl: FirebaseManager {
         break
       }
     }
-    
+
     self.analyticsManager.onTrackEvent.eraseToAnyPublisher()
       .sinkDisposed(receiveCompletion: nil) { (event, parameters) in
         switch event {
@@ -64,12 +64,16 @@ public class FirebaseManagerImpl: FirebaseManager {
           Analytics.logEvent(AnalyticsEventAppOpen, parameters: parameters)
         case AnalyticsEvent.didCopyShareLink:
           Analytics.logEvent(AnalyticsEventShare, parameters: parameters)
+        case AnalyticsEvent.didStartTutorial:
+          Analytics.logEvent(AnalyticsEventTutorialBegin, parameters: parameters)
+        case AnalyticsEvent.didEndTutorial:
+          Analytics.logEvent(AnalyticsEventTutorialComplete, parameters: parameters)
         default:
           Analytics.logEvent(event.rawValue, parameters: parameters)
         }
       }
   }
-  
+
   public func configure() {
     if let userId = authManager.authenticatedUserId {
       self.setUserId(userId)

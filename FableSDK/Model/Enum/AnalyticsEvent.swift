@@ -58,6 +58,11 @@ public enum AnalyticsEvent: RawRepresentable, AnalyticsEventIdentifiable {
   case emailignInSucceeded
   case emailSignInFailed
   
+  /// Onboarding
+  
+  case didStartTutorial
+  case didEndTutorial
+
   /// Share
   
   case didCopyShareLink
@@ -101,6 +106,8 @@ public enum AnalyticsEvent: RawRepresentable, AnalyticsEventIdentifiable {
   
   public var rawValue: String {
     switch self {
+    case .didStartTutorial: return "did_start_tutorial"
+    case .didEndTutorial: return "did_end_tutorial"
     case .didCopyShareLink: return "did_copy_share_link"
     case .appDidEnterForeground: return "app_did_enter_foreground"
     case .appDidEnterBackground: return "app_did_enter_background"

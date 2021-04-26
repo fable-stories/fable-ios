@@ -8,6 +8,7 @@
 import AppFoundation
 import AppUIFoundation
 import FableSDKResolver
+import FableSDKEnums
 import FableSDKModelObjects
 import FableSDKModelManagers
 import FableSDKViews
@@ -38,6 +39,7 @@ public class UserSettingsViewController: UITableViewController {
   private let envManager: EnvironmentManager
   private let userManager: UserManager
   private let configManager: ConfigManager
+  private let analyticsManager: AnalyticsManager
 
   public weak var delegate: UserSettingsViewControllerDelegate?
 
@@ -50,6 +52,7 @@ public class UserSettingsViewController: UITableViewController {
     self.stateManager = resolver.get()
     self.userManager = resolver.get()
     self.configManager = resolver.get()
+    self.analyticsManager = resolver.get()
     super.init(nibName: nil, bundle: nil)
   }
 
@@ -86,8 +89,10 @@ public class UserSettingsViewController: UITableViewController {
   }
 
   private func presentOnboarding() {
+    self.analyticsManager.trackEvent(AnalyticsEvent.didStartTutorial)
     let vc = OnboardViewController(resolver: resolver)
     navigationController?.present(vc.wrapInNavigationController { [weak self] in
+      self?.analyticsManager.trackEvent(AnalyticsEvent.didEndTutorial)
       self?.dismiss(animated: true, completion: nil)
     }, animated: true, completion: nil)
   }

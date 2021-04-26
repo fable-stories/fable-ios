@@ -126,7 +126,9 @@
       ],
       "scheme" : {
         "commandLineArguments" : {
-          "-FIRAnalyticsDebugEnabled" : "YES"
+          "-_UIConstraintBasedLayoutLogUnsatisfiable NO" : true,
+          "-FIRAnalyticsDebugEnabled" : false,
+          "-FIRDebugEnabled" : false
         },
         "environmentVariables" : {
           "ALLOWABLE_LOG_LEVELS" : "info,error",
