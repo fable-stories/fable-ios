@@ -11,16 +11,19 @@ import GoogleSignIn
 private let kEmailKey = "UserSessionFirebaseAdapter.email"
 private let kPasswordKey = "UserSessionFirebaseAdapter.password"
 
-public func configureFirebaseManager() {
-  let environment: String = Environment.sourceEnvironment() == .prod ? "Prod" : "Dev"
-  guard let filePath = Bundle.main.path(forResource: "GoogleService-Info-\(environment)", ofType: "plist"),
-        let options = FirebaseOptions(contentsOfFile: filePath)
-  else { fatalError("Unable to initialize Firebase") }
-  FirebaseApp.configure(options: options)
-  GIDSignIn.sharedInstance().clientID = FirebaseApp.app()?.options.clientID
+public class FirebaseSDK {
+  static public func configure() {
+    let environment: String = Environment.sourceEnvironment() == .prod ? "Prod" : "Dev"
+    guard let filePath = Bundle.main.path(forResource: "GoogleService-Info-\(environment)", ofType: "plist"),
+          let options = FirebaseOptions(contentsOfFile: filePath)
+    else { fatalError("Unable to initialize Firebase") }
+    FirebaseApp.configure(options: options)
+    GIDSignIn.sharedInstance().clientID = FirebaseApp.app()?.options.clientID
+  }
 }
 
 public protocol FirebaseManager {
+  func configure()
 }
 
 public class FirebaseManagerImpl: FirebaseManager {
@@ -40,13 +43,11 @@ public class FirebaseManagerImpl: FirebaseManager {
     eventManager.onEvent.sinkDisposed(receiveCompletion: nil) { eventContext in
       switch eventContext {
       case AuthManagerEvent.userDidSignIn:
-        if let userId = authManager.authenticatedUserId?.toString() {
-          Crashlytics.crashlytics().setUserID(userId)
-          Analytics.setUserID(userId)
+        if let userId = authManager.authenticatedUserId {
+          self.setUserId(userId)
         }
       case AuthManagerEvent.userDidSignOut:
-        Crashlytics.crashlytics().setUserID("")
-          Analytics.setUserID(nil)
+        self.setUserId(nil)
       default:
         break
       }
@@ -67,5 +68,23 @@ public class FirebaseManagerImpl: FirebaseManager {
           Analytics.logEvent(event.rawValue, parameters: parameters)
         }
       }
+  }
+  
+  public func configure() {
+    if let userId = authManager.authenticatedUserId {
+      self.setUserId(userId)
+    } else {
+      self.setUserId(nil)
+    }
+  }
+  
+  private func setUserId(_ userId: Int?) {
+    if let userId = userId?.toString() {
+      Crashlytics.crashlytics().setUserID(userId)
+      Analytics.setUserID(userId)
+    } else {
+      Crashlytics.crashlytics().setUserID("")
+      Analytics.setUserID(nil)
+    }
   }
 }

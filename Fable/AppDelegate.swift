@@ -32,22 +32,24 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   private let resolver = FBSDKResolver()
   private lazy var notificationManager: NotificationManager = resolver.get()
   private lazy var analyticsManager: AnalyticsManager = resolver.get()
+  private lazy var firebaseManager: FirebaseManager = resolver.get()
+  private lazy var configManager: ConfigManager = resolver.get()
   
   var window: UIWindow?
 
   func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
     if isLaunchedFromUnitTest { return true }
-    
-    let configManager: ConfigManager = resolver.get()
-    configManager.refreshConfigV2().sinkDisposed()
-    
-    consoleOutputListener.openConsolePipe()
 
-    configureFirebaseManager()
-    configureNavigationBar()
-    configureLaunchViewController()
+    self.configManager.refreshConfigV2().sinkDisposed()
+    self.consoleOutputListener.openConsolePipe()
 
-    configManager.initialLaunchConfig.eraseToAnyPublisher().sinkDisposed(receiveCompletion: { completion in
+    FirebaseSDK.configure()
+    self.firebaseManager.configure()
+    
+    self.configureNavigationBar()
+    self.configureLaunchViewController()
+
+    self.configManager.initialLaunchConfig.eraseToAnyPublisher().sinkDisposed(receiveCompletion: { completion in
       switch completion {
       case let .failure(error):
         print(error)
