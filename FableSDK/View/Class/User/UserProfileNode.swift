@@ -24,6 +24,7 @@ public protocol UserProfileNodeDelegate: class {
   func userProfileNode(didSelectFollowingCount node: UserProfileNode)
   func userProfileNode(didTapFollowButton followButton: FBSDKFollowButton, node: UserProfileNode, userId: Int, isFollowing: Bool)
   func userProfileNode(didTapBackgroundImage node: UserProfileNode)
+  func userProfileNode(didPullToRefresh node: UserProfileNode)
 }
 
 public class UserProfileNode: ASDisplayNode {
@@ -102,9 +103,7 @@ public class UserProfileNode: ASDisplayNode {
   public var sections: [Section] = [] {
     didSet {
       ASPerformBlockOnMainThread {
-        self.animationNode.isHidden = self.sections.isNotEmpty
-        self.tableNode.isHidden = self.sections.isEmpty
-        self.tableNode.reloadData()
+        self.reloadData()
       }
     }
   }
@@ -115,6 +114,10 @@ public class UserProfileNode: ASDisplayNode {
 
   public weak var delegate: UserProfileNodeDelegate?
   
+  public private(set) lazy var pullToRefresh: UIRefreshControl = .new {
+    $0.addTarget(self, action: #selector(didPullToRefresh(refreshControl:)), for: .valueChanged)
+  }
+  
   private lazy var tableNode: ASTableNode = .new {
     let node = ASTableNode(style: .plain)
     node.delegate = self
@@ -122,6 +125,7 @@ public class UserProfileNode: ASDisplayNode {
     ASPerformBlockOnMainThread {
       node.view.showsVerticalScrollIndicator = false
       node.view.separatorStyle = .none
+      node.view.refreshControl = self.pullToRefresh
     }
     return node
   }
@@ -153,6 +157,9 @@ public class UserProfileNode: ASDisplayNode {
   }
 
   public func reloadData() {
+    self.pullToRefresh.endRefreshing()
+    self.animationNode.isHidden = self.sections.isNotEmpty
+    self.tableNode.isHidden = self.sections.isEmpty
     self.tableNode.reloadData()
   }
 
@@ -175,6 +182,10 @@ public class UserProfileNode: ASDisplayNode {
   
   @objc private func tapBackgroundImage() {
     self.delegate?.userProfileNode(didTapBackgroundImage: self)
+  }
+  
+  @objc private func didPullToRefresh(refreshControl: UIRefreshControl) {
+    self.delegate?.userProfileNode(didPullToRefresh: self)
   }
   
   public func setIsMyUser(_ isMyUser: Bool) {

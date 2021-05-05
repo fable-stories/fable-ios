@@ -127,6 +127,7 @@ extension StoryCollectionNode: ASCollectionDelegate, ASCollectionDataSource {
     
     public func updateView() {
       guard let viewModel = viewModel else { return }
+      let placeholderImage = UIImage(named: "fable_story_placeholder_white")
       if let portraitAsset = viewModel.portraitAsset {
         if let image = portraitAsset.image() {
           self.backgroundImage.image = image
@@ -134,7 +135,7 @@ extension StoryCollectionNode: ASCollectionDelegate, ASCollectionDataSource {
           self.backgroundImage.url = url
         }
       } else {
-        self.backgroundImage.image = UIImage(.fableLightGray, size: StoryItemNode.defaultSize)
+        self.backgroundImage.image = placeholderImage
       }
       self.titleLabel.attributedText = viewModel.title.toAttributedString([
         .font: UIFont.systemFont(ofSize: 14.0, weight: .bold),

@@ -94,6 +94,7 @@ private class StoryDraftModelPresenterImpl: StoryDraftModelPresenter {
       storyDraftManager.createStoryDraft()
         .sinkDisposed(receiveCompletion: nil) { [weak self] storyDraft in
           guard let storyDraft = storyDraft else { return }
+          self?.eventManager.sendEvent(StoryDraftModelPresenterEvent.didCreateStory(storyId: storyDraft.storyId))
           self?.loadInitialData(storyDraft: storyDraft)
         }
     case .recentStory:

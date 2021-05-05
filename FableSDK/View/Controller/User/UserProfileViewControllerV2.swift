@@ -109,6 +109,7 @@ public class UserProfileViewControllerV2: ASDKViewController<UserProfileNode> {
       case AuthManagerEvent.userDidSignIn, AuthManagerEvent.userDidSignOut,
            StoryDraftModelPresenterEvent.didDeleteStory,
            StoryDraftModelPresenterEvent.didUpdateStory,
+           StoryDraftModelPresenterEvent.didCreateStory,
            UserManagerEvent.didSetFollowStatus,
            WriterDashboardEvent.didStartNewStory:
         self?.refreshData()
@@ -129,6 +130,7 @@ public class UserProfileViewControllerV2: ASDKViewController<UserProfileNode> {
     self.activityView.startAnimating()
 
     self.presenter.refreshData(userId: userId).sinkDisposed(receiveCompletion: { [weak self] completion in
+      self?.node.pullToRefresh.endRefreshing()
       self?.activityView.stopAnimating()
     }) { [weak self] (viewModel) in
       guard let self = self, let viewModel = viewModel else { return }
@@ -217,6 +219,10 @@ public class UserProfileViewControllerV2: ASDKViewController<UserProfileNode> {
 }
 
 extension UserProfileViewControllerV2: UserProfileNodeDelegate {
+  public func userProfileNode(didPullToRefresh node: UserProfileNode) {
+    self.refreshData()
+  }
+  
   public func userProfileNode(didSelectStory storyId: Int) {
     if self.isMyUser {
       self.presentStoryEditor(storyId: storyId)

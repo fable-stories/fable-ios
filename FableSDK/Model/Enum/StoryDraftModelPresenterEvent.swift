@@ -10,35 +10,6 @@ import FableSDKFoundation
 import AppFoundation
 
 public enum StoryDraftModelPresenterEvent: EventContext, Equatable {
-//  public var debugDescription: String {
-//    switch self {
-//    case .didDeleteStory(let storyId):
-//      return "didDeleteStory \(storyId)"
-//    case .didInsertCharacter(let characterId):
-//      return "didInsertCharacter \(characterId)"
-//    case .didInsertMessage(let messageId):
-//      return "didInsertMessage \(messageId)"
-//    case .didLoadInitialData:
-//      return "didLoadInitialData \(characterId)"
-//    case .didReceiveError(let error):
-//      return "didReceiveError \(characterId)"
-//    case .didRefreshCharacters:
-//      return "didRefreshCharacters \(characterId)"
-//    case .didRemoveCharacter(let characterId):
-//      return "didRemoveCharacter \(characterId)"
-//    case .didRemoveMessage(let messageId):
-//      return "didRemoveMessage \(characterId)"
-//    case .didRemoveCharacter(let characterId):
-//      return "didRemoveCharacter \(characterId)"
-//    case let .didSetCharacter(messageId, characterId):
-//      return "didSetCharacter \(characterId)"
-//    case .didSetEditMode(let editMode):
-//      return "didSetEditMode \(characterId)"
-//    case .didUpdateCharacter(let characterId):
-//      return "didUpdateCharacter \(characterId)"
-//    case .didUpdateStory(let storyId):
-//    }
-//  }
   
   case didLoadInitialData
   case didRefreshCharacters
@@ -49,6 +20,7 @@ public enum StoryDraftModelPresenterEvent: EventContext, Equatable {
   
   case didUpdateStory(storyId: Int)
   case didDeleteStory(storyId: Int)
+  case didCreateStory(storyId: Int)
 
   /// Messages
   
